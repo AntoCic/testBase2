@@ -1,10 +1,24 @@
-// .ms_container-lg{
-//   margin: 0 auto;
-//   max-width: 1809px;
-//   padding: 0 12px;
-// }
-// .ms_container-md{
-//   margin: 0 auto;
-//   max-width: 1344px;
-//   padding: 0 12px;
-// }
+@use './variables' as *;
+body {
+    min-height: 100vh;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: $bg-color;
+    color: $text-color;
+}
+
+header {
+    flex-shrink: 0;
+}
+
+main {
+    flex-grow: 1;
+}
+
+footer {
+    flex-shrink: 0;
+}

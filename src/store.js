@@ -4,6 +4,14 @@ import axios from "axios";
 // Item.configure();
 
 export const store = reactive({
+
+    appVersion: __APP_VERSION__,
+    appName: __APP_NAME__,
+    appShortName: __APP_SHORT_NAME__,
+    appDescription: __APP_DESCRIPTION__,
+    bkColor: __APP_BACKGROUND_COLOR__,
+    logoPath: __APP_LOGO__,
+
     userJWT: null,
 
     async start() {
@@ -18,6 +26,13 @@ export const store = reactive({
                 console.error(error);
                 return false;
             });
+            console.log(this.appVersion);
+            console.log(this.appName);
+            console.log(this.appShortName);
+            console.log(this.appDescription);
+            console.log(this.bkColor);
+            console.log(this.logoPath);
+            
         this.loading.off();
         // INSERISCI QUA CARICAMENTI DATI PUBLICI
         return

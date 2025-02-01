@@ -1,31 +1,27 @@
+<!-- App.vue -->
 <template>
-  <CmpLoading v-if="store.loading.state || user.accessToken === null" />
+  <CmpLoading v-if="$loading.state || user.accessToken === null" />
 
   <template v-if="user.accessToken !== null">
     <AppHeader />
-
     <main class="d-flex">
       <RouterView />
     </main>
-
     <AppFooter />
   </template>
   <p v-else>.</p>
-
 </template>
 
 <script>
-import { store } from './store.js';
 import { user } from './user.js';
 import { routes } from './router.js';
-import AppHeader from './components/layout/AppHeader.vue'
-import AppFooter from './components/layout/AppFooter.vue'
+import AppHeader from './layout/AppHeader.vue'
+import AppFooter from './layout/AppFooter.vue'
 import CmpLoading from './components/CmpLoading.vue'
 export default {
   components: { AppHeader, AppFooter, CmpLoading },
   data() {
     return {
-      store,
       user,
       routes,
     }
@@ -33,11 +29,11 @@ export default {
   watch: {
     'user.accessToken'(newLog, oldLog) {
       if (newLog !== oldLog) {
-        this.store.userJWT = newLog
+        this.$s.userJWT = newLog
         if (newLog) {
-          this.store.onLogin()
+          this.$s.onLogin()
         } else {
-          this.store.onLogout()
+          this.$s.onLogout()
         }
         this.checkRoute()
       }
@@ -50,9 +46,9 @@ export default {
   },
   methods: {
     checkRoute() {
-      // se this.store.userJWT non é null o false l'utente é loggato
-      // dunque se loggato this.store.userJWT sará considerato true
-      if (this.store.userJWT) {
+      // se this.$s.userJWT non é null o false l'utente é loggato
+      // dunque se loggato this.$s.userJWT sará considerato true
+      if (this.$s.userJWT) {
         if (this.routes.notAuth.includes(this.$route.name)) {
           this.$router.push({ name: 'home' });
         }
@@ -64,7 +60,10 @@ export default {
     }
   },
   async mounted() {
-    await this.store.start()
+    console.log(this.$s);
+    console.log(this.$u);
+    console.log(this.$loading);
+    // await this.$s.start()
     this.user.checkLogged()
   },
 }

@@ -6,18 +6,25 @@ import UserView from './pages/UserView.vue'
 
 // Definizione delle rotte complete
 const fullRoutes = {
-  public: [ // Aggiungi le rotte publiche qui, visibili sia da autenticacto che da non autenticato.
+  // Aggiungi le rotte publiche qui, visibili sia da autenticacto che da non autenticato.
+  public: [ 
     { path: '/', name: 'home', component: HomeView },
     { path: '/contact', name: 'contact', component: ContactView },
     // { path: '/esempio/:slug', name: 'esempio.show', component: EsempioShow, props: true },
   ],
-  notAuth: [ // Aggiungi le rotte visibili solo se non sei autenticato qui, se necessario.
+
+  // Aggiungi le rotte visibili solo se non sei autenticato qui, se necessario.
+  notAuth: [ 
     { path: '/user', name: 'user', component: UserView },
   ],
-  auth: [ // Aggiungi le rotte visibili solo se autenticato qui, se necessario.
+
+  // Aggiungi le rotte visibili solo se autenticato qui, se necessario.
+  auth: [ 
     
   ],
 };
+
+
 
 // funzione interna che crea l'Object routes che contiene gli array con i
 const routes = Object.keys(fullRoutes).reduce((acc, key) => {
