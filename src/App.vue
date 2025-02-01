@@ -63,8 +63,8 @@ export default {
       }
     }
   },
-  mounted() {
-    // await this.store.start()
+  async mounted() {
+    await this.store.start()
     this.user.checkLogged()
   },
 }

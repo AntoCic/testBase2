@@ -25,79 +25,84 @@ import admin from 'firebase-admin';
 
 exports.handler = async function (event, context) {
   await router.start(event);
+  console.log('ss');
+  
+  await router.GET('ciao', async () => {
+    router.setRes('ciao mondo');
+  })
   // AUTH route
-  if (router.authToken) {
-    const user = await firebase.user.logged(router.authToken);
-    if (user) {
-      await router.POST('g', async () => {
-        const res = await firebase.user.get(router.pathParams);
+  // if (router.authToken) {
+  //   const user = await firebase.user.logged(router.authToken);
+  //   if (user) {
+  //     await router.POST('g', async () => {
+  //       const res = await firebase.user.get(router.pathParams);
 
-        if (res) { router.setRes(res); }
-      })
+  //       if (res) { router.setRes(res); }
+  //     })
 
-      await router.POST('a', async () => {
-        let { id, data } = router.bodyParams
-        if (data) {
-          const res = await firebase.user.add(data, router.pathParams, id);
-          if (res) { router.setRes(res); }
-        } else {
-          router.error(400, '|I| Missing id or data');
-        }
-      })
+  //     await router.POST('a', async () => {
+  //       let { id, data } = router.bodyParams
+  //       if (data) {
+  //         const res = await firebase.user.add(data, router.pathParams, id);
+  //         if (res) { router.setRes(res); }
+  //       } else {
+  //         router.error(400, '|I| Missing id or data');
+  //       }
+  //     })
 
-      await router.PUT('u', async () => {
-        const { id, data } = router.bodyParams
-        if (id && data) {
-          const res = await firebase.user.update(id, data, router.pathParams);
-          if (res) { router.setRes(res); }
-        } else {
-          router.error(400, '|I| Missing id or data');
-        }
-      })
+  //     await router.PUT('u', async () => {
+  //       const { id, data } = router.bodyParams
+  //       if (id && data) {
+  //         const res = await firebase.user.update(id, data, router.pathParams);
+  //         if (res) { router.setRes(res); }
+  //       } else {
+  //         router.error(400, '|I| Missing id or data');
+  //       }
+  //     })
 
-      await router.DELETE('d', async () => {
-        const id = router.bodyParams.id
+  //     await router.DELETE('d', async () => {
+  //       const id = router.bodyParams.id
 
-        if (id !== null || id !== undefined) {
-          const res = await firebase.user.delete(id, router.pathParams);
-          if (res) { router.setRes(res); }
-        } else {
-          router.error(400, '|I| Missing id');
-        }
-      })
+  //       if (id !== null || id !== undefined) {
+  //         const res = await firebase.user.delete(id, router.pathParams);
+  //         if (res) { router.setRes(res); }
+  //       } else {
+  //         router.error(400, '|I| Missing id');
+  //       }
+  //     })
 
-      await router.POST('g-files', async () => {
-        let { fileNames } = router.bodyParams;
-        fileNames = fileNames ?? null
-        const res = await firebase.user.getFiles(fileNames, router.pathParams);
-        if (res) { router.setRes(res); }
+  //     await router.POST('g-files', async () => {
+  //       let { fileNames } = router.bodyParams;
+  //       fileNames = fileNames ?? null
+  //       const res = await firebase.user.getFiles(fileNames, router.pathParams);
+  //       if (res) { router.setRes(res); }
 
-      })
+  //     })
 
-      await router.POST('a-file', async () => {
-        const { base64Data, fileName } = router.bodyParams;
+  //     await router.POST('a-file', async () => {
+  //       const { base64Data, fileName } = router.bodyParams;
 
-        if (base64Data && fileName) {
-          const res = await firebase.user.addFile(base64Data, fileName, router.pathParams);
-          if (res) { router.setRes(res); }
-        } else {
-          router.error(400, '|I| Missing base64Data or fileName');
-        }
-      })
+  //       if (base64Data && fileName) {
+  //         const res = await firebase.user.addFile(base64Data, fileName, router.pathParams);
+  //         if (res) { router.setRes(res); }
+  //       } else {
+  //         router.error(400, '|I| Missing base64Data or fileName');
+  //       }
+  //     })
 
-      await router.POST('d-file', async () => {
-        const { fileName } = router.bodyParams;
-        if (fileName) {
-          const res = await firebase.user.deleteFile(fileName, router.pathParams);
-          if (res) { router.setRes(res); }
+  //     await router.POST('d-file', async () => {
+  //       const { fileName } = router.bodyParams;
+  //       if (fileName) {
+  //         const res = await firebase.user.deleteFile(fileName, router.pathParams);
+  //         if (res) { router.setRes(res); }
 
-        } else {
-          router.error(400, '|I| Missing fileName');
-        }
-      })
+  //       } else {
+  //         router.error(400, '|I| Missing fileName');
+  //       }
+  //     })
 
-    }
-  }
+  //   }
+  // }
 
   return router.sendRes()
 
@@ -400,7 +405,7 @@ class FIREBASE {
 
 }
 // ATTENZIONE inizializzare FIREBASE esattamente cosi.
-const firebase = new FIREBASE()
+// const firebase = new FIREBASE()
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%

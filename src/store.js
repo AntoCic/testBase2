@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import Item from './models/Item.js';
+import axios from "axios";
 // Item.configure();
 
 export const store = reactive({
@@ -7,6 +8,17 @@ export const store = reactive({
 
     async start() {
         this.loading.on();
+        await axios.get('/api/ciao/')
+            .then(async (res) => {
+                
+                console.log(res);
+                
+            })
+            .catch((error) => {
+                console.error(error);
+                return false;
+            });
+        this.loading.off();
         // INSERISCI QUA CARICAMENTI DATI PUBLICI
         return
     },

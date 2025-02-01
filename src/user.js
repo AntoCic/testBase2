@@ -10,6 +10,16 @@ const firebaseConfig = {
     authDomain: "temp-vue-firebase.firebaseapp.com",
 };
 
+// const firebaseConfig = {
+//   apiKey: "AIzaSyByFzlVlR70cs9WLQh7ROTkFeDDf-P0ANU",
+//   authDomain: "tempbase2.firebaseapp.com",
+//   databaseURL: "https://tempbase2-default-rtdb.europe-west1.firebasedatabase.app",
+//   projectId: "tempbase2",
+//   storageBucket: "tempbase2.firebasestorage.app",
+//   messagingSenderId: "269131075816",
+//   appId: "1:269131075816:web:5a12d30275e968f145395d"
+// };
+
 if (firebaseConfig.apiKey === "") {
     console.log("Non hai settato il firebaseConfig in src/firebase.js");
 }
