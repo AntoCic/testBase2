@@ -1,4 +1,4 @@
-// utility
+// utility | $u
 export default {
 
     // crea un id univoco
@@ -11,7 +11,8 @@ export default {
         return newId;
     },
 
-    // * --------------------
+
+    // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
     // DATE
     daysOfWeekShort: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
     daysOfWeek: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
@@ -72,16 +73,18 @@ export default {
         const regexDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
         return regexDate.test(date)
     },
-    // * --------------------
 
+
+    // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
     // TIME
     // Validatore stringa time
     isTime(time) {
         const regexTime = /^([01]\d|2[0-3]):([0-5]\d)$/;
         return regexTime.test(time)
     },
-    // * --------------------
 
+
+    // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
     // trasforma un numero in prezzo
     numberToPrice(total) {
         return '€' + total.toFixed(2).replace('.', ',')

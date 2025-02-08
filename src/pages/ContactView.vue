@@ -9,7 +9,7 @@
 
           <div class="main-contnet p-4">
             <div class="p-4 pb-2">
-              <img src="../../assets/img/contact/foto_profilo_no_bg.png" class="img-fluid rounded object-fit-cover"
+              <img src="https://raw.githubusercontent.com/AntoCic/portfolio/refs/heads/main/public/img/foto_profilo_no_bg.png" class="img-fluid rounded object-fit-cover"
                 alt="foto profilo personale">
             </div>
             <h3>{{ name }}</h3>
@@ -17,7 +17,7 @@
             <div class="stl_card mx-auto shadow">
               <button type="button" @mouseover="handleActive('EMAIL', email, 'mailto:' + email)"
                 class="socialContainer containerOne">
-                <img src="../../assets/img/contact/mail.svg" alt="Email">
+                <img src="/img/contact/mail.svg" alt="Email">
               </button>
 
               <button type="button" @mouseover="handleActive('PORTFOLIO', '/portfolio-antocic', site_link)"
@@ -29,12 +29,12 @@
 
               <button type="button" @mouseover="handleActive('LINKEDIN', '/Antonino-Cicala', linkedin_link)"
                 class="socialContainer containerThree">
-                <img src="../../assets/img/contact/linkedin.svg" alt="Linkedin">
+                <img src="/img/contact/linkedin.svg" alt="Linkedin">
               </button>
 
               <button type="button" @mouseover="handleActive('GITHUB', '/AntoCic', git_link)"
                 class="socialContainer containerFour">
-                <img class="ico-big" src="../../assets/img/contact/github.svg" alt="Github">
+                <img class="ico-big" src="/img/contact/github.svg" alt="Github">
               </button>
             </div>
 
@@ -89,7 +89,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../assets/scss/partials/_variables.scss' as *;
+@use '../style/partials/_variables.scss' as *;
 
 .wave-card {
   margin: 0 auto;

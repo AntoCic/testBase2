@@ -1,9 +1,12 @@
 import { reactive } from 'vue';
+
+import {$loading} from './loading.js'
 import Item from './models/Item.js';
 import axios from "axios";
 // Item.configure();
 
-export const store = reactive({
+// store
+export const $s = reactive({
 
     appVersion: __APP_VERSION__,
     appName: __APP_NAME__,
@@ -15,25 +18,29 @@ export const store = reactive({
     userJWT: null,
 
     async start() {
-        this.loading.on();
-        await axios.get('/api/ciao/')
-            .then(async (res) => {
-                
-                console.log(res);
-                
-            })
-            .catch((error) => {
-                console.error(error);
-                return false;
-            });
-            console.log(this.appVersion);
-            console.log(this.appName);
-            console.log(this.appShortName);
-            console.log(this.appDescription);
-            console.log(this.bkColor);
-            console.log(this.logoPath);
-            
-        this.loading.off();
+
+        $loading.on()
+        setTimeout(async () => {
+
+            // await axios.get('/api')
+            //     .then((res) => {
+            //         console.log(res.data);
+            //     })
+            //     .catch((err) => {
+            //         location.reload();
+            //     });
+
+            // await axios.post('/api/test', { msg: 'Hello World' })
+            //     .then((res) => {
+            //         console.log(res.data);
+            //     })
+            //     .catch((err) => {
+            //         location.reload();
+            //     });
+
+           $loading.off()
+        }, 2000);
+
         // INSERISCI QUA CARICAMENTI DATI PUBLICI
         return
     },
@@ -68,30 +75,5 @@ export const store = reactive({
             }
         },
 
-    },
-
-    loading: {
-        state: false,
-        msg: "",
-        loadingMessages: [
-            "Prepariamo qualcosa di speciale per te… resta sintonizzato!",
-            "I nostri robot stanno dando gli ultimi ritocchi… tutto pronto in un attimo!",
-            "Stiamo mescolando un po’ di magia digitale… presto sarai dentro!",
-            "I tecnici stanno preparando un'esperienza stellare… non ci vorrà molto!",
-            "Stiamo facendo una danza di caricamento… è quasi ora di partire!",
-            "Il nostro team di gnomi digitali è al lavoro… quasi pronti!",
-            "Stiamo preparando la magia dietro le quinte… non vediamo l’ora di mostrarti!"
-        ],
-
-        on(msg = null) {
-            if (msg === null) {
-                this.msg = this.loadingMessages[Math.floor(Math.random() * this.loadingMessages.length)]
-            } else {
-                this.msg = msg
-            }
-
-            this.state = true
-        },
-        off() { this.state = false },
     },
 });

@@ -1,5 +1,5 @@
 // firebaseConfig.js
-
+// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 // import { initializeApp } from "firebase/app";
 
 // // La tua configurazione Firebase

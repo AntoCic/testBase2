@@ -7,8 +7,8 @@
   "description": "come prima cosa sistema le info in packagejson",
   "display": "fullscreen",
   "background_color": "#212529",
-  "logo": "/img/logo.png",
-  "logo_sm": "/img/logo.png",
+  "logo": "/img/logo/logo.png",
+  "logo_sm": "/img/logo/logo.png",
   "type": "module",
   "scripts": {
     "set-init": "npm i && ntl link",

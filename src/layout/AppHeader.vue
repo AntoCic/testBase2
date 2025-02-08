@@ -4,7 +4,7 @@
       <nav class="row align-items-center my-1">
         <div class="col">
           <RouterLink to="/">
-            <img :src="$s.logoPath" class="logo align-text-top" alt="Vue logo" />
+            <img :src="$s.logoPath" class="logo-shadows align-text-top" alt="logo" />
           </RouterLink>
         </div>
         <div class="col-auto">
@@ -44,13 +44,7 @@ export default {
 
 
 <style lang="scss" scoped>
-.logo {
+.logo-shadows {
   height: 6em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #41B883);
 }
 </style>

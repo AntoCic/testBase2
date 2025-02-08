@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 
-export const loading = reactive({
+export const $loading = reactive({
     state: false,
     msg: "",
 

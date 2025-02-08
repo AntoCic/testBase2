@@ -26,6 +26,7 @@ export default {
       routes,
     }
   },
+  
   watch: {
     'user.accessToken'(newLog, oldLog) {
       if (newLog !== oldLog) {
@@ -44,6 +45,7 @@ export default {
       }
     },
   },
+
   methods: {
     checkRoute() {
       // se this.$s.userJWT non é null o false l'utente é loggato
@@ -59,11 +61,9 @@ export default {
       }
     }
   },
+
   async mounted() {
-    console.log(this.$s);
-    console.log(this.$u);
-    console.log(this.$loading);
-    // await this.$s.start()
+    await this.$s.start()
     this.user.checkLogged()
   },
 }
@@ -71,6 +71,7 @@ export default {
 
 <style lang="scss">
 /*
-@use '../assets/scss/partials/_variables.scss' as *;
+@use './style/partials/_variables.scss' as *;
+@use '../style/partials/_variables.scss' as *;
 */
 </style>
