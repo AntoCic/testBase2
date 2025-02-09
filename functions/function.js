@@ -21,15 +21,192 @@
 //   FIREBASE_STORAGE_BUCKET
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-import admin from 'firebase-admin';
+import firebaseAdmin from 'firebase-admin';
+
+const routs = {
+  auth: {
+    GET: {
+      "": () => 'auth:get/ CIAO',
+      test: async () => 'auth:get/test CIAO',
+    },
+    POST: {},
+    PUT: {},
+    PATCH: {},
+    DELETE: {},
+  },
+
+  notAuth: {
+    GET: {
+      "": 'notAuth:get/ CIAO',
+      test: async () => 'notAuth:get/test CIAO',
+    },
+    POST: {},
+    PUT: {},
+    PATCH: {},
+    DELETE: {},
+  }
+}
+
+
+// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+//  ____  _____ _____ _   _   _ _   _____                      |
+// |  _ \| ____|  ___/ \ | | | | | |_   _|                     |
+// | | | |  _| | |_ / _ \| | | | |   | |                       |
+// | |_| | |___|  _/ ___ \ |_| | |___| |                       |
+// |____/|_____|_|/_/   \_\___/|_____|_|_____ ____             |
+// | | | |_   _|_ _| |   |_ _|_   _|_ _| ____/ ___|            |
+// | | | | | |  | || |    | |  | |  | ||  _| \___ \            |
+// | |_| | | |  | || |___ | |  | |  | || |___ ___) |           |
+//  \___/  |_| |___|_____|___| |_| |___|_____|____/            |
+//                                                             |
+// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+class EventHandler {
+  constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }) {
+    this.rawUrl = rawUrl;
+    this.httpMethod = httpMethod;
+    this.pathParams = this.parsePathParams(path);
+    this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
+    this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
+    this.authorization = headers?.authorization;
+    if (headers?.authorization) delete headers.authorization
+    this.headers = headers;
+
+    this.routs = routs;
+    this.pathIndex = 0;
+    this.statusCode = 200;
+    this.headersResponse = { "Content-Type": "application/json" };
+    this.bodyResponse = {};
+
+    this.user = null;
+  }
+
+  parseQueryParams(multiValueQueryStringParameters) {
+    const queryParams = multiValueQueryStringParameters
+    for (const key in multiValueQueryStringParameters) {
+      if (multiValueQueryStringParameters[key].length <= 1) {
+        queryParams[key] = multiValueQueryStringParameters[key]?.[0]
+      }
+    }
+    return queryParams
+  }
+
+  parsePathParams(path) {
+    const pathParams = path.split("/");
+    for (let index = 0; index < 2; index++) {
+      pathParams.shift();
+    }
+    if (pathParams.length === 0) pathParams.push('')
+    return pathParams
+  }
+
+  async isAuth() {
+    if (firebaseAdmin) {
+      // todo fare qualche prova
+      try {
+        const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+        this.user = await firebaseAdmin.auth().getUser(decodedToken.uid);
+        return true;
+      } catch (error) {
+        // router.error(401, '|I| Unauthorized');
+        this.user = undefined
+        return false;
+      }
+    } else {
+      console.error("importare firebaseAdmin da 'firebase-admin'");
+    }
+  }
+
+  async response() {
+    // se invio headers.authorization cerco tra le rotte auth 
+    if (this.authorization) {
+      if (await this.isAuth()) {
+        return this.getRoutsFunction(this.routs.auth?.[this.httpMethod]) ?? this.getResponse();
+      } else {
+        this.errorResponse(401, 'Unauthorized');
+      }
+    } else {
+      return this.getRoutsFunction(this.routs.notAuth?.[this.httpMethod]) ?? this.getResponse();
+    }
+  }
+
+  errorResponse(statusCode = 400, error = '400 Bad Request') {
+    if (typeof error === 'string') error = '|I|Error: ' + error
+    return this.setResponse({ error }, statusCode);
+  }
+
+  setResponse(body, statusCode = this.statusCode, headers = this.headersResponse) {
+    this.bodyResponse = body;
+    this.statusCode = statusCode;
+    this.headersResponse = headers;
+    return this.getResponse();
+  }
+  getResponse() {
+    return {
+      statusCode: this.statusCode,
+      headers: this.headersResponse,
+      body: JSON.stringify(this.bodyResponse),
+    }
+  }
+
+  async getRoutsFunction(routs, oldDefaultFunction = undefined) {
+    if (routs !== undefined) {
+      const routToCheck = routs[this.currentPathParams()];
+      if (routToCheck) {
+        switch (typeof routToCheck) {
+          case 'function':
+            return this.setResponse(await routToCheck(this));
+
+          case 'object':
+            const defaultFunction = routToCheck?.['']
+            this.pathIndex++
+            return await this.getRoutsFunction(routToCheck, defaultFunction);
+
+          case 'boolean':
+          case 'string':
+          case 'number':
+            return this.setResponse(routToCheck);
+
+          default:
+            console.error('Rout dichiarata male, non è una function o un object');
+            return this.errorResponse(500, 'Rout dichiarata male, non è una function o un object');
+        }
+      } else {
+        if (oldDefaultFunction !== undefined) {
+          switch (typeof oldDefaultFunction) {
+            case 'function':
+              return this.setResponse(await oldDefaultFunction(this));
+            case 'boolean':
+            case 'string':
+            case 'number':
+              return this.setResponse(oldDefaultFunction);
+            default:
+              console.error('Rout dichiarata male, non è una function o un object');
+              return this.errorResponse(500, 'Rout dichiarata male, non è una function o un object');
+          }
+
+        }
+        return this.errorResponse(404);
+      }
+    } else {
+      return this.errorResponse(404);
+    }
+  }
+
+  currentPathParams() {
+    return this.pathParams?.[this.pathIndex]
+  }
+
+}
 
 exports.handler = async function (event, context) {
-  await router.start(event);
-  console.log('ss');
-  
-  await router.GET('ciao', async () => {
-    router.setRes('ciao mondo');
-  })
+  const call = new EventHandler(event)
+  return call.response()
+  // await router.start(event);
+  // console.log('ss');
+
+  // await router.GET('ciao', async () => {
+  //   router.setRes('ciao mondo');
+  // })
   // AUTH route
   // if (router.authToken) {
   //   const user = await firebase.user.logged(router.authToken);
@@ -104,483 +281,470 @@ exports.handler = async function (event, context) {
   //   }
   // }
 
-  return router.sendRes()
-
+  // return router.sendRes()
 };
 
 
 
+// class FIREBASE {
+//   constructor(mainPaths = []) {
+//     const required = {
+//       type: 'service_account',
+//       project_id: process.env.FIREBASE_PROJECT_ID,
+//       private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+//       private_key: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : null,
+//       client_email: process.env.FIREBASE_CLIENT_EMAIL,
+//       client_id: process.env.FIREBASE_CLIENT_ID,
+//       auth_uri: process.env.FIREBASE_AUTH_URI,
+//       token_uri: process.env.FIREBASE_TOKEN_URI,
+//       auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+//       client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+//       universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+//       databaseURL: process.env.FIREBASE_DATABASE_URL,
 
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-//  ____  _____ _____ _   _   _ _   _____                      |
-// |  _ \| ____|  ___/ \ | | | | | |_   _|                     |             
-// | | | |  _| | |_ / _ \| | | | |   | |                       |
-// | |_| | |___|  _/ ___ \ |_| | |___| |                       |
-// |____/|_____|_|/_/   \_\___/|_____|_|_____ ____             |
-// | | | |_   _|_ _| |   |_ _|_   _|_ _| ____/ ___|            |
-// | | | | | |  | || |    | |  | |  | ||  _| \___ \            |
-// | |_| | | |  | || |___ | |  | |  | || |___ ___) |           |
-//  \___/  |_| |___|_____|___| |_| |___|_____|____/            |
-//                                                             |
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+//       idIndex: Math.floor(Math.random() * 100),
+//     };
 
-class FIREBASE {
-  constructor(mainPaths = []) {
-    const required = {
-      type: 'service_account',
-      project_id: process.env.FIREBASE_PROJECT_ID,
-      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-      private_key: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : null,
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      client_id: process.env.FIREBASE_CLIENT_ID,
-      auth_uri: process.env.FIREBASE_AUTH_URI,
-      token_uri: process.env.FIREBASE_TOKEN_URI,
-      auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-      client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-      universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
-      databaseURL: process.env.FIREBASE_DATABASE_URL,
+//     const optional = {
+//       storageBucket: process.env.FIREBASE_STORAGE_BUCKET ?? `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+//     };
 
-      idIndex: Math.floor(Math.random() * 100),
-    };
+//     mainPaths.unshift('public')
+//     mainPaths.unshift('user')
+//     mainPaths = this.createMainPaths(mainPaths)
 
-    const optional = {
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET ?? `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
-    };
+//     Object.assign(this, { ...required, ...optional }, mainPaths);
 
-    mainPaths.unshift('public')
-    mainPaths.unshift('user')
-    mainPaths = this.createMainPaths(mainPaths)
+//     for (const key in required) {
+//       if (this[key] == null) {
+//         throw new Error(`Il campo ${key} è obbligatorio e non può essere nullo o indefinito.`);
+//       }
+//     }
 
-    Object.assign(this, { ...required, ...optional }, mainPaths);
+//     admin.initializeApp({
+//       credential: admin.credential.cert({
+//         type: this.type,
+//         project_id: this.project_id,
+//         private_key_id: this.private_key_id,
+//         private_key: this.private_key,
+//         client_email: this.client_email,
+//         client_id: this.client_id,
+//         auth_uri: this.auth_uri,
+//         token_uri: this.token_uri,
+//         auth_provider_x509_cert_url: this.auth_provider_x509_cert_url,
+//         client_x509_cert_url: this.client_x509_cert_url,
+//         universe_domain: this.universe_domain,
+//       }),
+//       databaseURL: this.databaseURL,
+//       storageBucket: this.storageBucket
+//     });
 
-    for (const key in required) {
-      if (this[key] == null) {
-        throw new Error(`Il campo ${key} è obbligatorio e non può essere nullo o indefinito.`);
-      }
-    }
+//     this.database = admin.database();
+//     this.bucket = admin.storage().bucket();
+//   }
 
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        type: this.type,
-        project_id: this.project_id,
-        private_key_id: this.private_key_id,
-        private_key: this.private_key,
-        client_email: this.client_email,
-        client_id: this.client_id,
-        auth_uri: this.auth_uri,
-        token_uri: this.token_uri,
-        auth_provider_x509_cert_url: this.auth_provider_x509_cert_url,
-        client_x509_cert_url: this.client_x509_cert_url,
-        universe_domain: this.universe_domain,
-      }),
-      databaseURL: this.databaseURL,
-      storageBucket: this.storageBucket
-    });
+//   // Method che risponde con un nuovo unique id ogni volta che viene chiamata
+//   newId() {
+//     let newId = this.idIndex.toString(36)
+//     this.idIndex++;
+//     newId += Math.random().toString(36).substring(2, 7) // stringa casuale
+//     newId += "-" + Date.now().toString(36) // converte in base 36
+//     return newId;
+//   }
 
-    this.database = admin.database();
-    this.bucket = admin.storage().bucket();
-  }
+//   createMainPaths(mainPaths) {
+//     const oldMainPaths = mainPaths;
+//     let newMainPaths = {}
 
-  // Method che risponde con un nuovo unique id ogni volta che viene chiamata
-  newId() {
-    let newId = this.idIndex.toString(36)
-    this.idIndex++;
-    newId += Math.random().toString(36).substring(2, 7) // stringa casuale
-    newId += "-" + Date.now().toString(36) // converte in base 36
-    return newId;
-  }
+//     for (const pathName of oldMainPaths) {
+//       newMainPaths[pathName] = {
+//         pathName,
 
-  createMainPaths(mainPaths) {
-    const oldMainPaths = mainPaths;
-    let newMainPaths = {}
+//         async get(pathParams = []) {
+//           try {
+//             const fullPath = this.getFullPath(pathParams)
+//             const snapshot = await firebase.database.ref(fullPath).once('value');
+//             return snapshot.val() || {};
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
+//         },
 
-    for (const pathName of oldMainPaths) {
-      newMainPaths[pathName] = {
-        pathName,
+//         async add(data, pathParams = [], id = false) {
+//           try {
+//             const fullPath = this.getFullPath(pathParams)
+//             const newId = id === true ? '/' + firebase.newId() : id === false ? '' : '/' + id;
 
-        async get(pathParams = []) {
-          try {
-            const fullPath = this.getFullPath(pathParams)
-            const snapshot = await firebase.database.ref(fullPath).once('value');
-            return snapshot.val() || {};
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
-        },
+//             console.log('newId', newId);
+//             if (id === true) {
+//               id = newId.substring(1)
+//               await firebase.database.ref(fullPath + newId).set({ ...data, id });
+//               return { [id]: { ...data, id } };
+//             } else {
+//               console.log('data', data);
 
-        async add(data, pathParams = [], id = false) {
-          try {
-            const fullPath = this.getFullPath(pathParams)
-            const newId = id === true ? '/' + firebase.newId() : id === false ? '' : '/' + id;
+//               await firebase.database.ref(fullPath + newId).set(data);
+//               if (id === false) {
+//                 return data
+//               }
+//               return { [id]: data }
+//             }
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
+//         },
 
-            console.log('newId', newId);
-            if (id === true) {
-              id = newId.substring(1)
-              await firebase.database.ref(fullPath + newId).set({ ...data, id });
-              return { [id]: { ...data, id } };
-            } else {
-              console.log('data', data);
+//         async update(id, data, pathParams = []) {
+//           try {
+//             const fullPath = this.getFullPath(pathParams)
+//             const content = { [id]: data }
+//             await firebase.database.ref(fullPath).update(content);
 
-              await firebase.database.ref(fullPath + newId).set(data);
-              if (id === false) {
-                return data
-              }
-              return { [id]: data }
-            }
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
-        },
+//             return content;
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
+//         },
 
-        async update(id, data, pathParams = []) {
-          try {
-            const fullPath = this.getFullPath(pathParams)
-            const content = { [id]: data }
-            await firebase.database.ref(fullPath).update(content);
+//         async delete(id, pathParams = []) {
+//           try {
+//             const fullPath = this.getFullPath(pathParams)
 
-            return content;
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
-        },
+//             await firebase.database.ref(`${fullPath}/${id}`).remove();
 
-        async delete(id, pathParams = []) {
-          try {
-            const fullPath = this.getFullPath(pathParams)
+//             return { deleted: id };
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
 
-            await firebase.database.ref(`${fullPath}/${id}`).remove();
+//         },
 
-            return { deleted: id };
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
+//         async getFiles(fileNames = null, pathParams = []) {
+//           const fullPath = this.getFullPath(pathParams);
+//           try {
+//             // Ottiene tutti i file con il prefisso specificato
+//             const [files] = await firebase.bucket.getFiles({ prefix: fullPath });
 
-        },
+//             const urls = {};
+//             // Mappa su ogni file e crea un oggetto con i file richiesti e i rispettivi URL
+//             for (const file of files) {
+//               const fileName = file.name.split('/').pop(); // Ottiene solo il nome del file
 
-        async getFiles(fileNames = null, pathParams = []) {
-          const fullPath = this.getFullPath(pathParams);
-          try {
-            // Ottiene tutti i file con il prefisso specificato
-            const [files] = await firebase.bucket.getFiles({ prefix: fullPath });
+//               if (!fileNames) {
+//                 const url = await this.getUrlFile(file);
+//                 urls[fileName] = { url };
+//               } else if (Object.values(fileNames).includes(fileName)) {
+//                 const key = Object.keys(fileNames).find(key => fileNames[key] === fileName);
+//                 const url = await this.getUrlFile(file);
 
-            const urls = {};
-            // Mappa su ogni file e crea un oggetto con i file richiesti e i rispettivi URL
-            for (const file of files) {
-              const fileName = file.name.split('/').pop(); // Ottiene solo il nome del file
+//                 urls[key] = { fileName, url };
+//               }
+//             }
 
-              if (!fileNames) {
-                const url = await this.getUrlFile(file);
-                urls[fileName] = { url };
-              } else if (Object.values(fileNames).includes(fileName)) {
-                const key = Object.keys(fileNames).find(key => fileNames[key] === fileName);
-                const url = await this.getUrlFile(file);
+//             // Restituisce gli URL dei file trovati
+//             return { urls };
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
+//         },
 
-                urls[key] = { fileName, url };
-              }
-            }
+//         async addFile(base64Data, fileName, pathParams = []) {
+//           try {
+//             // Decodifica i dati da base64
+//             const buffer = Buffer.from(base64Data, 'base64');
 
-            // Restituisce gli URL dei file trovati
-            return { urls };
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
-        },
+//             // Determina il tipo di contenuto (MIME type) basato sull'estensione del file
+//             const extension = fileName.split('.').pop().toLowerCase();
+//             const contentTypes = {
+//               'jpg': 'image/jpeg',
+//               'jpeg': 'image/jpeg',
+//               'png': 'image/png',
+//               'gif': 'image/gif',
+//               'svg': 'image/svg+xml',
+//               'txt': 'text/plain',
+//               'pdf': 'application/pdf',
+//               'doc': 'application/msword',
+//               'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+//               'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//               'csv': 'text/csv',
+//             };
+//             const contentType = contentTypes[extension];
+//             if (!contentType) {
+//               router.error(500, '|I| Failed: ContentType');
+//               return false;
+//             }
 
-        async addFile(base64Data, fileName, pathParams = []) {
-          try {
-            // Decodifica i dati da base64
-            const buffer = Buffer.from(base64Data, 'base64');
+//             // Genera un nuovo nome per il file
+//             const fullName = `${firebase.newId()}_${fileName}`;
 
-            // Determina il tipo di contenuto (MIME type) basato sull'estensione del file
-            const extension = fileName.split('.').pop().toLowerCase();
-            const contentTypes = {
-              'jpg': 'image/jpeg',
-              'jpeg': 'image/jpeg',
-              'png': 'image/png',
-              'gif': 'image/gif',
-              'svg': 'image/svg+xml',
-              'txt': 'text/plain',
-              'pdf': 'application/pdf',
-              'doc': 'application/msword',
-              'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-              'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-              'csv': 'text/csv',
-            };
-            const contentType = contentTypes[extension];
-            if (!contentType) {
-              router.error(500, '|I| Failed: ContentType');
-              return false;
-            }
+//             // Costruisce il percorso nel bucket
+//             const fullPath = this.getFullPath(pathParams)
+//             const file = firebase.bucket.file(`${fullPath}/${fullName}`);
 
-            // Genera un nuovo nome per il file
-            const fullName = `${firebase.newId()}_${fileName}`;
+//             // Salva il file nel bucket con il tipo di contenuto corretto
+//             await file.save(buffer, { contentType });
 
-            // Costruisce il percorso nel bucket
-            const fullPath = this.getFullPath(pathParams)
-            const file = firebase.bucket.file(`${fullPath}/${fullName}`);
+//             // Ottiene l'URL firmato per l'accesso al file
+//             const url = await this.getUrlFile(file)
 
-            // Salva il file nel bucket con il tipo di contenuto corretto
-            await file.save(buffer, { contentType });
+//             const key = fullName.split('_')[0]
+//             // Restituisce l'URL del file caricato
+//             return { [key]: { fileName: fullName, url } };
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
 
-            // Ottiene l'URL firmato per l'accesso al file
-            const url = await this.getUrlFile(file)
+//         },
 
-            const key = fullName.split('_')[0]
-            // Restituisce l'URL del file caricato
-            return { [key]: { fileName: fullName, url } };
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
+//         async deleteFile(fileName, pathParams = []) {
 
-        },
+//           const fullPath = this.getFullPath(pathParams)
 
-        async deleteFile(fileName, pathParams = []) {
+//           try {
+//             await firebase.bucket.file(`${fullPath}/${fileName}`).delete();
 
-          const fullPath = this.getFullPath(pathParams)
+//             return { deleted: fileName };
+//           } catch (error) {
+//             router.error(500, '|I| Failed: ' + String(error));
+//             return false;
+//           }
+//         },
 
-          try {
-            await firebase.bucket.file(`${fullPath}/${fileName}`).delete();
+//         getFullPath(pathParams) {
+//           let databasePath = '';
+//           if (pathParams.length >= 2) {
+//             for (let index = 1; index < pathParams.length; index++) {
+//               databasePath += '/' + pathParams[index];
+//             }
+//           }
 
-            return { deleted: fileName };
-          } catch (error) {
-            router.error(500, '|I| Failed: ' + String(error));
-            return false;
-          }
-        },
+//           let fullPath = this.pathName
+//           fullPath += this.userData ? '/' + this.userData.uid : ''
+//           fullPath += databasePath
 
-        getFullPath(pathParams) {
-          let databasePath = '';
-          if (pathParams.length >= 2) {
-            for (let index = 1; index < pathParams.length; index++) {
-              databasePath += '/' + pathParams[index];
-            }
-          }
+//           console.log([fullPath]);
 
-          let fullPath = this.pathName
-          fullPath += this.userData ? '/' + this.userData.uid : ''
-          fullPath += databasePath
+//           return fullPath
+//         },
 
-          console.log([fullPath]);
+//         async getUrlFile(file) {
+//           let expires = new Date();
+//           expires.setDate(expires.getDate() + 1);
+//           expires = expires.toISOString();
 
-          return fullPath
-        },
+//           const [url] = await file.getSignedUrl({
+//             action: 'read',
+//             expires,
+//           });
 
-        async getUrlFile(file) {
-          let expires = new Date();
-          expires.setDate(expires.getDate() + 1);
-          expires = expires.toISOString();
+//           return url
+//         }
+//       }
 
-          const [url] = await file.getSignedUrl({
-            action: 'read',
-            expires,
-          });
+//       if (pathName === 'user') {
+//         newMainPaths[pathName].logged = async function (idToken) {
+//           this.userData = null;
+//           try {
+//             const decodedToken = await admin.auth().verifyIdToken(idToken);
+//             this.userData = await admin.auth().getUser(decodedToken.uid);
+//             return true;
+//           } catch (error) {
+//             router.error(401, '|I| Unauthorized');
+//             return false;
+//           }
+//         };
 
-          return url
-        }
-      }
+//       }
+//     }
+//     return newMainPaths
+//   }
 
-      if (pathName === 'user') {
-        newMainPaths[pathName].logged = async function (idToken) {
-          this.userData = null;
-          try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            this.userData = await admin.auth().getUser(decodedToken.uid);
-            return true;
-          } catch (error) {
-            router.error(401, '|I| Unauthorized');
-            return false;
-          }
-        };
-
-      }
-    }
-    return newMainPaths
-  }
-
-}
+// }
 // ATTENZIONE inizializzare FIREBASE esattamente cosi.
 // const firebase = new FIREBASE()
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
+
+
 // Oggetto che ho creato per gestire e semplificare le chiamate al server
-const router = {
-  // VAR UTILITY
-  // contiene tuttu l'evento della chiamata
-  event: null,
-  // contiene un la risposta nel caso sono stete settate piú risposte é un array
-  response: null,
-  // status code che viene inviato con la risposta
-  statusCode: 200,
+// const router = {
+//   // VAR UTILITY
+//   // contiene tuttu l'evento della chiamata
+//   event: null,
+//   // contiene un la risposta nel caso sono stete settate piú risposte é un array
+//   response: null,
+//   // status code che viene inviato con la risposta
+//   statusCode: 200,
 
-  // var boolean di controllo si attiva se trova un errore
-  stateError: false,
-  // var boolean di controllo si attiva nel momento in cui viene settata la prima risposta
-  // per fornire un riferimento per trasformare in caso di un secondo set la risposta in un array
-  isSecondSet: false,
+//   // var boolean di controllo si attiva se trova un errore
+//   stateError: false,
+//   // var boolean di controllo si attiva nel momento in cui viene settata la prima risposta
+//   // per fornire un riferimento per trasformare in caso di un secondo set la risposta in un array
+//   isSecondSet: false,
 
-  // contiene tutti i path parems
-  pathParams: [],
-  // contiene tutti i body parems
-  bodyParams: null,
+//   // contiene tutti i path parems
+//   pathParams: [],
+//   // contiene tutti i body parems
+//   bodyParams: null,
 
-  // conta le chiamata ricevute per debugging
-  callCounter: 0,
+//   // conta le chiamata ricevute per debugging
+//   callCounter: 0,
 
-  // contiene se presente nell header l'autentication il JWT
-  authToken: null,
+//   // contiene se presente nell header l'autentication il JWT
+//   authToken: null,
 
-  // metodo OBLIGATORIO per inizializzare le variabili ricavate dallévento della chiamata
-  async start(event) {
-    this.callCounter++ // debugging
-    let attesa = 0 // debugging
-    while (this.event) {
-      attesa++ // debugging
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
-    console.log(`Call ${this.callCounter}: ${event.httpMethod} ${event.path} => attesa totale fine chiamata precedente ms:${attesa * 10}`); // debugging
-    this.event = event
-    this.stateError = false;
-    this.statusCode = 200;
-    this.bodyParams = null;
-    this.authToken = this.event.headers.authorization || null;
+//   // metodo OBLIGATORIO per inizializzare le variabili ricavate dallévento della chiamata
+//   async start(event) {
+//     this.callCounter++ // debugging
+//     let attesa = 0 // debugging
+//     while (this.event) {
+//       attesa++ // debugging
+//       await new Promise((resolve) => setTimeout(resolve, 10));
+//     }
+//     console.log(`Call ${this.callCounter}: ${event.httpMethod} ${event.path} => attesa totale fine chiamata precedente ms:${attesa * 10}`); // debugging
+//     this.event = event
+//     this.stateError = false;
+//     this.statusCode = 200;
+//     this.bodyParams = null;
+//     this.authToken = this.event.headers.authorization || null;
 
-    this.clearRes();
+//     this.clearRes();
 
-    this.setBodyParams();
+//     this.setBodyParams();
 
-    this.pathParams = this.getPathParams();
-  },
+//     this.pathParams = this.getPathParams();
+//   },
 
-  // metodo per debugging ti ricorda che devi inizializzare la chiamata
-  isStarted() {
-    if (this.event && !this.stateError) {
-      return true
-    } else {
-      console.error('|I| ERROR 500: non hai inizializzato il router, SCRIVI: router.start(event);');
-      this.error(500, '|I| ERROR 500: non hai inizializzato il router, SCRIVI: router.start(event);')
-      return false
-    }
-  },
+//   // metodo per debugging ti ricorda che devi inizializzare la chiamata
+//   isStarted() {
+//     if (this.event && !this.stateError) {
+//       return true
+//     } else {
+//       console.error('|I| ERROR 500: non hai inizializzato il router, SCRIVI: router.start(event);');
+//       this.error(500, '|I| ERROR 500: non hai inizializzato il router, SCRIVI: router.start(event);')
+//       return false
+//     }
+//   },
 
-  // metodo per settare una o piú risposte se eseguito piú volte
-  setRes(response) {
-    if (this.isStarted()) {
-      if (this.response) {
-        if (this.isSecondSet) {
-          this.response = [this.response]
-          this.isSecondSet = false
-        }
-        this.response.push(response)
+//   // metodo per settare una o piú risposte se eseguito piú volte
+//   setRes(response) {
+//     if (this.isStarted()) {
+//       if (this.response) {
+//         if (this.isSecondSet) {
+//           this.response = [this.response]
+//           this.isSecondSet = false
+//         }
+//         this.response.push(response)
 
-      } else {
-        this.response = response
-        this.isSecondSet = true
-      }
-    }
-  },
+//       } else {
+//         this.response = response
+//         this.isSecondSet = true
+//       }
+//     }
+//   },
 
-  // metodo che ripulisce la risposta
-  clearRes() {
-    if (this.isStarted()) {
-      this.isSecondSet = false;
-      this.response = null
-    }
-  },
+//   // metodo che ripulisce la risposta
+//   clearRes() {
+//     if (this.isStarted()) {
+//       this.isSecondSet = false;
+//       this.response = null
+//     }
+//   },
 
-  // metodo che setta delle variabili per inviare un errore
-  error(statusCode = 400, error = 'Errore: 400 Bad Request') {
-    this.stateError = true
-    this.response = error;
-    this.statusCode = statusCode
-  },
+//   // metodo che setta delle variabili per inviare un errore
+//   error(statusCode = 400, error = 'Errore: 400 Bad Request') {
+//     this.stateError = true
+//     this.response = error;
+//     this.statusCode = statusCode
+//   },
 
-  // metodo OBBLIGATORIO per inviare la risposta
-  sendRes() {
-    this.event = null;
-    if (this.response === null) {
-      this.error();
-    }
-    return {
-      statusCode: this.statusCode,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(this.response),
-    }
-  },
+//   // metodo OBBLIGATORIO per inviare la risposta
+//   sendRes() {
+//     this.event = null;
+//     if (this.response === null) {
+//       this.error();
+//     }
+//     return {
+//       statusCode: this.statusCode,
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify(this.response),
+//     }
+//   },
 
-  // metodo per settare su pathParams i path params utili
-  getPathParams() {
-    if (this.isStarted()) {
-      const params = this.event.path.split("/")
-      if (params.length > 2) {
-        for (let index = 0; index < 2; index++) {
-          params.shift();
-        }
+//   // metodo per settare su pathParams i path params utili
+//   getPathParams() {
+//     if (this.isStarted()) {
+//       const params = this.event.path.split("/")
+//       if (params.length > 2) {
+//         for (let index = 0; index < 2; index++) {
+//           params.shift();
+//         }
 
-        return params
-      } else {
-        return [""]
-      }
-    }
-  },
+//         return params
+//       } else {
+//         return [""]
+//       }
+//     }
+//   },
 
-  // metodo per ottenere i parametri
-  // di defaul viene utilizzata per ottenere il primo parametro che viene indicato nelle richeste
-  params(index = 0) {
-    if (this.pathParams.length >= index + 1) {
-      return this.pathParams[index]
-    } else {
-      return false
-    }
-  },
+//   // metodo per ottenere i parametri
+//   // di defaul viene utilizzata per ottenere il primo parametro che viene indicato nelle richeste
+//   params(index = 0) {
+//     if (this.pathParams.length >= index + 1) {
+//       return this.pathParams[index]
+//     } else {
+//       return false
+//     }
+//   },
 
-  // metodo per settare la mia var bodyParams con un oggetto contenete tutti i parametri del body
-  setBodyParams() {
-    if (this.event.body) {
-      this.bodyParams = JSON.parse(this.event.body)
-    }
-  },
+//   // metodo per settare la mia var bodyParams con un oggetto contenete tutti i parametri del body
+//   setBodyParams() {
+//     if (this.event.body) {
+//       this.bodyParams = JSON.parse(this.event.body)
+//     }
+//   },
 
-  // controllo dell'evento della chiamata e esegue la funzione richesta
-  async checkCall(pathParam, ArrowFunction, method) {
-    if (this.event.httpMethod === method) {
-      if (pathParam === this.params()) {
-        return await ArrowFunction();
-      } else {
-        return false
-      }
-    } else {
-      return false
-    }
-  },
+//   // controllo dell'evento della chiamata e esegue la funzione richesta
+//   async checkCall(pathParam, ArrowFunction, method) {
+//     if (this.event.httpMethod === method) {
+//       if (pathParam === this.params()) {
+//         return await ArrowFunction();
+//       } else {
+//         return false
+//       }
+//     } else {
+//       return false
+//     }
+//   },
 
-  // caso chiamata tipo GET
-  async GET(pathParam, ArrowFunction) {
-    return await this.checkCall(pathParam, ArrowFunction, "GET")
-  },
-  // caso chiamata tipo POST
-  async POST(pathParam, ArrowFunction) {
-    return await this.checkCall(pathParam, ArrowFunction, "POST")
-  },
-  // caso chiamata tipo PUT
-  async PUT(pathParam, ArrowFunction) {
-    return await this.checkCall(pathParam, ArrowFunction, "PUT")
-  },
-  // caso chiamata tipo PATCH
-  async PATCH(pathParam, ArrowFunction) {
-    return await this.checkCall(pathParam, ArrowFunction, "PATCH")
-  },
-  // caso chiamata tipo DELETE
-  async DELETE(pathParam, ArrowFunction) {
-    return await this.checkCall(pathParam, ArrowFunction, "DELETE")
-  },
-}
+//   // caso chiamata tipo GET
+//   async GET(pathParam, ArrowFunction) {
+//     return await this.checkCall(pathParam, ArrowFunction, "GET")
+//   },
+//   // caso chiamata tipo POST
+//   async POST(pathParam, ArrowFunction) {
+//     return await this.checkCall(pathParam, ArrowFunction, "POST")
+//   },
+//   // caso chiamata tipo PUT
+//   async PUT(pathParam, ArrowFunction) {
+//     return await this.checkCall(pathParam, ArrowFunction, "PUT")
+//   },
+//   // caso chiamata tipo PATCH
+//   async PATCH(pathParam, ArrowFunction) {
+//     return await this.checkCall(pathParam, ArrowFunction, "PATCH")
+//   },
+//   // caso chiamata tipo DELETE
+//   async DELETE(pathParam, ArrowFunction) {
+//     return await this.checkCall(pathParam, ArrowFunction, "DELETE")
+//   },
+// }

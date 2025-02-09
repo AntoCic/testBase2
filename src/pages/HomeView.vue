@@ -31,6 +31,16 @@
         </h1>
         <p class="mb-1">{{ $s.appDescription }}</p>
       </div>
+      <div class="col">
+        <button type="button" class="btn btn-outline-light" @click="getSender1">GET1</button>
+        <button type="button" class="btn btn-outline-light" @click="getSender2">GET2</button>
+        <button type="button" class="btn btn-outline-light" @click="getSender3">GET3</button>
+        <button type="button" class="btn btn-outline-light" @click="getSender3bb">GET3bb</button>
+        <button type="button" class="btn btn-outline-light" @click="postSender">POST</button>
+        <button type="button" class="btn btn-outline-light" @click="putSender">PUT</button>
+        <button type="button" class="btn btn-outline-light" @click="patchSender">PATCH</button>
+        <button type="button" class="btn btn-outline-light" @click="deleteSender">DELETE</button>
+      </div>
       <div v-if="$s.userJWT" class="col-12 col-md-8 mx-auto">
         <h2>logged</h2>
       </div>
@@ -40,13 +50,118 @@
 </template>
 
 <script>
-
+import axios from 'axios';
 export default {
   data() {
     return {
     };
   },
   methods: {
+    async getSender1() {
+      await axios.get('/api/', {
+        params: {
+          ID: 12345
+        }
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    async getSender2() {
+      await axios.get('/api/test', {
+        params: {
+          ID: 12345
+        }
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    async getSender3() {
+      await axios.get('/api/test3/pippo/cc?name=st%C3%A5le&car=saab', {
+        params: {
+          ID: 12345
+        }
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    async getSender3bb() {
+      await axios.get('/api/test3/bb/cc?name=st%C3%A5le&car=saab', {
+        params: {
+          ID: 12345
+        }
+      })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+
+    async postSender() {
+      await axios.post('/api/aa/bb/cc', {
+        firstName: 'Fred',
+        lastName: 'Flintstone'
+      }, {
+        params: {
+          ID: 12345
+        },
+        headers: {
+          authorization: "pippo",
+          'Content-Type': "application/json"
+        }
+      }
+      )
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async putSender() {
+      await axios.put('/api/aa/bb/cc', { msg: 'PUT' })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async patchSender() {
+      await axios.patch('/api/aa/bb/cc', { msg: 'PATCH' })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async deleteSender() {
+      await axios.delete('/api/aa/bb/cc', { msg: 'DELETE' })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
   created() {
   }
