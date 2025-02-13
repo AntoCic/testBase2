@@ -35,7 +35,7 @@
         <button type="button" class="btn btn-outline-light" @click="getSender1">GET1</button>
         <button type="button" class="btn btn-outline-light" @click="getSender2">GET2</button>
         <button type="button" class="btn btn-outline-light" @click="getSender3">GET3</button>
-        <button type="button" class="btn btn-outline-light" @click="getSender3bb">GET3bb</button>
+        <button type="button" class="btn btn-outline-light" @click="getEnv">getEnv</button>
         <button type="button" class="btn btn-outline-light" @click="postSender">POST</button>
         <button type="button" class="btn btn-outline-light" @click="putSender">PUT</button>
         <button type="button" class="btn btn-outline-light" @click="patchSender">PATCH</button>
@@ -61,6 +61,9 @@ export default {
       await axios.get('/api/', {
         params: {
           ID: 12345
+        },
+        headers:{
+          authorization:this.$s.userJWT
         }
       })
         .then((res) => {
@@ -99,12 +102,8 @@ export default {
         });
     },
 
-    async getSender3bb() {
-      await axios.get('/api/test3/bb/cc?name=st%C3%A5le&car=saab', {
-        params: {
-          ID: 12345
-        }
-      })
+    async getEnv() {
+      await axios.get('/api/getEnv')
         .then((res) => {
           console.log(res.data);
         })

@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: mpp-tmp
+    ports:
+      - "8888:8888"  # Porta usata da Netlify Dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ~/.netlify:/root/.netlify
+    environment:
+      - NODE_ENV=development
+      # - NETLIFY_AUTH_TOKEN=${NETLIFY_AUTH_TOKEN}
+    command: ["ntl", "dev"]
