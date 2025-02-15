@@ -1,7 +1,7 @@
 import axios from "axios";
 import { user } from "../stores/user";
 
-export default class Firebase {
+export default class FIREBASE {
     static build(item, required = {}, optional = {}) {
         for (const key in { ...required, ...optional, id: undefined }) {
             this[key] = item[key] ?? required[key] ?? optional[key];
