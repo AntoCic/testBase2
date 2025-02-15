@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router'
 
 import HomeView from './pages/HomeView.vue'
 import ContactView from './pages/ContactView.vue'
+import LoginView from './pages/LoginView.vue'
 import UserView from './pages/UserView.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
@@ -16,13 +17,13 @@ const fullRoutes = {
 
   
   notAuth: [ // Aggiungi le rotte visibili solo se non sei autenticato qui, se necessario.
-    { path: '/user', name: 'user', component: UserView },
+    { path: '/login', name: 'login', component: LoginView },
   ],
 
 
   
   auth: [ // Aggiungi le rotte visibili solo se autenticato qui, se necessario.
-    
+    { path: '/user', name: 'user', component: UserView },
   ],
 };
 

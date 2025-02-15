@@ -1,9 +1,6 @@
 import { reactive } from 'vue';
-
 import {$loading} from './loading.js'
-import Item from './models/Item.js';
 import axios from "axios";
-// Item.configure();
 
 // store
 export const $s = reactive({
@@ -47,10 +44,10 @@ export const $s = reactive({
 
     async onLogin() {
         // INSERISCI QUA CARICAMENTI DATI USER
-        await this.item.get()
-        this.loading.on("Altri 2s per vedere il loader");
+        // await this.item.get()
+        $loading.on("Altri 2s per vedere il loader");
         setTimeout(() => {
-            this.loading.off();
+            $loading.off();
         }, 2000);
     },
 
@@ -58,22 +55,5 @@ export const $s = reactive({
         console.log('- LOGOUT -');
     },
 
-    item: {
-        all: null,
-
-        async get() {
-            this.all = await Item.get();
-            return
-        },
-
-        async add(newItem) {
-            const added = await Item.add(newItem, true);
-            if (added) {
-                this.all = { ...this.all, ...added }
-            } else {
-                console.error('Errore adding item');
-            }
-        },
-
-    },
+    
 });

@@ -3,8 +3,8 @@ import App from './App.vue'
 import './style/general.scss'
 import * as bootstrap from 'bootstrap'
 import { router } from './router'
-import { $s } from './store'
-import { $loading } from './loading.js'
+import { $s } from './stores/store.js'
+import { $loading } from './stores/loading.js'
 import $u from './utility.js'
 
 const app = createApp(App)

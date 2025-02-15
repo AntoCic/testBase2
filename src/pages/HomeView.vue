@@ -41,8 +41,11 @@
         <button type="button" class="btn btn-outline-light" @click="patchSender">PATCH</button>
         <button type="button" class="btn btn-outline-light" @click="deleteSender">DELETE</button>
       </div>
-      <div v-if="$s.userJWT" class="col-12 col-md-8 mx-auto">
+      <div v-if="$s.userJWT" class="col-12 mt-3">
         <h2>logged</h2>
+      </div>
+      <div class="col-12 mt-3">
+        <CmpConvertEnv />
       </div>
     </div>
 
@@ -51,9 +54,12 @@
 
 <script>
 import axios from 'axios';
+import CmpConvertEnv from '../components/CmpConvertEnv.vue';
 export default {
+  components: { CmpConvertEnv },
   data() {
     return {
+      env:''
     };
   },
   methods: {
@@ -106,6 +112,7 @@ export default {
       await axios.get('/api/getEnv')
         .then((res) => {
           console.log(res.data);
+          this.env = res.data
         })
         .catch((err) => {
           console.log(err);

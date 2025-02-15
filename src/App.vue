@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { user } from './user.js';
+import { user } from './stores/user.js';
 import { routes } from './router.js';
 import AppHeader from './layout/AppHeader.vue'
 import AppFooter from './layout/AppFooter.vue'

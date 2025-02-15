@@ -1,54 +1,56 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'firebase/auth';
+import { auth, provider, getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut, onAuthStateChanged, sendPasswordResetEmail } from '../firebase.js';
+import PersonalInfo from '../models/PersonalInfo.js';
 import { reactive } from 'vue'
 import axios from 'axios'
-
-// Segui il README nella sezione START WITH FIREBASE prima di continuare
-// Sistema la tua public apiKey e authDomain qui sotto
-const firebaseConfig = {
-    apiKey: "AIzaSyAkVg40jIUOiulJ9OtndzkPFp_wgE-Q06M",
-    authDomain: "temp-vue-firebase.firebaseapp.com",
-};
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyByFzlVlR70cs9WLQh7ROTkFeDDf-P0ANU",
-//   authDomain: "tempbase2.firebaseapp.com",
-//   databaseURL: "https://tempbase2-default-rtdb.europe-west1.firebasedatabase.app",
-//   projectId: "tempbase2",
-//   storageBucket: "tempbase2.firebasestorage.app",
-//   messagingSenderId: "269131075816",
-//   appId: "1:269131075816:web:5a12d30275e968f145395d"
-// };
-
-if (firebaseConfig.apiKey === "") {
-    console.log("Non hai settato il firebaseConfig in src/firebase.js");
-}
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Auth
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
 export const user = reactive({
     accessToken: null,
     uid: null,
     email: null,
-    userName: null,
+    displayName: null,
+    phoneNumber: null,
+    photoURL: null,
+
+    personalInfo: new PersonalInfo(),
+    // personalInfo: {
+    //     all: null,
+    
+    //     async get() {
+    //         console.log(await personalInfo.get())
+    //         return
+    //     },
+    
+    //     async add(newItem) {
+    //         const added = await Item.add(newItem, true);
+    //         if (added) {
+    //             this.all = { ...this.all, ...added }
+    //         } else {
+    //             console.error('Errore adding item');
+    //         }
+    //     },
+    
+    // },
 
     checkLogged() {
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                this.accessToken = currentUser.accessToken
-                this.uid = currentUser.uid
-                this.email = currentUser.email
+                const { accessToken, uid, email, displayName, phoneNumber, photoURL } = currentUser;
+                this.accessToken = accessToken;
+                this.uid = uid;
+                this.email = email;
+                this.displayName = displayName;
+                this.phoneNumber = phoneNumber;
+                this.photoURL = photoURL;
 
-                if (this.userName) {
-                    await this.addUserName(this.userName)
-                } else {
-                    this.userName = await this.getUserName()
+                console.log(this.displayName);
+                console.log(this.personalInfo);
+                
+                try {
+                    await this.personalInfo?.init();
+                } catch (error) {
+                    console.error('Errore personalInfo.init: ', error);
                 }
+
                 // store.loading.off();
             } else {
                 this.reset();
@@ -110,25 +112,17 @@ export const user = reactive({
             });
     },
     // Metodo per eseguire il logout
-    async getUserName() {
+    async getPersonalInfo() {
         // store.loading.on();
-        return await axios.post('/api/g/userdata/userName', {}, {
+        return await axios.get('/api/user/personalInfo', {
             headers: {
                 "Authorization": this.accessToken
             }
         })
             .then(async (res) => {
-                if (res.data && res.data.constructor !== Object) {
-                    return res.data
-                } else {
-                    const userName = prompt("Inserisci il Nome utenete").trim();
-                    if (userName != null && userName != '') {
-                        return await this.addUserName(userName)
-                    } else {
-                        alert("Nome non settato correttamente");
-                        return null
-                    }
-                }
+                this.personalInfo = res.data
+                console.log({ personalInfo: this.personalInfo });
+                return this.personalInfo
             })
             .catch((error) => {
                 console.error(error)
@@ -169,16 +163,19 @@ export const user = reactive({
         try {
             await signOut(auth);
         } catch (error) {
-            this.reset();
             console.error('Logout failed', error);
         }
+        this.reset();
     },
     // Metodo per eseguire il logout
     reset() {
-        this.accessToken = false
-        this.uid = null
-        this.email = null
-        this.userName = null
+        this.accessToken = false;
+        this.uid = null;
+        this.email = null;
+        this.displayName = null;
+        this.phoneNumber = null;
+        this.photoURL = null;
+        personalInfo = null;
         // store.loading.off();
     },
 
