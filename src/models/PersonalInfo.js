@@ -1,4 +1,4 @@
-import FIREBASE from "../personal_modules/Firebase";
+import FIREBASE from "../personal_modules/Firebase.js";
 
 export default class PersonalInfo extends FIREBASE {
     static mainPaths = "user/personalInfo"; // Definisci qui il mainPaths per firebase 
