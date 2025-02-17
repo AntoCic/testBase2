@@ -1,8 +1,8 @@
 <!-- App.vue -->
 <template>
-  <CmpLoading v-if="$loading.state || user.accessToken === null" />
+  <CmpLoading v-if="$loading.state || $s.userJWT" />
 
-  <template v-if="user.accessToken !== null">
+  <template v-if="!$s.userJWT">
     <AppHeader />
     <main class="d-flex">
       <RouterView />
@@ -40,7 +40,7 @@ export default {
       }
     },
     '$route.name'(newRoute, oldRoute) {
-      if (newRoute && newRoute !== oldRoute && user.accessToken !== null) {
+      if (newRoute && newRoute !== oldRoute && user.accessToken !== '') {
         this.checkRoute()
       }
     },

@@ -12,7 +12,7 @@ export const $s = reactive({
     bkColor: __APP_BACKGROUND_COLOR__,
     logoPath: __APP_LOGO__,
 
-    userJWT: null,
+    userJWT: '',
 
     async start() {
 

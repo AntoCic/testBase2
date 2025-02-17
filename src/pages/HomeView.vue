@@ -24,27 +24,25 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row justify-content-center ">
       <div class="col-12 text-center">
         <h1 class="bg-light text-dark px-4 py-2 rounded bg-opacity-75">
           {{ $s.appName }} - {{ $s.appShortName }} - {{ $s.appVersion }}
         </h1>
-        <p class="mb-1">{{ $s.appDescription }}</p>
       </div>
-      <div class="col">
-        <button type="button" class="btn btn-outline-light" @click="getSender1">GET1</button>
-        <button type="button" class="btn btn-outline-light" @click="getSender2">GET2</button>
-        <button type="button" class="btn btn-outline-light" @click="getSender3">GET3</button>
-        <button type="button" class="btn btn-outline-light" @click="getEnv">getEnv</button>
+      <div class="col-auto">
+        <button type="button" class="btn btn-outline-light" @click="callGet">test call GET</button>
+        <button type="button" class="btn btn-outline-light" @click="callGetAuth">test call GET AUTH</button>
         <button type="button" class="btn btn-outline-light" @click="postSender">POST</button>
         <button type="button" class="btn btn-outline-light" @click="putSender">PUT</button>
         <button type="button" class="btn btn-outline-light" @click="patchSender">PATCH</button>
         <button type="button" class="btn btn-outline-light" @click="deleteSender">DELETE</button>
       </div>
-      <div v-if="$s.userJWT" class="col-12 mt-3">
-        <h2>logged</h2>
+      <div v-if="responce.length" class="col-12">
+        <pre class="bg-light text-dark">{{ responce }}</pre>
       </div>
       <div class="col-12 mt-3">
+        <p class="mb-1">{{ $s.appDescription }}</p>
         <CmpConvertEnv />
       </div>
     </div>
@@ -59,63 +57,29 @@ export default {
   components: { CmpConvertEnv },
   data() {
     return {
-      env:''
+      responce: [],
     };
   },
   methods: {
-    async getSender1() {
-      await axios.get('/api/', {
-        params: {
-          ID: 12345
-        },
-        headers:{
-          authorization:this.$s.userJWT
-        }
-      })
+    async callGet() {
+      await axios.get('/api/')
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
+          this.responce.push(err);
         });
     },
 
-    async getSender2() {
-      await axios.get('/api/test', {
-        params: {
-          ID: 12345
-        }
-      })
+    async callGetAuth() {
+      await axios.get('/api/', { params: { test: 'hola' }, headers: { authorization: this.$s.userJWT } })
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
-        });
-    },
-
-    async getSender3() {
-      await axios.get('/api/test3/pippo/cc?name=st%C3%A5le&car=saab', {
-        params: {
-          ID: 12345
-        }
-      })
-        .then((res) => {
-          console.log(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    async getEnv() {
-      await axios.get('/api/getEnv')
-        .then((res) => {
-          console.log(res.data);
-          this.env = res.data
-        })
-        .catch((err) => {
-          console.log(err);
+          this.responce.push(err);
         });
     },
 
@@ -135,37 +99,41 @@ export default {
       }
       )
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
+          this.responce.push(err);
         });
     },
     async putSender() {
       await axios.put('/api/aa/bb/cc', { msg: 'PUT' })
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
+          this.responce.push(err);
         });
     },
     async patchSender() {
       await axios.patch('/api/aa/bb/cc', { msg: 'PATCH' })
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
+          this.responce.push(err);
         });
     },
     async deleteSender() {
       await axios.delete('/api/aa/bb/cc', { msg: 'DELETE' })
         .then((res) => {
-          console.log(res.data);
+          this.responce.push(res.data);
         })
         .catch((err) => {
           console.log(err);
+          this.responce.push(err);
         });
     },
   },

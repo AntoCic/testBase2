@@ -1,7 +1,7 @@
 import axios from "axios";
 import { user } from "../stores/user";
 
-export default class FIREBASE {
+export default class UserDB {
     static build(item, required = {}, optional = {}) {
         for (const key in { ...required, ...optional, id: undefined }) {
             this[key] = item[key] ?? required[key] ?? optional[key];
@@ -10,41 +10,17 @@ export default class FIREBASE {
 
     async parse(res) {
         if (res) {
-            for (const key in res) {
-                this[key] = res[key];
-            }
-            if (this.id) { this.id = 'init' } 
+            for (const key in res) { this[key] = res[key] }
+            if (!this.id) { this.id = this.constructor.mainPaths }
             return this;
         }
         return res;
     }
 
-    getAuth() {
-        const token = user.accessToken;
-        if (!token) {
-            console.error('No access token available.');
-            return {};
-        }
-        return token;
-    }
+    async init() { return this.id ? this : await this.get() }
 
-    // todo c'è la init ma si deve creare la initAuth
-    async init() {
-        if (this.id) {
-            return this
-        } else {
-            return await this.get();
-        }
-        
-    }
-
-    // todo c'è la get ma si deve creare la getAuth
-     async get() {
-        return await axios.get('/api/' + this.constructor.mainPaths, {
-            headers: {
-                "Authorization": this.getAuth()
-            }
-        })
+    async get() {
+        return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { "Authorization": user.accessToken } })
             .then(async (res) => {
                 return await this.parse(res.data);
             })
@@ -55,11 +31,7 @@ export default class FIREBASE {
     }
 
     async add(resource, id = false) {
-        return await axios.post('/api/a/' + this.constructor.mainPaths, { data: resource, id }, {
-            headers: {
-                "Authorization": this.getAuth()
-            }
-        })
+        return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { "Authorization": user.accessToken } })
             .then(async (res) => {
                 return await this.parse(res.data);
             })
@@ -82,11 +54,7 @@ export default class FIREBASE {
         }
 
         if (newResource != null) {
-            return await axios.put('/api/u/' + this.constructor.mainPaths, { data: updateResource, id: this.id }, {
-                headers: {
-                    "Authorization": FIREBASE.getAuth()
-                }
-            })
+            return await axios.put('/api/user/' + this.constructor.mainPaths, { data: updateResource, id: this.id }, { headers: { "Authorization": user.accessToken } })
                 .then(async (res) => {
                     return await this.constructor.parse(res.data);
                 })
@@ -109,7 +77,7 @@ export default class FIREBASE {
         } else {
             propPath = ''
         }
-        return await axios.delete('/api/d/' + this.constructor.mainPaths + propPath, { data: { id }, headers: { "Authorization": FIREBASE.getAuth() } })
+        return await axios.delete('/api/user/' + this.constructor.mainPaths + propPath, { data: { id }, headers: { "Authorization": user.accessToken } })
             .then(async (res) => {
                 if (res.data.deleted) {
                     if (id === this.id) {
@@ -130,9 +98,9 @@ export default class FIREBASE {
 
 
     // async getFiles() {
-    //     return await axios.post(`/api/g-files/${this.id}`, { fileNames: this.files }, {
+    //     return await axios.post(`/api/user/g-files/${this.id}`, { fileNames: this.files }, {
     //         headers: {
-    //             "Authorization": FIREBASE.getAuth()
+    //             "Authorization": user.accessToken
     //         }
     //     }).then((res) => {
     //         if (res.data.urls) {
@@ -169,12 +137,12 @@ export default class FIREBASE {
     //             const fileName = file.name;
 
     //             // Effettua la richiesta di upload
-    //             const res = await axios.post(`/api/a-file/${this.id}`, {
+    //             const res = await axios.post(`/api/user/a-file/${this.id}`, {
     //                 base64Data,
     //                 fileName
     //             }, {
     //                 headers: {
-    //                     "Authorization": FIREBASE.getAuth()
+    //                     "Authorization": user.accessToken
     //                 }
     //             })
 
@@ -201,9 +169,9 @@ export default class FIREBASE {
 
     // async deleteFile(filekey) {
     //     const fileName = this.files[filekey].fileName
-    //     axios.post(`/api/d-file/${this.id}`, { fileName }, {
+    //     axios.post(`/api/user/d-file/${this.id}`, { fileName }, {
     //         headers: {
-    //             Authorization: FIREBASE.getAuth(),
+    //             Authorization: user.accessToken,
     //         },
     //     }).then(async (res) => {
     //         if (res.data.deleted) {

@@ -8,10 +8,9 @@
 import admin from 'firebase-admin';
 
 const routes = {
-  auth: {
+  notAuth: {
     GET: {
-      "": '[GET][AUTH]/: è una chiamata get senza pathParams',
-      user:userGet,
+      "": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
     },
     POST: {},
     PUT: {},
@@ -19,22 +18,25 @@ const routes = {
     DELETE: {},
   },
 
-  notAuth: {
+  auth: {
     GET: {
-      "": '[GET][NOT_AUTH]/: è una chiamata get senza pathParams',
+      "": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
+      user: async (event) => await firebase?.user.get(event.pathParams),
     },
-    POST: {},
-    PUT: {},
+    POST: {
+      user: async (event) => await firebase?.user.post(event.pathParams),
+    },
+    PUT: {
+      user: async (event) => await firebase?.user.put(event.pathParams),
+    },
     PATCH: {},
-    DELETE: {},
+    DELETE: {
+      user: async (event) => await firebase?.user.delete(event.pathParams),
+    },
   }
 }
 
-async function userGet(event) {
-  console.log(event);
 
-   return await firebase?.user.get(event.pathParams)
-}
 
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
@@ -362,6 +364,8 @@ class EventHandler {
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
     this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
+    console.log(headers?.authorization);
+    
     if (headers?.authorization) delete headers.authorization
     // this.headers = headers;
 

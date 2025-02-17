@@ -4,13 +4,13 @@
       <nav class="row align-items-center my-1">
         <div class="col">
           <RouterLink :to="{ name: 'home' }">
-            <img :src="$s.logoPath" class="logo-shadows align-text-top" alt="logo" />
+            <img :src="$s.logoPath" class="logo-shadows logo-app align-text-top" alt="logo" />
           </RouterLink>
         </div>
         <div class="col-auto">
 
-          <RouterLink v-if="user.accessToken"  :to="{ name: 'user' }">
-            <img :src="user.photoURL" alt="User Photo" class="rounded-circle" width="40">
+          <RouterLink v-if="$s.userJWT"  :to="{ name: 'user' }">
+            <img :src="user.photoURL" alt="User Photo" class="logo-shadows rounded-circle" width="40">
           </RouterLink>
 
           <RouterLink :to="{ name: 'login' }" v-else>
@@ -42,7 +42,7 @@ export default {
 
 
 <style lang="scss" scoped>
-.logo-shadows {
+.logo-app {
   height: 6em;
 }
 </style>

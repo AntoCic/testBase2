@@ -1,6 +1,6 @@
-import FIREBASE from "../personal_modules/firebase.js";
+import UserDB from "../personal_modules/UserDB.js";
 
-export default class PersonalInfo extends FIREBASE {
+export default class PersonalInfo extends UserDB {
     static mainPaths = "user/personalInfo"; // Definisci qui il mainPaths per firebase 
 
     constructor(personalInfo = {}) {
@@ -10,10 +10,13 @@ export default class PersonalInfo extends FIREBASE {
 
         const optional = {
             userName: null,
+            name: null,
+            surname: null,
+            phoneNumber: null
         };
 
         // Costruisci l'oggetto usando il metodo build
-        FIREBASE.build.call(this, personalInfo, required, optional);
+        UserDB.build.call(this, personalInfo, required, optional);
     }
 
     // static async parse(res) {

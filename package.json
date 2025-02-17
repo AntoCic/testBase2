@@ -4,7 +4,7 @@
   "name": "temp2-vue-bootstrap-firebase",
   "short_name": "TEMP",
   "private": true,
-  "description": "come prima cosa sistema le info in packagejson",
+  "description": "Come prima cosa sistema il firebaseConfig in src/firebase.js",
   "display": "fullscreen",
   "background_color": "#212529",
   "logo": "/img/logo/logo.png",

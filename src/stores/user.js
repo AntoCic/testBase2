@@ -4,7 +4,7 @@ import { reactive } from 'vue'
 import axios from 'axios'
 
 export const user = reactive({
-    accessToken: null,
+    accessToken: '',
     uid: null,
     email: null,
     displayName: null,
@@ -169,13 +169,13 @@ export const user = reactive({
     },
     // Metodo per eseguire il logout
     reset() {
-        this.accessToken = false;
+        this.accessToken = '';
         this.uid = null;
         this.email = null;
         this.displayName = null;
         this.phoneNumber = null;
         this.photoURL = null;
-        personalInfo = null;
+        this.personalInfo = null;
         // store.loading.off();
     },
 
