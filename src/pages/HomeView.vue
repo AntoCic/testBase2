@@ -38,8 +38,8 @@
         <button type="button" class="btn btn-outline-light" @click="patchSender">PATCH</button>
         <button type="button" class="btn btn-outline-light" @click="deleteSender">DELETE</button>
       </div>
-      <div v-if="responce.length" class="col-12">
-        <pre class="bg-light text-dark">{{ responce }}</pre>
+      <div v-if="response.length" class="col-12">
+        <pre class="bg-light text-dark">{{ response }}</pre>
       </div>
       <div class="col-12 mt-3">
         <p class="mb-1">{{ $s.appDescription }}</p>
@@ -57,29 +57,32 @@ export default {
   components: { CmpConvertEnv },
   data() {
     return {
-      responce: [],
+      response: [],
     };
   },
   methods: {
     async callGet() {
       await axios.get('/api/')
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
           console.log(err);
-          this.responce.push(err);
+          if (err?.response?.data?.error) {
+            this.response.push(err.response.data);
+          } else {
+            this.response.push(err);
+          }
         });
     },
 
     async callGetAuth() {
-      await axios.get('/api/', { params: { test: 'hola' }, headers: { authorization: this.$s.userJWT } })
+      await axios.get('/api/', { params: { test: 'hola' }, headers: { authorization: this.$s.accessToken } })
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
-          console.log(err);
-          this.responce.push(err);
+          this.response.push(this.$s.axiosErrror(err));
         });
     },
 
@@ -92,48 +95,48 @@ export default {
         params: {
           ID: 12345
         },
-        headers: {
-          authorization: "pippo",
-          'Content-Type': "application/json"
-        }
       }
       )
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
-          console.log(err);
-          this.responce.push(err);
+          this.response.push(this.$s.axiosErrror(err));
         });
     },
     async putSender() {
-      await axios.put('/api/aa/bb/cc', { msg: 'PUT' })
+      await axios.put('/api/aa/bb/cc', { msg: 'PUT' },{
+        params: {
+          ID: 12345
+        },
+      })
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
-          console.log(err);
-          this.responce.push(err);
+          this.response.push(this.$s.axiosErrror(err));
         });
     },
     async patchSender() {
-      await axios.patch('/api/aa/bb/cc', { msg: 'PATCH' })
+      await axios.patch('/api/aa/bb/cc', { msg: 'PATCH' },{
+        params: {
+          ID: 12345
+        },
+      })
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
-          console.log(err);
-          this.responce.push(err);
+          this.response.push(this.$s.axiosErrror(err));
         });
     },
     async deleteSender() {
-      await axios.delete('/api/aa/bb/cc', { msg: 'DELETE' })
+      await axios.delete('/api/aa/bb/cc', { params: { chiave: 1234567890000999 }, headers: { holla: 'pippo'} })
         .then((res) => {
-          this.responce.push(res.data);
+          this.response.push(res.data);
         })
         .catch((err) => {
-          console.log(err);
-          this.responce.push(err);
+          this.response.push(this.$s.this.$s.axiosErrror(err));
         });
     },
   },

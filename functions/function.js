@@ -12,10 +12,18 @@ const routes = {
     GET: {
       "": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
     },
-    POST: {},
-    PUT: {},
-    PATCH: {},
-    DELETE: {},
+    POST: {
+      "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    PUT: {
+      "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    PATCH: {
+      "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    DELETE: {
+      "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
   },
 
   auth: {
@@ -364,8 +372,6 @@ class EventHandler {
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
     this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
-    console.log(headers?.authorization);
-    
     if (headers?.authorization) delete headers.authorization
     // this.headers = headers;
 
@@ -376,6 +382,8 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
+    console.log(this);
+    
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
@@ -436,7 +444,7 @@ class EventHandler {
 
   async response() {
     // se invio headers.authorization cerco tra le rotte auth 
-    if (this.authorization) {
+    if (this.authorization !== undefined) {
       if (await this.isAuth()) {
         return this.getroutesFunction(this.routes.auth?.[this.httpMethod]) ?? this.getResponse();
       } else {

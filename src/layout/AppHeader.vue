@@ -9,7 +9,7 @@
         </div>
         <div class="col-auto">
 
-          <RouterLink v-if="$s.userJWT"  :to="{ name: 'user' }">
+          <RouterLink v-if="$s.isLogged" :to="{ name: 'user' }">
             <img :src="user.photoURL" alt="User Photo" class="logo-shadows rounded-circle" width="40">
           </RouterLink>
 

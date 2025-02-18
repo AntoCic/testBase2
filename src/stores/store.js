@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import {$loading} from './loading.js'
+import { $loading } from './loading.js'
 import axios from "axios";
 
 // store
@@ -12,10 +12,11 @@ export const $s = reactive({
     bkColor: __APP_BACKGROUND_COLOR__,
     logoPath: __APP_LOGO__,
 
-    userJWT: '',
+    isAppOnline: navigator.onLine,
+    isLogged: null,
+    accessToken: '',
 
     async start() {
-
         $loading.on()
         setTimeout(async () => {
 
@@ -35,7 +36,7 @@ export const $s = reactive({
             //         location.reload();
             //     });
 
-           $loading.off()
+            $loading.off()
         }, 2000);
 
         // INSERISCI QUA CARICAMENTI DATI PUBLICI
@@ -55,5 +56,12 @@ export const $s = reactive({
         console.log('- LOGOUT -');
     },
 
-    
+    axiosErrror(error) {
+        const errorMsg = error.response?.data?.error ?? `Errore: ${error.response?.status} - ${error.response?.statusText}`
+        console.error(errorMsg)
+        console.log(error);
+        // todo tost
+        return errorMsg
+    }
+
 });

@@ -20,7 +20,7 @@ export default class UserDB {
     async init() { return this.id ? this : await this.get() }
 
     async get() {
-        return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { "Authorization": user.accessToken } })
+        return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 return await this.parse(res.data);
             })
@@ -31,7 +31,7 @@ export default class UserDB {
     }
 
     async add(resource, id = false) {
-        return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { "Authorization": user.accessToken } })
+        return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 return await this.parse(res.data);
             })
@@ -54,7 +54,7 @@ export default class UserDB {
         }
 
         if (newResource != null) {
-            return await axios.put('/api/user/' + this.constructor.mainPaths, { data: updateResource, id: this.id }, { headers: { "Authorization": user.accessToken } })
+            return await axios.put('/api/user/' + this.constructor.mainPaths, { data: updateResource, id: this.id }, { headers: { authorization: user.accessToken } })
                 .then(async (res) => {
                     return await this.constructor.parse(res.data);
                 })
@@ -77,7 +77,7 @@ export default class UserDB {
         } else {
             propPath = ''
         }
-        return await axios.delete('/api/user/' + this.constructor.mainPaths + propPath, { data: { id }, headers: { "Authorization": user.accessToken } })
+        return await axios.delete('/api/user/' + this.constructor.mainPaths + propPath, { data: { id }, headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 if (res.data.deleted) {
                     if (id === this.id) {
@@ -100,7 +100,7 @@ export default class UserDB {
     // async getFiles() {
     //     return await axios.post(`/api/user/g-files/${this.id}`, { fileNames: this.files }, {
     //         headers: {
-    //             "Authorization": user.accessToken
+    //             authorization: user.accessToken
     //         }
     //     }).then((res) => {
     //         if (res.data.urls) {
@@ -142,7 +142,7 @@ export default class UserDB {
     //                 fileName
     //             }, {
     //                 headers: {
-    //                     "Authorization": user.accessToken
+    //                     authorization: user.accessToken
     //                 }
     //             })
 

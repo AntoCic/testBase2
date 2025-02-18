@@ -1,8 +1,8 @@
 <!-- App.vue -->
 <template>
-  <CmpLoading v-if="$loading.state || $s.userJWT" />
+  <CmpLoading v-if="$s.isLogged !== null ? $loading.state : false" />
 
-  <template v-if="!$s.userJWT">
+  <template v-if="$s.isLogged !== null">
     <AppHeader />
     <main class="d-flex">
       <RouterView />
@@ -10,6 +10,10 @@
     <AppFooter />
   </template>
   <p v-else>.</p>
+  <pre>
+  store:{{ $s }}
+  user:{{ user }}
+  </pre>
 </template>
 
 <script>
@@ -26,31 +30,31 @@ export default {
       routes,
     }
   },
-  
+
   watch: {
-    'user.accessToken'(newLog, oldLog) {
+    'user.isLogged'(newLog, oldLog) {
       if (newLog !== oldLog) {
-        this.$s.userJWT = newLog
+        this.$s.accessToken = user.accessToken;
+        this.$s.isLogged = newLog;
         if (newLog) {
-          this.$s.onLogin()
+          this.$s.onLogin();
         } else {
-          this.$s.onLogout()
+          this.$s.onLogout();
         }
-        this.checkRoute()
+        this.checkRoute();
       }
     },
     '$route.name'(newRoute, oldRoute) {
-      if (newRoute && newRoute !== oldRoute && user.accessToken !== '') {
-        this.checkRoute()
+      if (newRoute && newRoute !== oldRoute) {
+        this.checkRoute();
       }
     },
+    'navigator.onLine'(newRoute, oldRoute) { this.$s.isAppOnline },
   },
 
   methods: {
     checkRoute() {
-      // se this.$s.userJWT non é null o false l'utente é loggato
-      // dunque se loggato this.$s.userJWT sará considerato true
-      if (this.$s.userJWT) {
+      if (this.$s.isLogged) {
         if (this.routes.notAuth.includes(this.$route.name)) {
           this.$router.push({ name: 'home' });
         }
@@ -63,8 +67,8 @@ export default {
   },
 
   async mounted() {
-    await this.$s.start()
-    this.user.checkLogged()
+    await this.$s.start();
+    this.user.checkLogged();
   },
 }
 </script>

@@ -4,6 +4,8 @@ import { reactive } from 'vue'
 import axios from 'axios'
 
 export const user = reactive({
+
+    isLogged: null,
     accessToken: '',
     uid: null,
     email: null,
@@ -14,12 +16,12 @@ export const user = reactive({
     personalInfo: new PersonalInfo(),
     // personalInfo: {
     //     all: null,
-    
+
     //     async get() {
     //         console.log(await personalInfo.get())
     //         return
     //     },
-    
+
     //     async add(newItem) {
     //         const added = await Item.add(newItem, true);
     //         if (added) {
@@ -28,12 +30,14 @@ export const user = reactive({
     //             console.error('Errore adding item');
     //         }
     //     },
-    
+
     // },
 
     checkLogged() {
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
+                console.log(currentUser);
+                
                 const { accessToken, uid, email, displayName, phoneNumber, photoURL } = currentUser;
                 this.accessToken = accessToken;
                 this.uid = uid;
@@ -41,10 +45,11 @@ export const user = reactive({
                 this.displayName = displayName;
                 this.phoneNumber = phoneNumber;
                 this.photoURL = photoURL;
+                this.isLogged = true;
 
                 console.log(this.displayName);
                 console.log(this.personalInfo);
-                
+
                 try {
                     await this.personalInfo?.init();
                 } catch (error) {
@@ -133,31 +138,31 @@ export const user = reactive({
 
     },
     // Metodo per eseguire il logout
-    async addUserName(userName) {
-        // store.loading.on();
+    // async addUserName(userName) {
+    //     // store.loading.on();
 
-        const id = 'userName'
-        const data = userName
+    //     const id = 'userName'
+    //     const data = userName
 
-        return await axios.post('/api/a/userdata', { id, data }, {
-            headers: {
-                "Authorization": this.accessToken
-            }
-        })
-            .then((res) => {
-                if (res.data.userName) {
-                    return res.data.userName
-                } else {
-                    return null
-                }
-            })
-            .catch((error) => {
-                console.error(error)
-                // store.loading.off();
-                return null
-            })
+    //     return await axios.post('/api/a/userdata', { id, data }, {
+    //         headers: {
+    //             "Authorization": this.accessToken
+    //         }
+    //     })
+    //         .then((res) => {
+    //             if (res.data.userName) {
+    //                 return res.data.userName
+    //             } else {
+    //                 return null
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error(error)
+    //             // store.loading.off();
+    //             return null
+    //         })
 
-    },
+    // },
     // Metodo per eseguire il logout
     async logout() {
         try {
@@ -169,6 +174,7 @@ export const user = reactive({
     },
     // Metodo per eseguire il logout
     reset() {
+        this.isLogged = false;
         this.accessToken = '';
         this.uid = null;
         this.email = null;

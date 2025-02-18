@@ -3,7 +3,7 @@ version: "3.8"
 services:
   app:
     build: .
-    container_name: mpp-tmp
+    container_name: testBase2
     ports:
       - "8888:8888"  # Porta usata da Netlify Dev
     volumes:
