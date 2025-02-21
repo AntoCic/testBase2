@@ -2,14 +2,17 @@
     <label v-if="label" :for="idToSet" :class="['form-label', labelClass]" :style="labelStyle">
         {{ label === true ? idToSet : label }}
     </label>
-    <input type="text" v-model="value" :class="['form-label', inputClass]" :style="inputStyle" :id="idToSet"
-        :name="idToSet" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
-        :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength"
-        :lang="lang" :inputmode="inputmode" :list="isList">
+    <input type="text" v-model="value" :class="['form-control', inputClass, classValidator]"
+        :style="inputStyle" :id="idToSet" :name="idToSet" :placeholder="placeholder" :autocomplete="autocomplete"
+        :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
+        :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
+    <div class="invalid-feedback">{{ validatorOptions?.textError ? validatorOptions.textError : `Il campo deve contenere
+        tra ${minlength !== undefined ? minlength : '2'} a ${maxlength !== undefined ? maxlength : '255'} caratteri` }}
+    </div>
     <datalist v-if="isList" :id="isList">
         <option v-for="option in list" :key="option" :value="option"></option>
     </datalist>
-    <p :class="'text-danger'"> errore validazione</p>
+
 </template>
 
 <script>
@@ -22,6 +25,9 @@ export default {
         modelValue: {
             type: Object,
             required: true
+        },
+        validatorOptions: {
+            required: false
         },
 
         id: {
@@ -70,7 +76,7 @@ export default {
         },
         minlength: {
             type: Number,
-            default: 3
+            required: false
         },
         autocomplete: {
             type: String,
@@ -115,10 +121,21 @@ export default {
         },
         isList() {
             return this.list.length ? `list-${this.idToSet}` : null
+        },
+        classValidator() {
+            return this.modelValue.classValidator(this.field)
         }
     },
     mounted() {
-        this.modelValue.setType(this.field, 'text');
+        const validatorOptions = this.validatorOptions ? this.validatorOptions : { min: this.minlength, max: this.maxlength }
+        let sendValidatorOptions = false
+        for (const key in validatorOptions) {
+            if (validatorOptions !== undefined) {
+                sendValidatorOptions = true
+                break;
+            }
+        }
+        this.modelValue.initField(this.field, 'text', sendValidatorOptions ? validatorOptions : null);
     }
 };
 </script>

@@ -7,17 +7,17 @@
 
 // Metodi di validazione
 
-// Il metodo check(key) esegue il validator associato al campo, aggiorna lo stato di validazione e ritorna il risultato.
-// checkAll() permette di validare l’intero form.
+// Il metodo checkField(field) esegue il validator associato al campo, aggiorna lo stato di validazione e ritorna il risultato.
+// check() permette di validare l’intero form.
 // areValid() ritorna true se tutti i campi con un validator definito sono validi.
 // Gestione delle classi per errori
-// Il metodo classError(key) restituisce la classe CSS (ad esempio, 'is-valid' o 'is-invalid') in base allo stato di validazione del campo.
+// Il metodo classValidator(field) restituisce la classe CSS (ad esempio, 'is-valid' o 'is-invalid') in base allo stato di validazione del campo.
 
 // Metodi aggiuntivi
 // I metodi getValid() e getNotValid() permettono di ottenere oggetti contenenti solo i campi validi o non validi, mentre reset() ripristina i valori iniziali e azzera lo stato di validazione.
 
 // Questa architettura rende il form centralizzato, modulare e facilmente estendibile in futuro per aggiungere ulteriori funzionalità o personalizzazioni.
-
+import Validator from "./Validator.js";
 export class FormValidator {
     constructor(fields) {
         if (typeof fields !== 'object' || fields === null) {
@@ -25,17 +25,17 @@ export class FormValidator {
         }
         // Creiamo un oggetto per salvare lo stato iniziale di ogni campo
         this.state = {};
-        for (const key in fields) {
-            if (Object.prototype.hasOwnProperty.call(fields, key)) {
+        for (const field in fields) {
+            if (Object.prototype.hasOwnProperty.call(fields, field)) {
                 // Assegniamo il valore iniziale come proprietà direttamente sull'istanza
-                this[key] = fields[key];
+                this[field] = fields[field];
                 // Salviamo lo stato iniziale, il tipo (potrebbe essere usato per validazioni più specifiche) e lo stato di validazione
-                this.state[key] = {
-                    initialValue: fields[key],
+                this.state[field] = {
+                    initialValue: fields[field],
                     type: null, // il tipo di input da validare viene settato in automatico quando viene inizializzato il componente
                     validated: null, // il tipo di input da validare viene settato in automatico quando viene inizializzato il componente
                     validator: null, // se settato definisce il metodo con cui viene validato il campo
-                    validatorOptions: null,
+                    validatorOptions: undefined,
                 };
             }
         }
@@ -46,9 +46,9 @@ export class FormValidator {
     */
     get() {
         const result = {};
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                result[key] = this[key];
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                result[field] = this[field];
             }
         }
         return result;
@@ -59,10 +59,10 @@ export class FormValidator {
     */
     getValid() {
         const result = {};
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                if (this.state[key].validated === true) {
-                    result[key] = this[key];
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                if (this.state[field].validated === true) {
+                    result[field] = this[field];
                 }
             }
         }
@@ -74,10 +74,10 @@ export class FormValidator {
     */
     getNotValid() {
         const result = {};
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                if (this.state[key].validated === false) {
-                    result[key] = this[key];
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                if (this.state[field].validated === false) {
+                    result[field] = this[field];
                 }
             }
         }
@@ -88,10 +88,10 @@ export class FormValidator {
     * Resetta i campi ai valori iniziali e reimposta lo stato di validazione.
     */
     reset() {
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                this[key] = this.state[key].initialValue;
-                this.state[key].validated = null;
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                this[field] = this.state[field].initialValue;
+                this.state[field].validated = null;
             }
         }
     }
@@ -100,12 +100,12 @@ export class FormValidator {
     * Valida tutti i campi che hanno un validator definito.
     * Ritorna true se tutti i campi validati risultano validi.
     */
-    checkAll() {
+    check() {
         let allValid = true;
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                if (this.state[key].validator) {
-                    const valid = this.check(key);
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                if (this.state[field].validator) {
+                    const valid = this.checkField(field);
                     if (!valid) {
                         allValid = false;
                     }
@@ -120,9 +120,9 @@ export class FormValidator {
    */
     areValid() {
         // Se per ogni campo con un validator lo stato validato è true, il form è valido
-        for (const key in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, key)) {
-                if (this.state[key].validator && this.state[key].validated !== true) {
+        for (const field in this.state) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+                if (this.state[field].validator && this.state[field].validated !== true) {
                     return false;
                 }
             }
@@ -133,9 +133,9 @@ export class FormValidator {
     /**
     * Verifica se un campo specifico è valido.
     */
-    isFieldValid(key) {
-        if (this.state[key]) {
-            return this.state[key].validated === true;
+    isFieldValid(field) {
+        if (this.state[field]) {
+            return this.state[field].validated === true;
         }
         return false;
     }
@@ -145,33 +145,34 @@ export class FormValidator {
     * - Se il campo ha un validator definito, lo esegue con il valore corrente e le eventuali opzioni.
     * - Imposta lo stato di validazione nel campo e ritorna true se il campo è valido, false altrimenti.
     */
-    check(key) {
-        if (!this.state[key] || !this.state[key].validator) {
-            console.warn(`Nessun validator definito per il campo "${key}"`);
+    checkField(field) {
+        if (!this.state[field] || !this.state[field].validator) {
+            console.warn(`Nessun validator definito per il campo "${field}"`);
             return true; // Se non è definito un validator, consideriamo il campo valido
         }
-        const value = this[key];
-        const options = this.state[key].options;
-        // Richiamiamo il validator con il contesto della classe per poter eventualmente accedere ad altri metodi se serve
-        const valid = this.state[key].validator.call(this, value, options);
-        this.state[key].validated = valid;
+        const value = this[field];
+        const validatorOptions = this.state[field].validatorOptions;
+        const valid = validatorOptions !== null ? this.state[field].validator.call(this, value, validatorOptions) : this.state[field].validator.call(this, value);
+
+        this.state[field].validated = valid ? true : this.state[field].validated === null ? null : false;
+        console.log(field, this.state[field].validated);
         return valid;
     }
 
     /**
    * Imposta il tipo per un campo e associa il validator di default corrispondente.
    * - `type`: stringa che indica il tipo di validazione (es. 'string', 'email', ecc.)
-   * - `options`: parametri aggiuntivi (es. [min, max] oppure un oggetto con proprietà specifiche)
+   * - `validatorOptions`: parametri aggiuntivi (es. [min, max] oppure un oggetto con proprietà specifiche)
    */
-    setType(key, type, validatorOptions = null) {
-        if (!this.state[key]) {
-            console.error(`Il campo "${key}" non esiste.`);
+    setType(field, type, validatorOptions = null) {
+        if (!this.state[field]) {
+            console.error(`Il campo "${field}" non esiste.`);
             return;
         }
-        this.state[key].type = type;
-        this.state[key].validatorOptions = validatorOptions;
-        if (this.state[key].validator === null || this.state[key].validator === true) {
-            this.state[key].validator = this['VL_' + type];
+        this.state[field].type = type;
+        this.state[field].validatorOptions = validatorOptions;
+        if (this.state[field].validator === null || this.state[field].validator === true) {
+            this.state[field].validator = Validator[type];
         }
     }
 
@@ -181,102 +182,18 @@ export class FormValidator {
    * - 'is-invalid' se il campo non è valido
    * - '' se non è stato ancora validato
    */
-    classError(key) {
-        if (!this.state[key]) return '';
-        if (this.state[key].validated === true) return 'is-valid';
-        if (this.state[key].validated === false) return 'is-invalid';
+    classValidator(field) {
+        if (!this.state[field]) return '';
+        if (this.state[field].validated === true) return 'is-valid';
+        if (this.state[field].validated === false) return 'is-invalid';
         return '';
     }
 
-    // --------------------------
-    // Validator di default
-    // Ogni funzione riceve il valore e, eventualmente, delle opzioni (min/max, valore di confronto, ecc.)
-    // Restituiscono true se il valore è valido, false altrimenti.
-
-    VL_text(value, options) {
-        let min = 3;
-        let max = 255;
-        if (options && Array.isArray(options)) {
-            min = options[0] || min;
-            max = options[1] || max;
-        }
-        if (typeof value !== 'string') return false;
-        return value.length >= min && value.length <= max;
+    /**
+   * 
+   */
+    initField(field, type, validatorOptions = null) {
+        this.setType(field, type, validatorOptions);
+        this.checkField(field);
     }
-
-    VL_email(value) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-        if (typeof value !== 'string') return false;
-        return emailRegex.test(value);
-    }
-
-    VL_integer(value, options) {
-        let min = 1;
-        let max = 255;
-        if (options && Array.isArray(options)) {
-            min = options[0] || min;
-            max = options[1] || max;
-        }
-        const intValue = parseInt(value, 10);
-        if (isNaN(intValue)) return false;
-        return intValue % 1 === 0 && intValue >= min && intValue <= max;
-    }
-
-    VL_decimal(value, options) {
-        let min = 1;
-        let max = 9999.99;
-        if (options && Array.isArray(options)) {
-            min = options[0] || min;
-            max = options[1] || max;
-        }
-        const num = parseFloat(value);
-        if (isNaN(num)) return false;
-        return num >= min && num <= max;
-    }
-
-    VL_boolean(value) {
-        return value === '0' || value === '1' || value === 0 || value === 1;
-    }
-
-    VL_password(value, options) {
-        let min = 8;
-        let max = 255;
-        if (options && Array.isArray(options)) {
-            min = options[0] || min;
-            max = options[1] || max;
-        }
-        if (typeof value !== 'string') return false;
-        const regexPassword = /^(?=.*[A-Z])(?=.*\d)(?!.*\s).+$/;
-        return value.length >= min && value.length <= max && regexPassword.test(value);
-    }
-
-    VL_retypePassword(value, options) {
-        // options deve contenere una proprietà 'compare' con il valore originale da confrontare
-        if (!options || typeof options.compare === 'undefined') {
-            console.error('Valore di confronto mancante per la validazione "retype-password".');
-            return false;
-        }
-        return value === options.compare;
-    }
-
-    VL_date(value) {
-        const regexDate = /^(\d{4})-(\d{2})-(\d{2})$/;
-        if (typeof value !== 'string') return false;
-        return regexDate.test(value);
-    }
-
-    VL_endDate(value, options) {
-        // options deve contenere una proprietà 'start' con la data iniziale
-        const regexDate = /^(\d{4})-(\d{2})-(\d{2})$/;
-        if (typeof value !== 'string' || !options || !options.start) return false;
-        if (!regexDate.test(value) || !regexDate.test(options.start)) return false;
-        return new Date(options.start) <= new Date(value);
-    }
-
-    VL_time(value) {
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (typeof value !== 'string') return false;
-        return timeRegex.test(value);
-    }
-
 }

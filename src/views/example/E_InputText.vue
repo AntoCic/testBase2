@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        testo: 'TestoIniziale',
+        testo: 'a',
       }),
     };
   },
