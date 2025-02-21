@@ -12,5 +12,4 @@ services:
       - ~/.netlify:/root/.netlify
     environment:
       - NODE_ENV=development
-      # - NETLIFY_AUTH_TOKEN=${NETLIFY_AUTH_TOKEN}
     command: ["ntl", "dev"]

@@ -1,7 +1,7 @@
 import UserDB from "../personal_modules/UserDB.js";
 
 export default class PersonalInfo extends UserDB {
-    static mainPaths = "user/personalInfo"; // Definisci qui il mainPaths per firebase 
+    static mainPaths = "personalInfo"; // Definisci qui il mainPaths per firebase 
 
     constructor(personalInfo = {}) {
         super()

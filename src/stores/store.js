@@ -37,7 +37,7 @@ export const $s = reactive({
             //     });
 
             $loading.off()
-        }, 2000);
+        }, 500);
 
         // INSERISCI QUA CARICAMENTI DATI PUBLICI
         return

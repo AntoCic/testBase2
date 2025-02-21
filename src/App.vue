@@ -10,10 +10,10 @@
     <AppFooter />
   </template>
   <p v-else>.</p>
-  <pre>
+  <!-- <pre>
   store:{{ $s }}
   user:{{ user }}
-  </pre>
+  </pre> -->
 </template>
 
 <script>

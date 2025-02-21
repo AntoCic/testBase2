@@ -382,8 +382,8 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
-    console.log(this);
-    
+    console.log({pathParams:this.pathParams, queryParams:this.queryParams, bodyParams:this.bodyParams});
+    console.log({pathParams:this.pathParams, queryParams:this.queryParams, bodyParams:this.bodyParams});
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
