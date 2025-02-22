@@ -1,11 +1,12 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="['form-label', labelClass]" :style="labelStyle">
-        {{ label === true ? idToSet : label }} <span v-if="this.required" class="text-danger">*</span>
+    <label v-if="label" :for="idToSet" :class="['form-label', inline ? 'me-1' : '', labelClass]" :style="labelStyle">
+        {{ label === true ? idToSet : label }}<span v-if="this.required" class="text-danger">*</span>
     </label>
-    <input type="text" v-model="value" :class="['form-control', inputClass, classValidator]" :style="inputStyle"
-        :id="idToSet" :name="idToSet" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
-        :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength"
-        :lang="lang" :inputmode="inputmode" :list="isList">
+    <input type="text" v-model="value" :class="['form-control', inline ? 'd-inline' : '', inputClass, classValidator]"
+        :style="inline ? 'width: initial; ' : '' + inputStyle" :id="idToSet" :name="idToSet"
+        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
+        :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
+        :inputmode="inputmode" :list="isList">
     <div class="invalid-feedback">{{ errorContent ? errorContent : `Il campo deve contenere
         tra ${validation?.min !== undefined ? validation.min : '2'} a ${validation?.max !== undefined ? validation.max :
             '255'} caratteri` }}
@@ -31,10 +32,13 @@ export default {
             type: [Object, Boolean],
             default: {}
         },
-
         errorContent: {
             type: String,
             required: false
+        },
+        inline: {
+            type: Boolean,
+            default: false
         },
 
         id: {
@@ -87,7 +91,7 @@ export default {
         },
         autocomplete: {
             type: String,
-            default: 'on'
+            required: false
         },
         placeholder: {
             type: String,
