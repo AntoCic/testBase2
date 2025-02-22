@@ -8,7 +8,7 @@
         <hr>
         <InputText field="testo" v-model="form" label="ciao"
           :validation="{ validator: InputTextValidator, min: 5, max: 10 }" inline
-          :onChange="(value, field) => { console.log(`Campo ${field} aggiornato con: ${value}`) }" />
+          :onChange="(value, field) => { onChangeData = { field, value } }" />
         <hr>
         <p class="">{{ form.searchText }}</p>
         <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
@@ -16,6 +16,7 @@
         <hr>
         <pre class="bg-light text-dark text-start">
           form:{{ form }}
+          onChangeData:{{ onChangeData }}
         </pre>
       </div>
     </div>
@@ -34,6 +35,8 @@ export default {
       form: new FormValidator({
         testo: 'aff',
       }),
+
+      onChangeData: { field: '', value: '' },
     };
   },
   methods: {
