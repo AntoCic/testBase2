@@ -18,6 +18,7 @@
 
 // Questa architettura rende il form centralizzato, modulare e facilmente estendibile in futuro per aggiungere ulteriori funzionalità o personalizzazioni.
 import Validator from "./Validator.js";
+import requireParam from "./requireParam.js";
 export class FormValidator {
     constructor(fields) {
         if (typeof fields !== 'object' || fields === null) {
@@ -147,15 +148,14 @@ export class FormValidator {
     */
     checkField(field) {
         if (!this.state[field] || !this.state[field].validator) {
-            console.warn(`Nessun validator definito per il campo "${field}"`);
+            console.log('CheckField notRequired:', field, '=>', this.state[field].validated);
             return true; // Se non è definito un validator, consideriamo il campo valido
         }
         const value = this[field];
         const validatorOptions = this.state[field].validatorOptions;
         const valid = validatorOptions !== null ? this.state[field].validator.call(this, value, validatorOptions) : this.state[field].validator.call(this, value);
-
         this.state[field].validated = valid ? true : this.state[field].validated === null ? null : false;
-        console.log(field, this.state[field].validated);
+        console.log('CheckField:', field, '=>', this.state[field].validated);
         return valid;
     }
 
@@ -164,16 +164,13 @@ export class FormValidator {
    * - `type`: stringa che indica il tipo di validazione (es. 'string', 'email', ecc.)
    * - `validatorOptions`: parametri aggiuntivi (es. [min, max] oppure un oggetto con proprietà specifiche)
    */
-    setType(field, type, validatorOptions = null) {
-        if (!this.state[field]) {
-            console.error(`Il campo "${field}" non esiste.`);
-            return;
-        }
+    setType(field = requireParam('field'), type = requireParam('type'), validation = {}) {
+        if (!this.state[field]) { console.error(`Il campo "${field}" non esiste.`); return; }
         this.state[field].type = type;
-        this.state[field].validatorOptions = validatorOptions;
-        if (this.state[field].validator === null || this.state[field].validator === true) {
-            this.state[field].validator = Validator[type];
-        }
+        if (validation === false) { this.state[field].validated === true; return; }
+        this.state[field].validator = validation.validator ? validation.validator : Validator[type];
+        if (validation.validator) delete validation.validator
+        this.state[field].validatorOptions = validation;
     }
 
     /**
@@ -192,8 +189,8 @@ export class FormValidator {
     /**
    * 
    */
-    initField(field, type, validatorOptions = null) {
-        this.setType(field, type, validatorOptions);
+    initField(field = requireParam('field'), type = requireParam('type'), validation = requireParam('validation')) {
+        this.setType(field, type, validation);
         this.checkField(field);
     }
 }

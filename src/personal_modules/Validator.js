@@ -1,6 +1,5 @@
 export default {
     ['text'](value, { min, max } = {}) {
-        // ! controllare se puo capitare di passare numeri nel value
         min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 2;
         max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
         if (typeof value !== 'string') {

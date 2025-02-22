@@ -1,13 +1,14 @@
 <template>
     <label v-if="label" :for="idToSet" :class="['form-label', labelClass]" :style="labelStyle">
-        {{ label === true ? idToSet : label }}
+        {{ label === true ? idToSet : label }} <span v-if="this.required" class="text-danger">*</span>
     </label>
-    <input type="text" v-model="value" :class="['form-control', inputClass, classValidator]"
-        :style="inputStyle" :id="idToSet" :name="idToSet" :placeholder="placeholder" :autocomplete="autocomplete"
-        :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
-        :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
-    <div class="invalid-feedback">{{ validatorOptions?.textError ? validatorOptions.textError : `Il campo deve contenere
-        tra ${minlength !== undefined ? minlength : '2'} a ${maxlength !== undefined ? maxlength : '255'} caratteri` }}
+    <input type="text" v-model="value" :class="['form-control', inputClass, classValidator]" :style="inputStyle"
+        :id="idToSet" :name="idToSet" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
+        :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength"
+        :lang="lang" :inputmode="inputmode" :list="isList">
+    <div class="invalid-feedback">{{ errorContent ? errorContent : `Il campo deve contenere
+        tra ${validation?.min !== undefined ? validation.min : '2'} a ${validation?.max !== undefined ? validation.max :
+            '255'} caratteri` }}
     </div>
     <datalist v-if="isList" :id="isList">
         <option v-for="option in list" :key="option" :value="option"></option>
@@ -26,7 +27,13 @@ export default {
             type: Object,
             required: true
         },
-        validatorOptions: {
+        validation: {
+            type: [Object, Boolean],
+            default: {}
+        },
+
+        errorContent: {
+            type: String,
             required: false
         },
 
@@ -64,7 +71,7 @@ export default {
         },
         required: {
             type: Boolean,
-            default: false
+            default: true
         },
         autofocus: {
             type: Boolean,
@@ -124,18 +131,10 @@ export default {
         },
         classValidator() {
             return this.modelValue.classValidator(this.field)
-        }
+        },
     },
     mounted() {
-        const validatorOptions = this.validatorOptions ? this.validatorOptions : { min: this.minlength, max: this.maxlength }
-        let sendValidatorOptions = false
-        for (const key in validatorOptions) {
-            if (validatorOptions !== undefined) {
-                sendValidatorOptions = true
-                break;
-            }
-        }
-        this.modelValue.initField(this.field, 'text', sendValidatorOptions ? validatorOptions : null);
+        this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
     }
 };
 </script>

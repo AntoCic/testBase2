@@ -4,9 +4,10 @@
       <div class="col-12 mb-3">
         <h1>InputText</h1>
       </div>
-      <div class="col-12">
+      <div class="col-12 text-start">
         <hr>
-        <InputText field="testo" v-model="form" />
+        <InputText field="testo" v-model="form" label="ciao"
+          :validation="{ validator: InputTextValidator, min: 5, max: 10 }" />
         <hr>
         <p class="">{{ form.searchText }}</p>
         <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
@@ -23,18 +24,22 @@
 
 <script>
 import { FormValidator } from '../../personal_modules/FormValidator';
-import InputText from '../../components/formCmp/InputText.vue'; 
+import InputText from '../../components/formCmp/InputText.vue';
 import ButtonLightOutline from '../../components/ButtonLightOutline.vue';
 export default {
   components: { InputText, ButtonLightOutline },
   data() {
     return {
       form: new FormValidator({
-        testo: 'a',
+        testo: 'aff',
       }),
     };
   },
   methods: {
+    InputTextValidator(value, { min, max }) {
+      console.log(value, { min, max });
+      return value.length <= max && value.length >= min
+    }
   },
   created() {
   }
