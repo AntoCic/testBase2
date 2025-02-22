@@ -7,7 +7,8 @@
       <div class="col-12 text-start">
         <hr>
         <InputText field="testo" v-model="form" label="ciao"
-          :validation="{ validator: InputTextValidator, min: 5, max: 10 }" inline />
+          :validation="{ validator: InputTextValidator, min: 5, max: 10 }" inline
+          :onChange="(value, field) => { console.log(`Campo ${field} aggiornato con: ${value}`) }" />
         <hr>
         <p class="">{{ form.searchText }}</p>
         <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>

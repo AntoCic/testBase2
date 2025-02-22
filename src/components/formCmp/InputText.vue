@@ -3,10 +3,10 @@
         {{ label === true ? idToSet : label }}<span v-if="this.required" class="text-danger">*</span>
     </label>
     <input type="text" v-model="value" :class="['form-control', inline ? 'd-inline' : '', inputClass, classValidator]"
-        :style="inline ? 'width: initial; ' : '' + inputStyle" :id="idToSet" :name="idToSet"
-        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
-        :inputmode="inputmode" :list="isList">
+        :style="inline ? 'width: initial; ' : '' + inputStyle" :id="idToSet" :name="idToSet" :placeholder="placeholder"
+        :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly" :required="required"
+        :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang" :inputmode="inputmode"
+        :list="isList">
     <div class="invalid-feedback">{{ errorContent ? errorContent : `Il campo deve contenere
         tra ${validation?.min !== undefined ? validation.min : '2'} a ${validation?.max !== undefined ? validation.max :
             '255'} caratteri` }}
@@ -36,6 +36,11 @@ export default {
             type: String,
             required: false
         },
+        onChange: {
+            type: Function,
+            required: false
+        },
+
         inline: {
             type: Boolean,
             default: false
@@ -125,6 +130,9 @@ export default {
             set(value) {
                 this.modelValue[this.field] = value;
                 this.modelValue.check(this.field);
+                if (this.onChange) {
+                    this.onChange(value, this.field);
+                }
             }
         },
         idToSet() {
