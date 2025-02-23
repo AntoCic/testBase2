@@ -37,7 +37,7 @@ export const user = reactive({
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 console.log(currentUser);
-                
+
                 const { accessToken, uid, email, displayName, phoneNumber, photoURL } = currentUser;
                 this.accessToken = accessToken;
                 this.uid = uid;
@@ -46,10 +46,6 @@ export const user = reactive({
                 this.phoneNumber = phoneNumber;
                 this.photoURL = photoURL;
                 this.isLogged = true;
-
-                console.log(this.displayName);
-                console.log(this.personalInfo);
-
                 try {
                     await this.personalInfo?.init();
                 } catch (error) {
@@ -181,7 +177,7 @@ export const user = reactive({
         this.displayName = null;
         this.phoneNumber = null;
         this.photoURL = null;
-        this.personalInfo = null;
+        this.personalInfo = new PersonalInfo();
         // store.loading.off();
     },
 

@@ -3,7 +3,7 @@ export default {
         min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 2;
         max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
         if (typeof value !== 'string') {
-            console.Error('Errore no stai passando al flidValidation una stringa');
+            console.error('Errore no stai passando al flidValidation una stringa');
             return false
         };
         return value.length <= max && value.length >= min
@@ -12,7 +12,7 @@ export default {
     ['email'](value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
         if (typeof value !== 'string') {
-            console.Error('Errore no stai passando al flidValidation una stringa');
+            console.error('Errore no stai passando al flidValidation una stringa');
             return false
         };
         return emailRegex.test(value);

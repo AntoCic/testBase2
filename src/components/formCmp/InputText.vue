@@ -1,16 +1,29 @@
 <template>
     <label v-if="label" :for="idToSet" :class="['form-label', inline ? 'me-1' : '', labelClass]" :style="labelStyle">
-        {{ label === true ? idToSet : label }}<span v-if="this.required" class="text-danger">*</span>
+        <template v-if="label === true">
+            {{ idToSet }}
+        </template>
+        <template v-else>
+            <span v-html="label"></span>
+        </template>
+        <span v-if="required" class="text-danger">*</span>
     </label>
-    <input type="text" v-model="value" :class="['form-control', inline ? 'd-inline' : '', inputClass, classValidator]"
-        :style="inline ? 'width: initial; ' : '' + inputStyle" :id="idToSet" :name="idToSet" :placeholder="placeholder"
-        :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly" :required="required"
-        :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang" :inputmode="inputmode"
-        :list="isList">
-    <div class="invalid-feedback">{{ errorContent ? errorContent : `Il campo deve contenere
-        tra ${validation?.min !== undefined ? validation.min : '2'} a ${validation?.max !== undefined ? validation.max :
-            '255'} caratteri` }}
-    </div>
+    <span :class="[inputIcon || googleIcon ? 'position-relative' : 'd-contents', containerClass]" :style="containerStyle">
+        <label v-if="inputIcon" :for="idToSet" class="position-absolute top-50 start-0 translate-middle-y ps-1"
+            v-html="inputIcon"></label>
+        <label v-if="googleIcon" :for="idToSet"
+            class="position-absolute top-50 start-0 translate-middle-y ps-1 material-symbols-outlined text-dark">{{
+                googleIcon }}</label>
+        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
+            :class="['form-control', inputIcon || googleIcon ? 'p-input-icon' : '', inline ? 'd-inline' : '', inputClass, classValidator]"
+            :style="inline ? 'width: initial; ' : '' + inputStyle" :id="idToSet" :name="idToSet"
+            data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorContent ? errorContent : `Il campo deve contenere tra ${validation?.min !== undefined ? validation.min : '2'} a ${validation?.max !== undefined ?
+                validation.max : '255'} caratteri`" :placeholder="placeholder" :autocomplete="autocomplete"
+            :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
+            :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
+    </span>
+
+
     <datalist v-if="isList" :id="isList">
         <option v-for="option in list" :key="option" :value="option"></option>
     </datalist>
@@ -18,109 +31,62 @@
 </template>
 
 <script>
+import { Tooltip } from 'bootstrap';
 export default {
     props: {
-        field: {
-            type: String,
-            required: true
-        },
-        modelValue: {
-            type: Object,
-            required: true
-        },
-        validation: {
-            type: [Object, Boolean],
-            default: {}
-        },
-        errorContent: {
-            type: String,
-            required: false
-        },
-        onChange: {
-            type: Function,
-            required: false
-        },
-
-        inline: {
-            type: Boolean,
-            default: false
-        },
-
-        id: {
-            type: String,
-            required: false
-        },
-        label: {
-            type: [String, Boolean],
-            required: false
-        },
-        inputClass: {
-            type: String,
-            required: false
-        },
-        labelClass: {
-            type: String,
-            required: false
-        },
-        inputStyle: {
-            type: String,
-            required: false
-        },
-        labelStyle: {
-            type: String,
-            required: false
-        },
-        readonly: {
-            type: Boolean,
-            default: false
-        },
-        disabled: {
-            type: Boolean,
-            default: false
-        },
-        required: {
-            type: Boolean,
-            default: true
-        },
-        autofocus: {
-            type: Boolean,
-            default: false
-        },
-        maxlength: {
-            type: Number,
-            required: false
-        },
-        minlength: {
-            type: Number,
-            required: false
-        },
-        autocomplete: {
-            type: String,
-            required: false
-        },
-        placeholder: {
-            type: String,
-            required: false
-        },
-        lang: {
-            type: String,
-            default: 'it'
-        },
-        // numeric | decimal | tel | email | url | search | none
-        inputmode: {
-            type: String,
-            required: false
-        },
-        list: {
-            type: Array,
-            default: () => []
-        },
+        field: { type: String, required: true },
+        modelValue: { type: Object, required: true },
+        lazy: { type: Boolean, default: false },
+        validation: { type: [Object, Boolean], default: {} },
+        errorContent: { type: String, required: false },
+        onChange: { type: Function, required: false },
+        inline: { type: Boolean, default: false },
+        id: { type: String, required: false },
+        label: { type: [String, Boolean], required: false },
+        googleIcon: { type: String, required: false },
+        inputIcon: { type: String, required: false },
+        inputClass: { type: String, required: false },
+        containerClass: { type: String, required: false },
+        labelClass: { type: String, required: false },
+        inputStyle: { type: String, required: false },
+        containerStyle: { type: String, required: false },
+        labelStyle: { type: String, required: false },
+        readonly: { type: Boolean, default: false },
+        disabled: { type: Boolean, default: false },
+        required: { type: Boolean, default: true },
+        autofocus: { type: Boolean, default: false },
+        maxlength: { type: Number, required: false },
+        minlength: { type: Number, required: false },
+        autocomplete: { type: String, required: false },
+        placeholder: { type: String, required: false },
+        lang: { type: String, default: 'it' },
+        inputmode: { type: String, required: false },
+        list: { type: Array, default: () => [] },
     },
     data() {
-        return {
-        };
+        return { lazyTimer: null, tooltips: null };
     },
     methods: {
+        handleInput(event) {
+            if (this.lazy) {
+                if (this.lazyTimer) {
+                    clearTimeout(this.lazyTimer);
+                    this.lazyTimer = null;
+                };
+                this.lazyTimer = setTimeout(() => {
+                    this.value = event.target.value;
+                }, 500);
+            } else {
+                this.value = event.target.value;
+            }
+        },
+        handleChange(event) {
+            if (this.lazy && this.lazyTimer) {
+                clearTimeout(this.lazyTimer);
+                this.lazyTimer = null;
+                this.value = event.target.value;
+            }
+        }
     },
     computed: {
         value: {
@@ -129,10 +95,9 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                this.modelValue.check(this.field);
-                if (this.onChange) {
-                    this.onChange(value, this.field);
-                }
+                this.modelValue.checkField(this.field);
+
+                if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
@@ -142,11 +107,31 @@ export default {
             return this.list.length ? `list-${this.idToSet}` : null
         },
         classValidator() {
-            return this.modelValue.classValidator(this.field)
+            const classValidator = this.modelValue.classValidator(this.field);
+            if (!this.tooltips) return classValidator
+            switch (classValidator) {
+                case '':
+                case 'is-valid':
+                    this.tooltips.disable();
+                    this.tooltips.hide()
+                    break;
+                default:
+                    this.tooltips.enable();
+                    this.tooltips.show();
+                    break;
+            }
+            return classValidator
         },
     },
     mounted() {
         this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
+        this.tooltips = new Tooltip(this.$refs.inputEl);
+        this.tooltips.disable();
+    },
+    unmounted() {
+        if (this.tooltips) {
+            this.tooltips.dispose();
+        }
     }
 };
 </script>

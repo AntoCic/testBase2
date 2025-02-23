@@ -6,18 +6,15 @@
       </div>
       <div class="col-12 text-start">
         <hr>
-        <InputText field="testo" v-model="form" label="ciao"
-          :validation="{ validator: InputTextValidator, min: 5, max: 10 }" inline
-          :onChange="(value, field) => { onChangeData = { field, value } }" />
+        <InputText field="testo" v-model="form" label='<span class="material-symbols-outlined">person</span> Username'
+          
+          inline :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
         <hr>
         <p class="">{{ form.searchText }}</p>
         <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
-        <ButtonLightOutline type="submit" @click="form.get()">submit</ButtonLightOutline>
+        <ButtonLightOutline type="submit" @click="handleSubmit">submit</ButtonLightOutline>
         <hr>
-        <pre class="bg-light text-dark text-start">
-          form:{{ form }}
-          onChangeData:{{ onChangeData }}
-        </pre>
+        <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
     </div>
 
@@ -33,16 +30,23 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        testo: 'aff',
+        testo: 'abc',
       }),
 
-      onChangeData: { field: '', value: '' },
+      onChangeData: {},
     };
   },
   methods: {
     InputTextValidator(value, { min, max }) {
       console.log(value, { min, max });
       return value.length <= max && value.length >= min
+    },
+    handleChange(value, field) {
+      this.onChangeData = { [field]: value }
+    },
+    handleSubmit() {
+      console.log(this.form.check());
+      console.log(this.form.get());
     }
   },
   created() {

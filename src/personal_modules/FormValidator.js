@@ -109,6 +109,7 @@ export class FormValidator {
                     const valid = this.checkField(field);
                     if (!valid) {
                         allValid = false;
+                        this.state[field].validated = false;
                     }
                 }
             }
@@ -156,7 +157,7 @@ export class FormValidator {
         const valid = validatorOptions !== null ? this.state[field].validator.call(this, value, validatorOptions) : this.state[field].validator.call(this, value);
         this.state[field].validated = valid ? true : this.state[field].validated === null ? null : false;
         console.log('CheckField:', field, '=>', this.state[field].validated);
-        return valid;
+        return this.state[field].validated;
     }
 
     /**

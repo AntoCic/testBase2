@@ -9,6 +9,7 @@ export default class UserDB {
     }
 
     async parse(res) {
+        console.log(this.constructor.mainPaths,' parse(res) ',res);
         if (res) {
             for (const key in res) { this[key] = res[key] }
             if (!this.id) { this.id = this.constructor.mainPaths }
