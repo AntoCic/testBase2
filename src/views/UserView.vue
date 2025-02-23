@@ -28,8 +28,7 @@
 
 <script>
 import { user } from '../stores/user.js'
-import InputText from '../components/formCmp/InputText.vue';
-import { FormValidator } from '../personal_modules/FormValidator.js';
+import { FormValidator, InputText } from '../personal_modules/form-validator/formValidator.js';
 
 export default {
   components: { InputText },

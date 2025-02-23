@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import { FormValidator } from '../../personal_modules/FormValidator';
-import InputText from '../../components/formCmp/InputText.vue';
+import { FormValidator, InputText } from '../../personal_modules/form-validator/formValidator';
+
 import ButtonLightOutline from '../../components/ButtonLightOutline.vue';
 export default {
   components: { InputText, ButtonLightOutline },
