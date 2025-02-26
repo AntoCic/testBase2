@@ -9,10 +9,22 @@ import UserView from './views/UserView.vue'
 import ExampleHomeView from './views/example/ExampleHomeView.vue'
 import E_Call from './views/example/E_Call.vue'
 import E_InputText from './views/example/E_InputText.vue'
+import E_InputTextIcon from './views/example/E_InputTextIcon.vue'
+import E_InputCheckbox from './views/example/E_InputCheckbox.vue'
+import E_InputBtnCheckbox from './views/example/E_InputBtnCheckbox.vue'
+import E_InputDate from './views/example/E_InputDate.vue'
+import E_InputEmail from './views/example/E_InputEmail.vue'
+import E_InputNumber from './views/example/E_InputNumber.vue'
+import E_InputPassword from './views/example/E_InputPassword.vue'
+import E_InputPrice from './views/example/E_InputPrice.vue'
+import E_InputRadio from './views/example/E_InputRadio.vue'
+import E_InputRange from './views/example/E_InputRange.vue'
+import E_InputSelect from './views/example/E_InputSelect.vue'
+import E_InputTime from './views/example/E_InputTime.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
-  
+
   public: [ // Aggiungi le rotte publiche qui, visibili sia da autenticacto che da non autenticato.
     { path: '/', name: 'home', component: HomeView },
     { path: '/contact', name: 'contact', component: ContactView },
@@ -21,18 +33,30 @@ const fullRoutes = {
     // ! EXAMPLE VIEWS TO DELETE
     { path: '/example', name: 'example.home', component: ExampleHomeView },
     { path: '/example/call', name: 'example.call', component: E_Call },
-    { path: '/example/inputText', name: 'example.inputText', component: E_InputText },
+    { path: '/example/InputText', name: 'example.InputText', component: E_InputText },
+    { path: '/example/InputTextIcon', name: 'example.InputTextIcon', component: E_InputTextIcon },
+    { path: '/example/InputCheckbox', name: 'example.InputCheckbox', component: E_InputCheckbox },
+    { path: '/example/InputBtnCheckbox', name: 'example.InputBtnCheckbox', component: E_InputBtnCheckbox },
+    { path: '/example/InputDate', name: 'example.InputDate', component: E_InputDate },
+    { path: '/example/InputEmail', name: 'example.InputEmail', component: E_InputEmail },
+    { path: '/example/InputNumber', name: 'example.InputNumber', component: E_InputNumber },
+    { path: '/example/InputPassword', name: 'example.InputPassword', component: E_InputPassword },
+    { path: '/example/InputPrice', name: 'example.InputPrice', component: E_InputPrice },
+    { path: '/example/InputRadio', name: 'example.InputRadio', component: E_InputRadio },
+    { path: '/example/InputRange', name: 'example.InputRange', component: E_InputRange },
+    { path: '/example/InputSelect', name: 'example.InputSelect', component: E_InputSelect },
+    { path: '/example/InputTime', name: 'example.InputTime', component: E_InputTime },
 
   ],
 
 
-  
+
   notAuth: [ // Aggiungi le rotte visibili solo se non sei autenticato qui, se necessario.
     { path: '/login', name: 'login', component: LoginView },
   ],
 
 
-  
+
   auth: [ // Aggiungi le rotte visibili solo se autenticato qui, se necessario.
     { path: '/user', name: 'user', component: UserView },
   ],

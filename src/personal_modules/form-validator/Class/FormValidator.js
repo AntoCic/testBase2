@@ -24,10 +24,18 @@ export default class FormValidator {
         if (typeof fields !== 'object' || fields === null) {
             throw new Error('Input selector must be an object');
         }
+
+        // Lista dei metodi della classe
+        const methodNames = Object.getOwnPropertyNames(FormValidator.prototype).filter(name => name !== 'constructor');
+       
         // Creiamo un oggetto per salvare lo stato iniziale di ogni campo
         this.state = {};
         for (const field in fields) {
             if (Object.prototype.hasOwnProperty.call(fields, field)) {
+                // Controlliamo se il campo ha un nome riservato
+                if (methodNames.includes(field)) {
+                    throw new Error(`Il nome del campo '${field}' è riservato e non può essere utilizzato.`);
+                }
                 // Assegniamo il valore iniziale come proprietà direttamente sull'istanza
                 this[field] = fields[field];
                 // Salviamo lo stato iniziale, il tipo (potrebbe essere usato per validazioni più specifiche) e lo stato di validazione

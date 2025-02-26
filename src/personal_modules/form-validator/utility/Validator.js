@@ -33,10 +33,34 @@ export default {
         if (isNaN(num)) return false;
         return num >= min && num <= max;
     },
-    ['boolean'](value) {
-        // ! controllare se puo capitare di passare true o false nel value 
-        // ! e aggiungere in options requered true o false
-        return value === '0' || value === '1' || value === 0 || value === 1;
+    ['checkbox'](value, { required = true } = {}) {
+        switch (typeof value) {
+            case 'boolean':
+            case 'number':
+                return value === required;
+            case 'string':
+                if (value === 'true') {
+                    if (required === true) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                if (value === 'false') {
+                    if (required === false) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            default:
+                console.log('A checkbox validator non è stato passato un valore corretto');
+                return false;
+        }
+    },
+
+    ['boolean'](value, required = true) {
+        return this.checkbox(value, { required });
     },
 
     ['password'](value, { min, max } = {}) {

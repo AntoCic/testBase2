@@ -5,15 +5,18 @@
         <img :src="user.photoURL" alt="User Photo" class="rounded-circle">
         <p>{{ user.displayName }}</p>
         <p v-if="user.personalInfo?.userName">{{ user.personalInfo.userName }}</p>
-        <InputText field="name" :label="true" inline v-model="form" /> <br>
-        <InputText field="surname" :label="true" inline v-model="form" /><br>
-        <InputText field="gender" :label="true" inline v-model="form" /><br>
-        <InputText field="dateOfBirth" :label="true" inline v-model="form" /><br>
-        <InputText field="birthHideYear" :label="true" inline v-model="form" /><br>
-        <InputText field="email" :label="true" inline v-model="form" /><br>
-        <InputText field="phonePrefix" :label="true" inline v-model="form" /><br>
-        <InputText field="phoneNumber" :label="true" inline v-model="form" /><br>
-        <InputText field="photoURL" :label="true" inline v-model="form" />
+        <div class="input-group"><InputText inputGroup field="name" :label="true" v-model="form" /></div>
+        <div class="input-group"><InputText inputGroup field="surname" :label="true" v-model="form" /></div>
+        <div class="input-group"><InputText inputGroup field="gender" :label="true" v-model="form" /></div>
+        <div class="input-group">
+          <InputText inputGroup field="dateOfBirth" :label="true" v-model="form" />
+          <InputCheckbox inputGroup field="birthHideYear" v-model="form" label="Nascondi anno di nascita" />
+        </div>
+        <div class="input-group"><InputText inputGroup field="email" :label="true" v-model="form" /></div>
+        <div class="input-group"><InputText inputGroup field="phonePrefix" :label="true" v-model="form" /></div>
+        <div class="input-group"><InputText inputGroup field="phoneNumber" :label="true" v-model="form" /></div>
+        <div class="input-group"><InputText inputGroup field="photoURL" :label="true" v-model="form" /></div>
+
         <p>{{ user.uid }}</p>
         <button v-if="user.accessToken" @click="user.logout()" class="btn btn-outline-danger px-2">
           <span v-if="user.displayName" class="me-1">{{ user.displayName }}</span>
@@ -28,10 +31,10 @@
 
 <script>
 import { user } from '../stores/user.js'
-import { FormValidator, InputText } from '../personal_modules/form-validator/formValidator.js';
+import { FormValidator, InputText, InputCheckbox } from '../personal_modules/form-validator/formValidator.js';
 
 export default {
-  components: { InputText },
+  components: { InputText, InputCheckbox },
   data() {
     return {
       user,

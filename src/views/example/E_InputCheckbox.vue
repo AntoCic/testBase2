@@ -6,13 +6,9 @@
       </div>
       <div class="col-12 text-start">
         <hr>
-        <div class="input-group">
-          <InputText field="testo" v-model="form" label='<span class="material-symbols-outlined">person</span> Username'
-            inputGroup :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
-        </div>
-
+        <InputCheckbox field="checkA" v-model="form" :label="true" :onChange="handleChange" />
         <hr>
-        <p class="">{{ form.searchText }}</p>
+        <p>{{ form.checkA }}</p>
         <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
         <ButtonLightOutline type="submit" @click="handleSubmit">submit</ButtonLightOutline>
         <hr>
@@ -24,25 +20,18 @@
 </template>
 
 <script>
-import { FormValidator, InputText } from '../../personal_modules/form-validator/formValidator';
+import { FormValidator, InputCheckbox } from '../../personal_modules/form-validator/formValidator';
 
 import ButtonLightOutline from '../../components/ButtonLightOutline.vue';
 export default {
-  components: { InputText, ButtonLightOutline },
+  components: { InputCheckbox, ButtonLightOutline },
   data() {
     return {
-      form: new FormValidator({
-        testo: 'abc',
-      }),
-
+      form: new FormValidator({ checkA: false}),
       onChangeData: {},
     };
   },
   methods: {
-    InputTextValidator(value, { min, max }) {
-      console.log(value, { min, max });
-      return value.length <= max && value.length >= min
-    },
     handleChange(value, field) {
       this.onChangeData = { [field]: value }
     },
