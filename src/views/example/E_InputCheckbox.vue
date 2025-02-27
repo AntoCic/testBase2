@@ -9,8 +9,8 @@
         <InputCheckbox field="checkA" v-model="form" :label="true" :onChange="handleChange" />
         <hr>
         <p>{{ form.checkA }}</p>
-        <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
-        <ButtonLightOutline type="submit" @click="handleSubmit">submit</ButtonLightOutline>
+        <Btn @click="form.reset()">Resetta input</Btn>
+        <Btn type="submit" @click="handleSubmit">submit</Btn>
         <hr>
         <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
@@ -22,9 +22,9 @@
 <script>
 import { FormValidator, InputCheckbox } from '../../personal_modules/form-validator/formValidator';
 
-import ButtonLightOutline from '../../components/ButtonLightOutline.vue';
+import Btn from '../../components/Btn.vue';
 export default {
-  components: { InputCheckbox, ButtonLightOutline },
+  components: { InputCheckbox, Btn },
   data() {
     return {
       form: new FormValidator({ checkA: false}),

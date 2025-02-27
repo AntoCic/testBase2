@@ -13,8 +13,8 @@
 
         <hr>
         <p class="">{{ form.searchText }}</p>
-        <ButtonLightOutline @click="form.reset()">Resetta input</ButtonLightOutline>
-        <ButtonLightOutline type="submit" @click="handleSubmit">submit</ButtonLightOutline>
+        <Btn @click="form.reset()">Resetta input</Btn>
+        <Btn type="submit" @click="handleSubmit">submit</Btn>
         <hr>
         <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
@@ -26,9 +26,9 @@
 <script>
 import { FormValidator, InputText } from '../../personal_modules/form-validator/formValidator';
 
-import ButtonLightOutline from '../../components/ButtonLightOutline.vue';
+import Btn from '../../components/Btn.vue';
 export default {
-  components: { InputText, ButtonLightOutline },
+  components: { InputText, Btn },
   data() {
     return {
       form: new FormValidator({
