@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import { FormValidator, InputText } from '../../personal_modules/form-validator/formValidator';
-
+import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
+import InputText from '../../personal_modules/form-validator/InputText.vue';
 import Btn from '../../components/Btn.vue';
 export default {
   components: { InputText, Btn },

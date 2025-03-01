@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import { FormValidator, InputCheckbox } from '../../personal_modules/form-validator/formValidator';
-
+import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
+import InputCheckbox from '../../personal_modules/form-validator/InputCheckbox.vue';
 import Btn from '../../components/Btn.vue';
 export default {
   components: { InputCheckbox, Btn },

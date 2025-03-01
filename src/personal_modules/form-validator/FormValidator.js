@@ -17,8 +17,8 @@
 // I metodi getValid() e getNotValid() permettono di ottenere oggetti contenenti solo i campi validi o non validi, mentre reset() ripristina i valori iniziali e azzera lo stato di validazione.
 
 // Questa architettura rende il form centralizzato, modulare e facilmente estendibile in futuro per aggiungere ulteriori funzionalità o personalizzazioni.
-import Validator from "../utility/Validator.js";
-import requireParam from "../utility/requireParam.js";
+import Validator from "./utility/Validator.js";
+import requireParam from "./utility/requireParam.js";
 export default class FormValidator {
     constructor(fields) {
         if (typeof fields !== 'object' || fields === null) {

@@ -7,14 +7,12 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputText class="form-control border-start-0 border-end-0" style="background-color: yellow;" field="testo"
+          <InputText style="background-color: yellow;" field="testo"
             v-model="form" label='<span class="material-symbols-outlined">person</span> Username' inputGroup
             :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
-          <span class='input-group-text'>ciao</span>
-          <Btn @click="form.reset()" googleIcon>replay</Btn>
+          <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
-
         <hr>
         <p class="">{{ form.testo }}</p>
         <hr>
@@ -26,8 +24,8 @@
 </template>
 
 <script>
-import { FormValidator, InputText } from '../../personal_modules/form-validator/formValidator';
-
+import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
+import InputText from '../../personal_modules/form-validator/InputText.vue';
 import Btn from '../../components/Btn.vue';
 export default {
   components: { InputText, Btn },

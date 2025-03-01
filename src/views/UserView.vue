@@ -30,9 +30,10 @@
 </template>
 
 <script>
+import FormValidator from '../personal_modules/form-validator/FormValidator.js';
+import InputCheckbox from '../personal_modules/form-validator/InputCheckbox.vue';
+import InputText from '../personal_modules/form-validator/InputText.vue';
 import { user } from '../stores/user.js'
-import { FormValidator, InputText, InputCheckbox } from '../personal_modules/form-validator/formValidator.js';
-
 export default {
   components: { InputText, InputCheckbox },
   data() {
