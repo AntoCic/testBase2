@@ -1,39 +1,15 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="[inputGroup ? 'input-group-text' : 'form-label', 'mb-0', labelClass]"
+    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
-        <template v-if="label === true">
-            {{ idToSet }}
-        </template>
-        <template v-else>
-            <span v-html="label"></span>
-        </template>
+        <template v-if="label === true"> {{ idToSet }} </template>
+        <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
+    <input ref="inputRef" type="date" v-model="value" :class="[classValidator, $attrs.class ?? 'form-control']"
+        :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
+        :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
+        :readonly="readonly" :required="required" :autofocus="autofocus" :max="max" :min="min" :step="step">
 
-    <div v-if="inputIcon || googleIcon" :class="['position-relative', containerClass]" :style="containerStyle">
-        <label v-if="inputIcon" :for="idToSet" class="position-absolute top-50 start-0 translate-middle-y ps-1"
-            v-html="inputIcon"></label>
-        <label v-if="googleIcon" :for="idToSet"
-            class="position-absolute top-50 start-0 translate-middle-y ps-1 material-symbols-outlined text-dark">{{
-                googleIcon }}</label>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control p-input-icon', classValidator, inputClass]"
-            :style="inputStyle" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-            :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete"
-            :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
-            :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
-    </div>
-    <template v-else>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control', classValidator, inputClass]" :style="inputStyle" :id="idToSet" :name="idToSet"
-            data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
-            :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-            :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
-            :inputmode="inputmode" :list="isList">
-    </template>
-    <datalist v-if="isList" :id="isList">
-        <option v-for="option in list" :key="option" :value="option"></option>
-    </datalist>
 </template>
 
 <script>
@@ -42,78 +18,48 @@ export default {
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },
-        lazy: { type: Boolean, default: false },
         validation: { type: Object, default: {} },
         errorContent: { type: String, required: false },
         onChange: { type: Function, required: false },
         inputGroup: { type: Boolean, default: false },
         id: { type: String, required: false },
         label: { type: [String, Boolean], required: false },
-        googleIcon: { type: String, required: false },
-        inputIcon: { type: String, required: false },
-        inputClass: { type: String, required: false },
-        containerClass: { type: String, required: false },
         labelClass: { type: String, required: false },
-        inputStyle: { type: String, required: false },
-        containerStyle: { type: String, required: false },
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: true },
         autofocus: { type: Boolean, default: false },
-        maxlength: { type: Number, required: false },
-        minlength: { type: Number, required: false },
+        max: { type: Number, required: false },
+        min: { type: Number, required: false },
+        step: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
-        lang: { type: String, default: 'it' },
-        inputmode: { type: String, required: false },
-        list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null, tooltips: null };
+        return {};
     },
-    methods: {
-        handleInput(event) {
-            if (this.lazy) {
-                if (this.lazyTimer) {
-                    clearTimeout(this.lazyTimer);
-                    this.lazyTimer = null;
-                };
-                this.lazyTimer = setTimeout(() => {
-                    this.value = event.target.value;
-                }, 500);
-            } else {
-                this.value = event.target.value;
-            }
-        },
-        handleChange(event) {
-            if (this.lazy && this.lazyTimer) {
-                clearTimeout(this.lazyTimer);
-                this.lazyTimer = null;
-                this.value = event.target.value;
-            }
-        }
-    },
+    methods: {},
     computed: {
         value: {
             get() {
-                return this.modelValue[this.field];
+                if (!(this.modelValue[this.field] instanceof Date) || isNaN(this.modelValue[this.field])) return "";
+                // SE HO PROBLEMI DI FUSORARIO
+                // const offset = this.modelValue[this.field].getTimezoneOffset() * 60000; // Offset in millisecondi
+                // return new Date(this.modelValue[this.field].getTime() - offset).toISOString().split('T')[0];
+                return this.modelValue[this.field].toISOString().split('T')[0];
             },
             set(value) {
-                this.modelValue[this.field] = value;
+                this.modelValue[this.field] = new Date(value);
                 this.modelValue.checkField(this.field);
-
                 if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
-            return this.id ?? this.field
-        },
-        isList() {
-            return this.list.length ? `list-${this.idToSet}` : null
+            return this.id ?? this.field;
         },
         lableDefaultText() {
-            return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
+            return this.errorContent ? this.errorContent : `Seleziona una data valida.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -122,25 +68,29 @@ export default {
                 case '':
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     break;
                 default:
+                    this.tooltips._isHovered = null;
                     this.tooltips.enable();
                     this.tooltips.show();
                     break;
             }
             return classValidator
         },
+        formattedValue() {
+            if (!(this.value instanceof Date) || isNaN(this.value)) return "";
+            const offset = this.value.getTimezoneOffset() * 60000; // Offset in millisecondi
+            return new Date(this.value.getTime() - offset).toISOString().split('T')[0];
+        }
     },
     mounted() {
         this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.inputEl);
+        this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },
     unmounted() {
-        if (this.tooltips) {
-            this.tooltips.dispose();
-        }
+        if (this.tooltips) { this.tooltips.dispose(); }
     }
 };
 </script>

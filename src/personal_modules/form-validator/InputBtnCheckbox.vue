@@ -32,33 +32,33 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                const cc = this.modelValue.checkField(this.field);
+                this.modelValue.checkField(this.field);
                 if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
-            return this.id ?? this.field
+            return this.id ?? this.field;
         },
         lableDefaultText() {
             return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
-            if (!this.tooltips) return classValidator
+            if (!this.tooltips) return classValidator;
             switch (classValidator) {
                 case '':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     return ''
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
-                    return 'border-success'
+                    this.tooltips.hide();
+                    return 'border-success';
                 default:
                     this.tooltips._isHovered = null
                     this.tooltips.enable();
                     this.tooltips.show();
-                    return 'border-danger'
+                    return 'border-danger';
             }
         },
     },

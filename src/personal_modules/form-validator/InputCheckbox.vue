@@ -38,15 +38,15 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                const cc = this.modelValue.checkField(this.field);
+                this.modelValue.checkField(this.field);
                 if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
-            return this.id ?? this.field
+            return this.id ?? this.field;
         },
         lableDefaultText() {
-            return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`
+            return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -63,7 +63,7 @@ export default {
                     this.tooltips.show();
                     break;
             }
-            return classValidator
+            return classValidator;
         },
     },
     mounted() {
