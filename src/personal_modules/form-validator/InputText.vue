@@ -1,11 +1,11 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label']"
+    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
         <template v-if="label === true"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
+    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
@@ -29,8 +29,6 @@ export default {
         inputGroup: { type: Boolean, default: false },
         id: { type: String, required: false },
         label: { type: [String, Boolean], required: false },
-        googleIcon: { type: String, required: false },
-        inputIcon: { type: String, required: false },
         labelClass: { type: String, required: false },
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
@@ -110,13 +108,11 @@ export default {
     },
     mounted() {
         this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.inputEl);
+        this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },
     unmounted() {
-        if (this.tooltips) {
-            this.tooltips.dispose();
-        }
+        if (this.tooltips) {this.tooltips.dispose();}
     }
 };
 </script>

@@ -1,36 +1,26 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="[inputGroup ? 'input-group-text' : 'form-label', 'mb-0', labelClass]"
+    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
-        <template v-if="label === true">
-            {{ idToSet }}
-        </template>
-        <template v-else>
-            <span v-html="label"></span>
-        </template>
+        <template v-if="label === true"> {{ idToSet }} </template>
+        <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
 
-    <div v-if="inputIcon || googleIcon" :class="['position-relative', containerClass]" :style="containerStyle">
-        <label v-if="inputIcon" :for="idToSet" class="position-absolute top-50 start-0 translate-middle-y ps-1"
+    <div :class="[containerClass ?? `position-relative${inputGroup ? ' form-control' : ''}`]" :style="containerStyle">
+        <label v-if="inputIcon" :for="idToSet" 
+        :class="`position-absolute top-50 start-0 translate-middle-y ${inputGroup ? 'ps-3' : ' ps-1'}`"
+        class="position-absolute top-50 start-0 translate-middle-y ps-1"
             v-html="inputIcon"></label>
         <label v-if="googleIcon" :for="idToSet"
-            class="position-absolute top-50 start-0 translate-middle-y ps-1 material-symbols-outlined text-dark">{{
+            :class="`position-absolute top-50 start-0 translate-middle-y material-symbols-outlined text-dark ${inputGroup ? 'ps-3' : ' ps-1'}`">{{
                 googleIcon }}</label>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control p-input-icon', classValidator, inputClass]"
-            :style="inputStyle" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-            :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete"
-            :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
-            :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
-    </div>
-    <template v-else>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control', classValidator, inputClass]" :style="inputStyle" :id="idToSet" :name="idToSet"
-            data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
+        <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
+            :class="[classValidator, $attrs.class ?? `form-control p-input-icon`]" :style="$attrs.style" :id="idToSet"
+            :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
             :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
             :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
             :inputmode="inputmode" :list="isList">
-    </template>
+    </div>
     <datalist v-if="isList" :id="isList">
         <option v-for="option in list" :key="option" :value="option"></option>
     </datalist>
@@ -51,10 +41,8 @@ export default {
         label: { type: [String, Boolean], required: false },
         googleIcon: { type: String, required: false },
         inputIcon: { type: String, required: false },
-        inputClass: { type: String, required: false },
         containerClass: { type: String, required: false },
         labelClass: { type: String, required: false },
-        inputStyle: { type: String, required: false },
         containerStyle: { type: String, required: false },
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
@@ -134,13 +122,11 @@ export default {
     },
     mounted() {
         this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.inputEl);
+        this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },
     unmounted() {
-        if (this.tooltips) {
-            this.tooltips.dispose();
-        }
+        if (this.tooltips) { this.tooltips.dispose(); }
     }
 };
 </script>

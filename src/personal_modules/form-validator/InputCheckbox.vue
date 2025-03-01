@@ -1,5 +1,5 @@
 <template>
-    <div :class="[inputGroup ? 'input-group-text' : undefined]" ref="toolbarContainer" data-bs-toggle="tooltip"
+    <div :class="[inputGroup ? 'input-group-text' : undefined]" ref="tooltipsRef" data-bs-toggle="tooltip"
         data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText">
         <input type="checkbox" v-model="value" :class="['form-check-input',inputGroup ? 'mt-0' : undefined , inputClass, classValidator]"
             :style="inputStyle" :id="idToSet" :name="idToSet" :disabled="disabled" :readonly="readonly">
@@ -66,7 +66,7 @@ export default {
     },
     mounted() {
         this.modelValue.initField(this.field, 'checkbox', (this.required || this.validation?.required !== undefined) ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.toolbarContainer);
+        this.tooltips = new Tooltip(this.$refs.tooltipsRef);
         this.tooltips.disable();
     },
     unmounted() {
