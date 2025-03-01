@@ -1,7 +1,8 @@
 <template>
     <div :class="[inputGroup ? 'input-group-text' : undefined]" ref="tooltipsRef" data-bs-toggle="tooltip"
         data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText">
-        <input type="checkbox" v-model="value" :class="['form-check-input',inputGroup ? 'mt-0' : undefined , inputClass, classValidator]"
+        <input type="checkbox" v-model="value"
+            :class="['form-check-input', inputGroup ? 'mt-0' : undefined, inputClass, classValidator]"
             :style="inputStyle" :id="idToSet" :name="idToSet" :disabled="disabled" :readonly="readonly">
         <label v-if="label" :for="idToSet" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
             <template v-if="label === true"> {{ idToSet }} </template>
@@ -54,9 +55,10 @@ export default {
                 case '':
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     break;
                 default:
+                    this.tooltips._isHovered = null;
                     this.tooltips.enable();
                     this.tooltips.show();
                     break;

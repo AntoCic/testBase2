@@ -114,6 +114,7 @@ export default class FormValidator {
         for (const field in this.state) {
             if (Object.prototype.hasOwnProperty.call(this.state, field)) {
                 if (this.state[field].validator) {
+                    this.state[field].validated = null
                     const valid = this.checkField(field);
                     if (!valid) {
                         allValid = false;

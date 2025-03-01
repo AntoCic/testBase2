@@ -96,9 +96,10 @@ export default {
                 case '':
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     break;
                 default:
+                    this.tooltips._isHovered = null;
                     this.tooltips.enable();
                     this.tooltips.show();
                     break;
@@ -112,7 +113,7 @@ export default {
         this.tooltips.disable();
     },
     unmounted() {
-        if (this.tooltips) {this.tooltips.dispose();}
+        if (this.tooltips) { this.tooltips.dispose(); }
     }
 };
 </script>

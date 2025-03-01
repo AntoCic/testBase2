@@ -7,10 +7,9 @@
     </label>
 
     <div :class="[containerClass ?? `position-relative${inputGroup ? ' form-control' : ''}`]" :style="containerStyle">
-        <label v-if="inputIcon" :for="idToSet" 
-        :class="`position-absolute top-50 start-0 translate-middle-y ${inputGroup ? 'ps-3' : ' ps-1'}`"
-        class="position-absolute top-50 start-0 translate-middle-y ps-1"
-            v-html="inputIcon"></label>
+        <label v-if="inputIcon" :for="idToSet"
+            :class="`position-absolute top-50 start-0 translate-middle-y ${inputGroup ? 'ps-3' : ' ps-1'}`"
+            class="position-absolute top-50 start-0 translate-middle-y ps-1" v-html="inputIcon"></label>
         <label v-if="googleIcon" :for="idToSet"
             :class="`position-absolute top-50 start-0 translate-middle-y material-symbols-outlined text-dark ${inputGroup ? 'ps-3' : ' ps-1'}`">{{
                 googleIcon }}</label>
@@ -110,9 +109,10 @@ export default {
                 case '':
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     break;
                 default:
+                    this.tooltips._isHovered = null;
                     this.tooltips.enable();
                     this.tooltips.show();
                     break;

@@ -1,14 +1,14 @@
 <template>
-    <div :class="[inputGroup ? 'input-group-text' : undefined]" ref="toolbarContainer" data-bs-toggle="tooltip"
-        data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText">
-        <input type="checkbox" v-model="value" :class="['form-check-input',inputGroup ? 'mt-0' : undefined , inputClass, classValidator]"
-            :style="inputStyle" :id="idToSet" :name="idToSet" :disabled="disabled" :readonly="readonly">
-        <label v-if="label" :for="idToSet" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
-            <template v-if="label === true"> {{ idToSet }} </template>
-            <template v-else> <span v-html="label"></span> </template>
-            <span v-if="required" class="text-danger">*</span>
-        </label>
-    </div>
+    <input type="checkbox" v-model="value" :class="['btn-check']" :id="idToSet" :name="idToSet" :disabled="disabled"
+        :readonly="readonly">
+    <label v-if="label" :for="idToSet" :class="[$attrs.class ?? 'btn btn-outline-primary', classValidator]"
+        :style="$attrs.style" ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
+        :data-bs-title="lableDefaultText">
+        <template v-if="label === true"> {{ idToSet }} </template>
+        <template v-else> <span v-html="label"></span> </template>
+        <span v-if="required" class="text-danger">*</span>
+    </label>
+
 </template>
 
 <script>
@@ -22,13 +22,8 @@ export default {
         onChange: { type: Function, required: false },
         id: { type: String, required: false },
         label: { type: [String, Boolean], required: false },
-        inputClass: { type: String, required: false },
-        labelClass: { type: String, required: false },
-        inputStyle: { type: String, required: false },
-        labelStyle: { type: String, required: false },
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
-        inputGroup: { type: Boolean, default: false },
     },
     computed: {
         value: {
@@ -52,21 +47,24 @@ export default {
             if (!this.tooltips) return classValidator
             switch (classValidator) {
                 case '':
+                    this.tooltips.disable();
+                    this.tooltips.hide()
+                    return ''
                 case 'is-valid':
                     this.tooltips.disable();
                     this.tooltips.hide()
-                    break;
+                    return 'border-success'
                 default:
+                    this.tooltips._isHovered = null
                     this.tooltips.enable();
                     this.tooltips.show();
-                    break;
+                    return 'border-danger'
             }
-            return classValidator
         },
     },
     mounted() {
         this.modelValue.initField(this.field, 'checkbox', (this.required || this.validation?.required !== undefined) ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.toolbarContainer);
+        this.tooltips = new Tooltip(this.$refs.tooltipsRef);
         this.tooltips.disable();
     },
     unmounted() {
