@@ -57,6 +57,7 @@ export default {
         { hrKey: '5' },
         { name: 'InputDate' },
         { name: 'InputTime' },
+        { name: 'InputDatetime' },
       ],
     };
   },

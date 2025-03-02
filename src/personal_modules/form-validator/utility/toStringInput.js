@@ -1,6 +1,6 @@
-export default function dateTimetoStringInput(value) {
+export function dateTimetoStringInput(value) {
     let date;
-    if (value === undefined) return undefined;
+    if (value === undefined) return undefined; 
     if (value === null) return null;
     if (typeof value === 'string') {
         if (value.trim() === '') return null;
@@ -17,7 +17,8 @@ export default function dateTimetoStringInput(value) {
     }
 
     const offset = date.getTimezoneOffset() * 60000; // Offset in millisecondi
-    return new Date(date.getTime() - offset).toISOString();
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().slice(0, 16);
 }
 export function dateToStringInput(value) {
     const result = dateTimetoStringInput(value);

@@ -5,24 +5,20 @@
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
-        :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
-        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
-        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
-        :inputmode="inputmode" :list="isList">
-    <datalist v-if="isList" :id="isList">
-        <option v-for="option in list" :key="option" :value="option"></option>
-    </datalist>
+    <input ref="inputRef" type="datetime-local" v-model="value" :class="[classValidator, $attrs.class ?? 'form-control']"
+        :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
+        :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
+        :readonly="readonly" :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
+
 </template>
 
 <script>
 import { Tooltip } from 'bootstrap';
+import { dateTimetoStringInput } from './utility/toStringInput.js';
 export default {
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },
-        lazy: { type: Boolean, default: false },
         validation: { type: Object, default: {} },
         errorContent: { type: String, required: false },
         onChange: { type: Function, required: false },
@@ -33,61 +29,43 @@ export default {
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
+        required: { type: Boolean, default: undefined },
         autofocus: { type: Boolean, default: false },
-        maxlength: { type: Number, required: false },
-        minlength: { type: Number, required: false },
+        max: { type: Number, required: false },
+        min: { type: Number, required: false },
+        step: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
-        lang: { type: String, default: 'it' },
-        inputmode: { type: String, required: false },
-        list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null, tooltips: null };
+        return {};
     },
     methods: {
-        handleInput(event) {
-            if (this.lazy) {
-                if (this.lazyTimer) {
-                    clearTimeout(this.lazyTimer);
-                    this.lazyTimer = null;
-                };
-                this.lazyTimer = setTimeout(() => {
-                    this.value = event.target.value;
-                }, 500);
-            } else {
-                this.value = event.target.value;
-            }
-        },
-        handleChange(event) {
-            if (this.lazy && this.lazyTimer) {
-                clearTimeout(this.lazyTimer);
-                this.lazyTimer = null;
-                this.value = event.target.value;
-            }
-        }
     },
     computed: {
         value: {
             get() {
-                return this.modelValue[this.field];
+                const res = dateTimetoStringInput(this.modelValue[this.field]);
+                return res ? res : '';
             },
             set(value) {
-                this.modelValue[this.field] = value;
+                let data = new Date(value);
+                this.modelValue[this.field] = data;
                 this.modelValue.checkField(this.field);
-
                 if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
-            return this.id ?? this.field
+            return this.id ?? this.field;
         },
-        isList() {
-            return this.list.length ? `list-${this.idToSet}` : null
+        minToSet() {
+            return this.min ? dateTimetoStringInput(this.min) : (this.validation?.min ? dateTimetoStringInput(this.validation.min) : false);
+        },
+        maxToSet() {
+            return this.max ? dateTimetoStringInput(this.max) : (this.validation?.max ? dateTimetoStringInput(this.validation.max) : false);
         },
         lableDefaultText() {
-            return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
+            return this.errorContent ? this.errorContent : `Seleziona una data valida.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -108,7 +86,11 @@ export default {
         },
     },
     mounted() {
-        this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
+        let validation = this.validation
+        if (this.required) validation = { required: this.required, ...validation };
+        if (this.minToSet) validation = { min: this.minToSet, ...validation };
+        if (this.maxToSet) validation = { max: this.maxToSet, ...validation };
+        this.modelValue.initField(this.field, 'datetime-local', validation);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },

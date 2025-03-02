@@ -21,6 +21,7 @@ import E_InputRadio from './views/example/E_InputRadio.vue'
 import E_InputRange from './views/example/E_InputRange.vue'
 import E_InputSelect from './views/example/E_InputSelect.vue'
 import E_InputTime from './views/example/E_InputTime.vue'
+import E_InputDatetime from './views/example/E_InputDatetime.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
@@ -46,6 +47,7 @@ const fullRoutes = {
     { path: '/example/InputRange', name: 'example.InputRange', component: E_InputRange },
     { path: '/example/InputSelect', name: 'example.InputSelect', component: E_InputSelect },
     { path: '/example/InputTime', name: 'example.InputTime', component: E_InputTime },
+    { path: '/example/InputDatetime', name: 'example.InputDatetime', component: E_InputDatetime },
 
   ],
 

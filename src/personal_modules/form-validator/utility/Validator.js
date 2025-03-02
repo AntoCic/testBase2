@@ -85,7 +85,7 @@ export default {
     },
 
     ['date'](value, { min, max, required } = {}) {
-        if (required === true && ( value === null || value === undefined || value.trim() === '')) {
+        if (required === true && (value === null || value === undefined || (typeof value === 'string' ? value.trim() === '' : false))) {
             return false;
         }
         let data = value instanceof Date ? value : new Date(value);
@@ -96,6 +96,21 @@ export default {
 
         if (min instanceof Date && !isNaN(min)) min.setHours(0, 0, 0, 0);
         if (max instanceof Date && !isNaN(max)) max.setHours(0, 0, 0, 0);
+
+        if ((min && data < min) || (max && data > max)) {
+            return false;
+        }
+        return true;
+    },
+
+    ['datetime-local'](value, { min, max, required } = {}) {
+        if (required === true && (value === null || value === undefined || (typeof value === 'string' ? value.trim() === '' : false))) {
+            return false;
+        }
+        let data = value instanceof Date ? value : new Date(value);
+
+        if (min && !(min instanceof Date)) min = new Date(min);
+        if (max && !(max instanceof Date)) max = new Date(max);
 
         if ((min && data < min) || (max && data > max)) {
             return false;
