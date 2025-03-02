@@ -8,8 +8,8 @@
         <hr>
         <InputDatetime field="dateX" v-model="form" label='Data di nascita' required :onChange="handleChange"
           :validation="{ max: tomorrow }" />
-        <Btn @click="form.reset()" googleIcon="replay"></Btn>
-        <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
+        <Btn @click="form.reset()" class="w-100" googleIcon="replay"></Btn>
+        <Btn type="submit"  class="w-100" @click="handleSubmit" googleIcon="send"></Btn>
 
         <hr>
         <p class="">{{ form.dateX }}</p>
@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        dateX: '',
+        dateX: new Date(),
       }),
 
       onChangeData: {},

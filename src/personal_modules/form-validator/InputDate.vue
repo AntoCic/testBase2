@@ -1,4 +1,5 @@
 <template>
+    <!-- ! Da miglirare messaggio di errore aggiungere quale data  -->
     <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
         <template v-if="label === true"> {{ idToSet }} </template>
@@ -31,8 +32,8 @@ export default {
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: undefined },
         autofocus: { type: Boolean, default: false },
-        max: { type: Number, required: false },
-        min: { type: Number, required: false },
+        max: { type: [String, Date], required: false },
+        min: { type: [String, Date], required: false },
         step: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },

@@ -126,9 +126,36 @@ export default {
         return new Date(options.start) <= new Date(value);
     },
 
-    ['time'](value) {
+    ['time'](value, { min, max, required } = {}) {
         const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (typeof value !== 'string') return false;
-        return timeRegex.test(value);
-    },
+
+        if (required === true && (value === null || value === undefined || (typeof value === 'string' ? !timeRegex.test(value) : false))) {
+            return false;
+        }
+        console.log('AAAAAAAAAAAAAAAA', min, max);
+        if (!(min || max)) return true;
+        
+        const toMinutes = (time) => {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        };
+        const timeValue = toMinutes(value);
+        if (min) {
+            if (typeof min === 'string' && timeRegex.test(min)) {
+                const minValue = min ? toMinutes(min) : null;
+                if (minValue !== null && timeValue < minValue) {
+                    return false;
+                }
+            } else { throw new Error("time min non è corretto"); }
+        }
+        if (max) {
+            if (typeof max === 'string' && timeRegex.test(max)) {
+                const maxValue = max ? toMinutes(max) : null;
+                if (maxValue !== null && timeValue > maxValue) {
+                    return false;
+                }
+            } else { throw new Error("time max non è corretto"); }
+        }
+        return true;
+    }
 }

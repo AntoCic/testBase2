@@ -1,14 +1,16 @@
 <template>
+    <!-- ! Da miglirare messaggio di errore aggiungere quale data  -->
     <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
         <template v-if="label === true"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="datetime-local" v-model="value" :class="[classValidator, $attrs.class ?? 'form-control']"
-        :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-        :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
-        :readonly="readonly" :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
+    <input ref="inputRef" type="datetime-local" v-model="value"
+        :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
+        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
+        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
+        :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
 
 </template>
 
@@ -31,8 +33,8 @@ export default {
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: undefined },
         autofocus: { type: Boolean, default: false },
-        max: { type: Number, required: false },
-        min: { type: Number, required: false },
+        max: { type: [String, Date], required: false },
+        min: { type: [String, Date], required: false },
         step: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
