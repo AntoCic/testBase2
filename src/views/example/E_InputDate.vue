@@ -7,9 +7,7 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputDate field="dateX" v-model="form"
-            label='<span class="material-symbols-outlined">person</span> Username' inputGroup
-            :onChange="handleChange" />
+          <InputDate field="dateX" v-model="form" label='Data di nascita' inputGroup required :onChange="handleChange" :validation="{max : tomorrow}" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
@@ -32,10 +30,11 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        dateX: new Date(),
+        dateX: '',
       }),
 
       onChangeData: {},
+
     };
   },
   methods: {
@@ -51,7 +50,19 @@ export default {
       console.log(this.form.get());
     }
   },
-  created() {
+  computed: {
+    yesterday() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0);
+      return yesterday;
+    },
+    tomorrow() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      return tomorrow;
+    }
   }
 }
 </script>

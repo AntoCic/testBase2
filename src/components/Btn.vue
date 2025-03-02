@@ -52,10 +52,6 @@ export default {
       return this.loading !== undefined ? (this.loading && this.showTextLoading) : true
     },
   },
-  mounted() {
-    console.dir(this);
-
-  },
 };
 </script>
 

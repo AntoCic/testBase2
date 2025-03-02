@@ -84,10 +84,23 @@ export default {
 
     },
 
-    ['date'](value) {
-        const regexDate = /^(\d{4})-(\d{2})-(\d{2})$/;
-        if (typeof value !== 'string') return false;
-        return regexDate.test(value);
+    ['date'](value, { min, max, required } = {}) {
+        if (required === true && ( value === null || value === undefined || value.trim() === '')) {
+            return false;
+        }
+        let data = value instanceof Date ? value : new Date(value);
+        data.setHours(0, 0, 0, 0);
+
+        if (min && !(min instanceof Date)) min = new Date(min);
+        if (max && !(max instanceof Date)) max = new Date(max);
+
+        if (min instanceof Date && !isNaN(min)) min.setHours(0, 0, 0, 0);
+        if (max instanceof Date && !isNaN(max)) max.setHours(0, 0, 0, 0);
+
+        if ((min && data < min) || (max && data > max)) {
+            return false;
+        }
+        return true;
     },
 
     ['endDate'](value, startDate) {
