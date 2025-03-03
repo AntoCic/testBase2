@@ -3,7 +3,7 @@
         :readonly="readonly">
     <label v-if="label" :for="idToSet" :class="[$attrs.class ?? 'btn btn-outline-primary', classValidator]"
         :style="$attrs.style" ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-        :data-bs-title="lableDefaultText">
+        :data-bs-title="errorDefaultText">
         <template v-if="label === true"> {{ idToSet }} </template>
         <template v-else> <span v-html="label"></span> </template>
         <span v-if="required" class="text-danger">*</span>
@@ -39,7 +39,7 @@ export default {
         idToSet() {
             return this.id ?? this.field;
         },
-        lableDefaultText() {
+        errorDefaultText() {
             return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`
         },
         classValidator() {

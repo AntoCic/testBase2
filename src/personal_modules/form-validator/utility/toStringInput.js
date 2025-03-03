@@ -5,8 +5,12 @@ export function dateTimetoStringInput(value) {
     if (typeof value === 'string') {
         if (value.trim() === '') return null;
         const regexData = /^(\d{4})-(\d{2})-(\d{2})$/;
+        const regexDateTime = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
+
         if (regexData.test(value)) {
             date = new Date(value + 'T00:00:00Z');
+        }else if(regexDateTime.test(value)){
+            return value
         } else {
             throw new Error("Date format non valido toStringInput");
         }

@@ -7,7 +7,7 @@
     </label>
     <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
-        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
+        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
         :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
         :inputmode="inputmode" :list="isList">
@@ -86,7 +86,7 @@ export default {
         isList() {
             return this.list.length ? `list-${this.idToSet}` : null
         },
-        lableDefaultText() {
+        errorDefaultText() {
             return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
         },
         classValidator() {

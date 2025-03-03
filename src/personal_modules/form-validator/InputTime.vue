@@ -1,5 +1,4 @@
 <template>
-    <!-- ! Da miglirare messaggio di errore aggiungere quale orario  -->
     <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
         <template v-if="label === true"> {{ idToSet }} </template>
@@ -8,7 +7,7 @@
     </label>
     <input ref="inputRef" type="time" v-model="value" :class="[classValidator, $attrs.class ?? 'form-control']"
         :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-        :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
+        :data-bs-title="errorDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
         :readonly="readonly" :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
 
 </template>
@@ -62,8 +61,9 @@ export default {
         maxToSet() {
             return this.max ?? (this.validation?.max ?? false);
         },
-        lableDefaultText() {
-            return this.errorContent ? this.errorContent : `Seleziona un orario valido.`;
+
+        errorDefaultText() {
+            return this.errorContent ? this.errorContent : `Seleziona un orario valido${this.minToSet ? ', dopo le ' + this.minToSet  : ''}${this.maxToSet ? ', prima delle ' + this.maxToSet  : ''}.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);

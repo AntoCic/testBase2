@@ -1,5 +1,4 @@
 <template>
-    <!-- ! Da miglirare messaggio di errore aggiungere quale data  -->
     <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
         <template v-if="label === true"> {{ idToSet }} </template>
@@ -8,7 +7,7 @@
     </label>
     <input ref="inputRef" type="datetime-local" v-model="value"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
-        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
+        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
         :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
 
@@ -66,8 +65,8 @@ export default {
         maxToSet() {
             return this.max ? dateTimetoStringInput(this.max) : (this.validation?.max ? dateTimetoStringInput(this.validation.max) : false);
         },
-        lableDefaultText() {
-            return this.errorContent ? this.errorContent : `Seleziona una data valida.`;
+        errorDefaultText() {
+            return this.errorContent ? this.errorContent : `Seleziona una data${this.minToSet ? ', dopo il ' + new Date(this.minToSet).toLocaleString()  : ''}${this.maxToSet ? ', prima del ' + new Date(this.maxToSet).toLocaleString()  : ''}.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);

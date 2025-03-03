@@ -6,8 +6,8 @@
       </div>
       <div class="col-12 text-start">
         <hr>
-        <InputDatetime field="dateX" v-model="form" label='Data di nascita' required :onChange="handleChange"
-          :validation="{ max: tomorrow }" />
+        <InputDatetime field="dateX" v-model="form" label='Data di nascita' required min="2025-03-03T12:00" max="2025-03-06T15:00" :onChange="handleChange"
+          />
         <Btn @click="form.reset()" class="w-100" googleIcon="replay"></Btn>
         <Btn type="submit"  class="w-100" @click="handleSubmit" googleIcon="send"></Btn>
 

@@ -1,6 +1,6 @@
 <template>
     <div :class="[inputGroup ? 'input-group-text' : undefined]" ref="tooltipsRef" data-bs-toggle="tooltip"
-        data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText">
+        data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText">
         <input type="checkbox" v-model="value"
             :class="['form-check-input', inputGroup ? 'mt-0' : undefined, inputClass, classValidator]"
             :style="inputStyle" :id="idToSet" :name="idToSet" :disabled="disabled" :readonly="readonly">
@@ -45,7 +45,7 @@ export default {
         idToSet() {
             return this.id ?? this.field;
         },
-        lableDefaultText() {
+        errorDefaultText() {
             return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`;
         },
         classValidator() {

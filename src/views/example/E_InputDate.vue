@@ -7,7 +7,7 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputDate field="dateX" v-model="form" label='Data di nascita' inputGroup required :onChange="handleChange" :validation="{max : tomorrow}" />
+          <InputDate field="dateX" v-model="form" label='Data di nascita' min="2025-03-03" max="2025-03-06"  inputGroup required :onChange="handleChange" :validation="{max : tomorrow}" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
