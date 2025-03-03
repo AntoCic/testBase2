@@ -1,21 +1,20 @@
 <template>
-    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
+    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
-        <template v-if="label === true || label === ''"> {{ idToSet }} </template>
+        <template v-if="label === true"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="datetime-local" v-model="value"
-        :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
-        data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
-        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
+    <input ref="inputRef" type="date" v-model="value" :class="[classValidator, $attrs.class ?? 'form-control']"
+        :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
+        :data-bs-title="errorDefaultText" :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled"
+        :readonly="readonly" :required="required" :autofocus="autofocus" :max="maxToSet" :min="minToSet" :step="step">
 
 </template>
 
 <script>
 import { Tooltip } from 'bootstrap';
-import { dateTimetoStringInput } from './utility/toStringInput.js';
+import { dateToStringInput } from './utility/toStringInput.js';
 export default {
     props: {
         field: { type: String, required: true },
@@ -46,11 +45,12 @@ export default {
     computed: {
         value: {
             get() {
-                const res = dateTimetoStringInput(this.modelValue[this.field]);
+                const res = dateToStringInput(this.modelValue[this.field]);
                 return res ? res : '';
             },
             set(value) {
                 let data = new Date(value);
+                data.setHours(0, 0, 0, 0);
                 this.modelValue[this.field] = data;
                 this.modelValue.checkField(this.field);
                 if (this.onChange) { this.onChange(value, this.field); }
@@ -60,13 +60,13 @@ export default {
             return this.id ?? this.field;
         },
         minToSet() {
-            return this.min ? dateTimetoStringInput(this.min) : (this.validation?.min ? dateTimetoStringInput(this.validation.min) : false);
+            return this.min ? dateToStringInput(this.min) : (this.validation?.min ? dateToStringInput(this.validation.min) : false);
         },
         maxToSet() {
-            return this.max ? dateTimetoStringInput(this.max) : (this.validation?.max ? dateTimetoStringInput(this.validation.max) : false);
+            return this.max ? dateToStringInput(this.max) : (this.validation?.max ? dateToStringInput(this.validation.max) : false);
         },
         errorDefaultText() {
-            return this.errorContent ? this.errorContent : `Seleziona una data${this.minToSet ? ', dopo il ' + new Date(this.minToSet).toLocaleString()  : ''}${this.maxToSet ? ', prima del ' + new Date(this.maxToSet).toLocaleString()  : ''}.`;
+            return this.errorContent ? this.errorContent : `Seleziona una data${this.minToSet ? ', dopo il ' + new Date(this.minToSet).toLocaleDateString()  : ''}${this.maxToSet ? ', prima del ' + new Date(this.maxToSet).toLocaleDateString()  : ''}.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -87,11 +87,16 @@ export default {
         },
     },
     mounted() {
+        if (this.modelValue[this.field] instanceof Date) {
+            this.modelValue[this.field].setHours(0, 0, 0, 0);
+            this.modelValue.state[this.field].initialValue = this.modelValue[this.field];
+        }
+
         let validation = this.validation
         if (this.required) validation = { required: this.required, ...validation };
         if (this.minToSet) validation = { min: this.minToSet, ...validation };
         if (this.maxToSet) validation = { max: this.maxToSet, ...validation };
-        this.modelValue.initField(this.field, 'datetime-local', validation);
+        this.modelValue.initField(this.field, 'date', validation);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },

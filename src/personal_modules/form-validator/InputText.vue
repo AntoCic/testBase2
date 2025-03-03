@@ -1,7 +1,7 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
+    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
         :style="labelStyle">
-        <template v-if="label === true"> {{ idToSet }} </template>
+        <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>

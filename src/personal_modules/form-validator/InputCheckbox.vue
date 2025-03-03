@@ -4,8 +4,8 @@
         <input type="checkbox" v-model="value"
             :class="['form-check-input', inputGroup ? 'mt-0' : undefined, inputClass, classValidator]"
             :style="inputStyle" :id="idToSet" :name="idToSet" :disabled="disabled" :readonly="readonly">
-        <label v-if="label" :for="idToSet" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
-            <template v-if="label === true"> {{ idToSet }} </template>
+        <label v-if="label || label === ''" :for="idToSet" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
+            <template v-if="label === true || label === ''"> {{ idToSet }} </template>
             <template v-else> <span v-html="label"></span> </template>
             <span v-if="required" class="text-danger">*</span>
         </label>

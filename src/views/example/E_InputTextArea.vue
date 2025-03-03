@@ -2,16 +2,19 @@
   <div class="container my-auto text-white">
     <div class="row justify-content-center text-center">
       <div class="col-12 mb-3">
-        <h1>InputSelect</h1>
+        <h1>InputText</h1>
       </div>
       <div class="col-12 text-start">
         <hr>
-        <InputSelect :options="optionsSelect" field="selectedField" v-model="form" label emptyOption
-          :onChange="handleChange" />
-        <Btn @click="form.reset()" googleIcon="replay"></Btn>
-        <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
+        <div class="input-group">
+          <InputText style="background-color: yellow;" field="testo"
+            v-model="form" label='<span class="material-symbols-outlined">person</span> Username' inputGroup
+            :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
+          <Btn @click="form.reset()" googleIcon="replay"></Btn>
+          <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
+        </div>
         <hr>
-        <p class="">{{ form.selectedField }}</p>
+        <p class="">{{ form.testo }}</p>
         <hr>
         <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
@@ -22,27 +25,21 @@
 
 <script>
 import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
-import InputSelect from '../../personal_modules/form-validator/InputSelect.vue';
+import InputText from '../../personal_modules/form-validator/InputText.vue';
 import Btn from '../../components/Btn.vue';
 export default {
-  components: { InputSelect, Btn },
+  components: { InputText, Btn },
   data() {
     return {
       form: new FormValidator({
-        selectedField: null,
+        testo: 'abc',
       }),
 
       onChangeData: {},
-
-      optionsSelect: [
-        { text: 'One', value: 'A' },
-        { text: 'Two', value: 'B' },
-        { text: 'Three', value: 'C' }
-      ],
     };
   },
   methods: {
-    InputSelectValidator(value, { min, max }) {
+    InputTextValidator(value, { min, max }) {
       console.log(value, { min, max });
       return value.length <= max && value.length >= min
     },

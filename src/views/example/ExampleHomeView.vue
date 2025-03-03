@@ -43,6 +43,7 @@ export default {
         { hrKey: '2', description: 'Input' },
         { name: 'InputText' },
         { name: 'InputTextIcon' },
+        { name: 'InputTextArea' },
         { name: 'InputEmail' },
         { name: 'InputPassword' },
         { hrKey: '3' },

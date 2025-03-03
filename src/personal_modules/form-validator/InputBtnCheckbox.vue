@@ -1,10 +1,10 @@
 <template>
     <input type="checkbox" v-model="value" :class="['btn-check']" :id="idToSet" :name="idToSet" :disabled="disabled"
         :readonly="readonly">
-    <label v-if="label" :for="idToSet" :class="[$attrs.class ?? 'btn btn-outline-primary', classValidator]"
+    <label v-if="label || label === ''" :for="idToSet" :class="[$attrs.class ?? 'btn btn-outline-primary', classValidator]"
         :style="$attrs.style" ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
         :data-bs-title="errorDefaultText">
-        <template v-if="label === true"> {{ idToSet }} </template>
+        <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <template v-else> <span v-html="label"></span> </template>
         <span v-if="required" class="text-danger">*</span>
     </label>
