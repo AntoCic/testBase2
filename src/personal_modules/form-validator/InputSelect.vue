@@ -9,7 +9,9 @@
         :style="$attrs.style" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
         :data-bs-title="errorDefaultText" :autocomplete="autocomplete" :disabled="disabled" :required="required"
         :autofocus="autofocus">
-        <option v-if="emptyOption || emptyOption === ''" :value="null">---</option>
+        <option v-if="emptyOption || emptyOption === ''" :value="null">
+            {{ emptyOption === '' ? '---' : emptyOption }}
+        </option>
         <option v-for="(option, index) in options" :key="field + 'Options-' + index" :value="option.value"
             :class="optionsClass" :style="optionsStyle">
             {{ option.text }}
@@ -36,7 +38,7 @@ export default {
         optionsStyle: { type: String, required: false },
         inputGroup: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
+        required: { type: Boolean, default: false },
         autofocus: { type: Boolean, default: false },
         autocomplete: { type: String, required: false },
         inputmode: { type: String, required: false },

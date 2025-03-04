@@ -132,9 +132,8 @@ export default {
         if (required === true && (value === null || value === undefined || (typeof value === 'string' ? !timeRegex.test(value) : false))) {
             return false;
         }
-        console.log('AAAAAAAAAAAAAAAA', min, max);
         if (!(min || max)) return true;
-        
+
         const toMinutes = (time) => {
             const [hours, minutes] = time.split(':').map(Number);
             return hours * 60 + minutes;
@@ -157,5 +156,10 @@ export default {
             } else { throw new Error("time max non è corretto"); }
         }
         return true;
+    },
+    ['select'](value, { } = {}) {
+        console.log(value, value);
+
+        return value !== null;
     }
 }

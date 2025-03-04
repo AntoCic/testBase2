@@ -179,7 +179,7 @@ export default class FormValidator {
         this.state[field].type = type;
         if (validation === false) { this.state[field].validated === true; return; }
         this.state[field].validator = validation.validator ? validation.validator : Validator[type];
-        if (validation.validator) delete validation.validator
+        if (validation.validator) delete validation.validator;
         this.state[field].validatorOptions = validation;
     }
 

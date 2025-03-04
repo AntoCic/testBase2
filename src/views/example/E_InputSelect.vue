@@ -6,7 +6,7 @@
       </div>
       <div class="col-12 text-start">
         <hr>
-        <InputSelect :options="optionsSelect" field="selectedField" v-model="form" label emptyOption
+        <InputSelect :options="optionsSelect" field="selectedField" v-model="form" label emptyOption="(nessun elemento selezionato)"
           :onChange="handleChange" />
         <Btn @click="form.reset()" googleIcon="replay"></Btn>
         <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
@@ -38,7 +38,7 @@ export default {
         { text: 'One', value: 'A' },
         { text: 'Two', value: 'B' },
         { text: 'Three', value: 'C' }
-      ],
+      ], 
     };
   },
   methods: {
