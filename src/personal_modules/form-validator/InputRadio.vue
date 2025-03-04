@@ -1,39 +1,17 @@
 <template>
-    <label v-if="label" :for="idToSet" :class="[inputGroup ? 'input-group-text' : 'form-label', 'mb-0', labelClass]"
-        :style="labelStyle">
-        <template v-if="label === true">
-            {{ idToSet }}
-        </template>
-        <template v-else>
-            <span v-html="label"></span>
-        </template>
-        <span v-if="required" class="text-danger">*</span>
-    </label>
-
-    <div v-if="inputIcon || googleIcon" :class="['position-relative', containerClass]" :style="containerStyle">
-        <label v-if="inputIcon" :for="idToSet" class="position-absolute top-50 start-0 translate-middle-y ps-1"
-            v-html="inputIcon"></label>
-        <label v-if="googleIcon" :for="idToSet"
-            class="position-absolute top-50 start-0 translate-middle-y ps-1 material-symbols-outlined text-dark">{{
-                googleIcon }}</label>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control p-input-icon', classValidator, inputClass]"
-            :style="inputStyle" :id="idToSet" :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger"
-            :data-bs-title="lableDefaultText" :placeholder="placeholder" :autocomplete="autocomplete"
-            :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus" :maxlength="maxlength"
-            :minlength="minlength" :lang="lang" :inputmode="inputmode" :list="isList">
+    <div ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText">
+        <label v-if="label || label === ''" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
+            <template v-if="label === true || label === ''"> {{ idToSet }} </template>
+            <template v-else> <span v-html="label"></span> </template>
+            <span v-if="required" class="text-danger">*</span>
+        </label>
+        <div :class="[containerClass ?? `form-check ${inputGroup ? ' form-control' : ''}`]" :style="containerStyle"
+            v-for="(option, index) in options" :key="field + 'Options-' + index">
+            <input v-model="value" :class="optionsInputClass ?? 'form-check-input'" :style="optionsInputStyle"
+                :value="option.value" type="radio" :id="field + 'Options-' + index" :name="field" :disabled="disabled">
+            <label :for="field + 'Options-' + index" :class="optionsInputClass ?? 'form-check-label'" :style="optionsInputStyle">{{ option.text }}</label>
+        </div>
     </div>
-    <template v-else>
-        <input ref="inputEl" type="text" :value="value" @input="handleInput" @change="handleChange"
-            :class="['form-control', classValidator, inputClass]" :style="inputStyle" :id="idToSet" :name="idToSet"
-            data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="lableDefaultText"
-            :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-            :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
-            :inputmode="inputmode" :list="isList">
-    </template>
-    <datalist v-if="isList" :id="isList">
-        <option v-for="option in list" :key="option" :value="option"></option>
-    </datalist>
 </template>
 
 <script>
@@ -42,58 +20,25 @@ export default {
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },
-        lazy: { type: Boolean, default: false },
         validation: { type: Object, default: {} },
         errorContent: { type: String, required: false },
         onChange: { type: Function, required: false },
-        inputGroup: { type: Boolean, default: false },
         id: { type: String, required: false },
+        options: { type: Array, required: true },
         label: { type: [String, Boolean], required: false },
-        googleIcon: { type: String, required: false },
-        inputIcon: { type: String, required: false },
-        inputClass: { type: String, required: false },
         containerClass: { type: String, required: false },
-        labelClass: { type: String, required: false },
-        inputStyle: { type: String, required: false },
         containerStyle: { type: String, required: false },
+        labelClass: { type: String, required: false },
         labelStyle: { type: String, required: false },
-        readonly: { type: Boolean, default: false },
+        optionsInputClass: { type: String, required: false },
+        optionsInputStyle: { type: String, required: false },
+        optionsLableClass: { type: String, required: false },
+        optionsLableStyle: { type: String, required: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
-        autofocus: { type: Boolean, default: false },
-        maxlength: { type: Number, required: false },
-        minlength: { type: Number, required: false },
-        autocomplete: { type: String, required: false },
-        placeholder: { type: String, required: false },
-        lang: { type: String, default: 'it' },
-        inputmode: { type: String, required: false },
-        list: { type: Array, default: () => [] },
+        required: { type: Boolean, default: false },
+        inputGroup: { type: Boolean, default: false },
     },
-    data() {
-        return { lazyTimer: null, tooltips: null };
-    },
-    methods: {
-        handleInput(event) {
-            if (this.lazy) {
-                if (this.lazyTimer) {
-                    clearTimeout(this.lazyTimer);
-                    this.lazyTimer = null;
-                };
-                this.lazyTimer = setTimeout(() => {
-                    this.value = event.target.value;
-                }, 500);
-            } else {
-                this.value = event.target.value;
-            }
-        },
-        handleChange(event) {
-            if (this.lazy && this.lazyTimer) {
-                clearTimeout(this.lazyTimer);
-                this.lazyTimer = null;
-                this.value = event.target.value;
-            }
-        }
-    },
+    data() { return { tooltips: null }; },
     computed: {
         value: {
             get() {
@@ -102,18 +47,14 @@ export default {
             set(value) {
                 this.modelValue[this.field] = value;
                 this.modelValue.checkField(this.field);
-
                 if (this.onChange) { this.onChange(value, this.field); }
             }
         },
         idToSet() {
-            return this.id ?? this.field
+            return this.id ?? this.field;
         },
-        isList() {
-            return this.list.length ? `list-${this.idToSet}` : null
-        },
-        lableDefaultText() {
-            return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
+        errorDefaultText() {
+            return this.errorContent ? this.errorContent : this.validation?.required === false ? `È obbligatorio deselezionare questo campo` : `È obbligatorio`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -122,19 +63,20 @@ export default {
                 case '':
                 case 'is-valid':
                     this.tooltips.disable();
-                    this.tooltips.hide()
+                    this.tooltips.hide();
                     break;
                 default:
+                    this.tooltips._isHovered = null;
                     this.tooltips.enable();
                     this.tooltips.show();
                     break;
             }
-            return classValidator
+            return classValidator;
         },
     },
     mounted() {
-        this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
-        this.tooltips = new Tooltip(this.$refs.inputEl);
+        this.modelValue.initField(this.field, 'radio', (this.required || this.validation?.required !== undefined) ? this.validation : false);
+        this.tooltips = new Tooltip(this.$refs.tooltipsRef);
         this.tooltips.disable();
     },
     unmounted() {

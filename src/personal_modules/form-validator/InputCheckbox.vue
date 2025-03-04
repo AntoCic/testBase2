@@ -31,6 +31,7 @@ export default {
         required: { type: Boolean, default: false },
         inputGroup: { type: Boolean, default: false },
     },
+    data() { return { tooltips: null }; },
     computed: {
         value: {
             get() {

@@ -43,7 +43,7 @@ export default {
         autocomplete: { type: String, required: false },
         inputmode: { type: String, required: false },
     },
-    data() { },
+    data() { return { tooltips: null }; },
     methods: {
     },
     computed: {

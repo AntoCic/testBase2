@@ -25,6 +25,7 @@ export default {
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
     },
+    data() { return { tooltips: null }; },
     computed: {
         value: {
             get() {

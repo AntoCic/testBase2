@@ -2,17 +2,13 @@
   <div class="container my-auto text-white">
     <div class="row justify-content-center text-center">
       <div class="col-12 mb-3">
-        <h1>InputText</h1>
+        <h1>InputRadio</h1>
       </div>
       <div class="col-12 text-start">
         <hr>
-        <div class="input-group">
-          <InputText field="testo" v-model="form" label='<span class="material-symbols-outlined">person</span> Username'
-            inputGroup :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
-        </div>
-
+        <InputRadio field="selectedRadio" v-model="form" label :options="optionsSelect" :onChange="handleChange" />
         <hr>
-        <p class="">{{ form.searchText }}</p>
+        <p>{{ form.selectedRadio }}</p>
         <Btn @click="form.reset()">Resetta input</Btn>
         <Btn type="submit" @click="handleSubmit">submit</Btn>
         <hr>
@@ -25,24 +21,22 @@
 
 <script>
 import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
-import InputText from '../../personal_modules/form-validator/InputText.vue';
+import InputRadio from '../../personal_modules/form-validator/InputRadio.vue';
 import Btn from '../../components/Btn.vue';
 export default {
-  components: { InputText, Btn },
+  components: { InputRadio, Btn },
   data() {
     return {
-      form: new FormValidator({
-        testo: 'abc',
-      }),
-
+      form: new FormValidator({ selectedRadio: null}),
       onChangeData: {},
+      optionsSelect: [
+        { text: 'One', value: 'A' },
+        { text: 'Two', value: 'B' },
+        { text: 'Three', value: 'C' }
+      ], 
     };
   },
   methods: {
-    InputTextValidator(value, { min, max }) {
-      console.log(value, { min, max });
-      return value.length <= max && value.length >= min
-    },
     handleChange(value, field) {
       this.onChangeData = { [field]: value }
     },
