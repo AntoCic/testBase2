@@ -43,7 +43,7 @@ export default {
         autocomplete: { type: String, required: false },
         inputmode: { type: String, required: false },
     },
-    data() { return { tooltips: null }; },
+    data() { return {  }; },
     methods: {
     },
     computed: {
@@ -83,8 +83,6 @@ export default {
         },
     },
     mounted() {
-        console.log({ label: this.label });
-
         this.modelValue.initField(this.field, 'select', this.required ? this.validation : false);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();

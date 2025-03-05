@@ -6,7 +6,7 @@
       </div>
       <div class="col-12 text-start">
         <hr>
-        <InputRadio field="selectedRadio" v-model="form" label :options="optionsSelect" :onChange="handleChange" />
+        <InputRadio field="selectedRadio" v-model="form" label required :options="optionsSelect" :onChange="handleChange" />
         <hr>
         <p>{{ form.selectedRadio }}</p>
         <Btn @click="form.reset()">Resetta input</Btn>

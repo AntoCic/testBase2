@@ -1,5 +1,5 @@
 <template>
-    <div ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText">
+    <div ref="tooltipsRef" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText" :class="classValidator">
         <label v-if="label || label === ''" :class="['form-label ms-1 mb-0', labelClass]" :style="labelStyle">
             <template v-if="label === true || label === ''"> {{ idToSet }} </template>
             <template v-else> <span v-html="label"></span> </template>
@@ -38,7 +38,7 @@ export default {
         required: { type: Boolean, default: false },
         inputGroup: { type: Boolean, default: false },
     },
-    data() { return { tooltips: null }; },
+    data() { return {  }; },
     computed: {
         value: {
             get() {
@@ -58,7 +58,7 @@ export default {
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
-            if (!this.tooltips) return classValidator
+            if (!this.tooltips) return classValidator;
             switch (classValidator) {
                 case '':
                 case 'is-valid':
@@ -75,7 +75,7 @@ export default {
         },
     },
     mounted() {
-        this.modelValue.initField(this.field, 'radio', (this.required || this.validation?.required !== undefined) ? this.validation : false);
+        this.modelValue.initField(this.field, 'radio', this.required ? this.validation : false);
         this.tooltips = new Tooltip(this.$refs.tooltipsRef);
         this.tooltips.disable();
     },

@@ -157,9 +157,6 @@ export default {
         }
         return true;
     },
-    ['select'](value, { } = {}) {
-        console.log(value, value);
-
-        return value !== null;
-    }
+    ['select'](value, { } = {}) { return value !== null; },
+    ['radio'](value, { } = {}) { return value !== null; }
 }

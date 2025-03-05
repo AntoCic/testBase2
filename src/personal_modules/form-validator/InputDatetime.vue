@@ -38,7 +38,7 @@ export default {
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
     },
-    data() { return { tooltips: null }; },
+    data() { return {  }; },
     methods: {
     },
     computed: {

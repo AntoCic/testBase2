@@ -44,7 +44,7 @@ export default {
         list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null, tooltips: null };
+        return { lazyTimer: null,  };
     },
     methods: {
         handleInput(event) {
