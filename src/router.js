@@ -23,6 +23,8 @@ import E_InputSelect from './views/example/E_InputSelect.vue'
 import E_InputTime from './views/example/E_InputTime.vue'
 import E_InputDatetime from './views/example/E_InputDatetime.vue'
 import E_InputTextArea from './views/example/E_InputTextArea.vue'
+import E_InputSearch from './views/example/E_InputSearch.vue'
+import E_InputTel from './views/example/E_InputTel.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
@@ -50,6 +52,8 @@ const fullRoutes = {
     { path: '/example/InputTime', name: 'example.InputTime', component: E_InputTime },
     { path: '/example/InputDatetime', name: 'example.InputDatetime', component: E_InputDatetime },
     { path: '/example/InputTextArea', name: 'example.InputTextArea', component: E_InputTextArea },
+    { path: '/example/InputSearch', name: 'example.InputSearch', component: E_InputSearch },
+    { path: '/example/InputTel', name: 'example.InputTel', component: E_InputTel },
 
   ],
 

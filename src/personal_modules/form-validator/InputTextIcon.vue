@@ -17,7 +17,7 @@
             :class="[classValidator, $attrs.class ?? `form-control p-input-icon`]" :style="$attrs.style" :id="idToSet"
             :name="idToSet" data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
             :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-            :required="required" :autofocus="autofocus" :maxlength="maxlength" :minlength="minlength" :lang="lang"
+            :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"
             :inputmode="inputmode" :list="isList">
     </div>
     <datalist v-if="isList" :id="isList">
@@ -96,6 +96,12 @@ export default {
         idToSet() {
             return this.id ?? this.field
         },
+        minToSet() {
+            return this.minlength ?? (this.validation?.min ?? false);
+        },
+        maxToSet() {
+            return this.maxlength ?? (this.validation?.max ?? false);
+        },
         isList() {
             return this.list.length ? `list-${this.idToSet}` : null
         },
@@ -121,7 +127,10 @@ export default {
         },
     },
     mounted() {
-        this.modelValue.initField(this.field, 'text', this.required ? this.validation : false);
+        let validation = this.validation
+        if (this.minToSet) validation = { min: this.minToSet, ...validation };
+        if (this.maxToSet) validation = { max: this.maxToSet, ...validation };
+        this.modelValue.initField(this.field, 'text', this.required ? validation : false);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },

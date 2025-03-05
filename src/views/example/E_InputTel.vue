@@ -2,17 +2,17 @@
   <div class="container my-auto text-white">
     <div class="row justify-content-center text-center">
       <div class="col-12 mb-3">
-        <h1>InputRange</h1>
+        <h1>InputTel</h1>
       </div>
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputRange field="limiti" v-model="form" label inputGroup :onChange="handleChange" />
+          <InputTel field="Cell" v-model="form" label inputGroup :onChange="handleChange" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
         <hr>
-        <p class="">{{ form.limiti }}</p>
+        <p class="">{{ form.Cell }}</p>
         <hr>
         <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
@@ -23,14 +23,14 @@
 
 <script>
 import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
-import InputRange from '../../personal_modules/form-validator/InputRange.vue';
+import InputTel from '../../personal_modules/form-validator/InputTel.vue';
 import Btn from '../../components/Btn.vue';
 export default {
-  components: { InputRange, Btn },
+  components: { InputTel, Btn },
   data() {
     return {
       form: new FormValidator({
-        limiti: null,
+        Cell: null,
       }),
 
       onChangeData: {},

@@ -9,13 +9,18 @@ export default {
         return value.length <= max && value.length >= min
     },
 
-    ['email'](value) {
+    ['email'](value, { min, max } = {}) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        if (!emailRegex.test(value)) return false;
+
+        min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 2;
+        max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
         if (typeof value !== 'string') {
             console.error('Errore no stai passando al flidValidation una stringa');
             return false
         };
-        return emailRegex.test(value);
+
+        return value.length <= max && value.length >= min;
     },
 
     ['number'](value, { min, max } = {}) {

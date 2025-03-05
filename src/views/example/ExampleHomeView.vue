@@ -46,6 +46,8 @@ export default {
         { name: 'InputTextArea' },
         { name: 'InputEmail' },
         { name: 'InputPassword' },
+        { name: 'InputSearch' },
+        { name: 'InputTel' },
         { hrKey: '3' },
         { name: 'InputNumber' },
         { name: 'InputPrice' },
