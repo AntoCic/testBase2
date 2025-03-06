@@ -51,8 +51,8 @@ export default {
                 let data = new Date(value);
                 this.modelValue[this.field] = data;
                 const check = this.modelValue.checkField(this.field);
+                if (this.onChange) { this.onChange({ value, check, field: this.field }); };
                 this.modelValue.onChange(value, check, this.field);
-                if (this.onChange) { this.onChange({ value, check, field: this.field }); }
             }
         },
         idToSet() {

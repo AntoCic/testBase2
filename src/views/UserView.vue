@@ -1,6 +1,9 @@
 <template>
   <div class="container my-auto">
     <div class="row text-center p-3">
+      <div class="col-12">
+        <h1 class="text-danger">NEED FIX (remove) onChange from all input an use form.onChange</h1>
+      </div>
       <div class="col">
         <img :src="user.photoURL" alt="User Photo" class="rounded-circle">
         <p>{{ user.displayName }}</p>
