@@ -1,16 +1,15 @@
 <template>
-    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
-        :style="labelStyle">
+    <label v-if="label || label === ''" :for="idToSet"
+        :class="labelClass ?? 'form-label mb-1'" :style="labelStyle">
         <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
-        :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
+    <input ref="inputRef" type="range" :value="value" @input="handleInput" @change="handleChange"
+        :class="[classValidator, $attrs.class ?? 'form-range']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
-        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"
-        :inputmode="inputmode" :list="isList">
+        :placeholder="placeholder" :disabled="disabled" :readonly="readonly" :required="required" :autofocus="autofocus"
+        :max="maxToSet" :min="minToSet" :step="step" :list="isList">
     <datalist v-if="isList" :id="isList">
         <option v-for="option in list" :key="option" :value="option"></option>
     </datalist>
@@ -26,7 +25,6 @@ export default {
         validation: { type: Object, default: {} },
         errorContent: { type: String, required: false },
         onChange: { type: Function, required: false },
-        inputGroup: { type: Boolean, default: false },
         id: { type: String, required: false },
         label: { type: [String, Boolean], required: false },
         labelClass: { type: String, required: false },
@@ -35,16 +33,14 @@ export default {
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: true },
         autofocus: { type: Boolean, default: false },
-        maxlength: { type: Number, required: false },
-        minlength: { type: Number, required: false },
-        autocomplete: { type: String, required: false },
+        max: { type: Number, required: false },
+        min: { type: Number, required: false },
+        step: { type: Number, required: false },
         placeholder: { type: String, required: false },
-        lang: { type: String, default: 'it' },
-        inputmode: { type: String, required: false },
         list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null,  };
+        return { lazyTimer: null, };
     },
     methods: {
         handleInput(event) {
@@ -84,16 +80,16 @@ export default {
             return this.id ?? this.field
         },
         minToSet() {
-            return this.minlength ?? (this.validation?.min ?? false);
+            return this.min ?? (this.validation?.min ?? false);
         },
         maxToSet() {
-            return this.maxlength ?? (this.validation?.max ?? false);
+            return this.max ?? (this.validation?.max ?? false);
         },
         isList() {
             return this.list.length ? `list-${this.idToSet}` : null
         },
         errorDefaultText() {
-            return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
+            return this.errorContent ? this.errorContent : `Il valore deve essere tra ${this.validation?.min !== undefined ? this.validation.min : '0'} a ${this.validation?.max !== undefined ? this.validation.max : '255'}.`
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -117,7 +113,7 @@ export default {
         let validation = this.validation
         if (this.minToSet) validation = { min: this.minToSet, ...validation };
         if (this.maxToSet) validation = { max: this.maxToSet, ...validation };
-        this.modelValue.initField(this.field, 'text', this.required ? validation : false);
+        this.modelValue.initField(this.field, 'number', this.required ? validation : false);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },
