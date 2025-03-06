@@ -16,7 +16,6 @@ import E_InputDate from './views/example/E_InputDate.vue'
 import E_InputEmail from './views/example/E_InputEmail.vue'
 import E_InputNumber from './views/example/E_InputNumber.vue'
 import E_InputPassword from './views/example/E_InputPassword.vue'
-import E_InputPrice from './views/example/E_InputPrice.vue'
 import E_InputRadio from './views/example/E_InputRadio.vue'
 import E_InputRange from './views/example/E_InputRange.vue'
 import E_InputSelect from './views/example/E_InputSelect.vue'
@@ -45,7 +44,6 @@ const fullRoutes = {
     { path: '/example/InputEmail', name: 'example.InputEmail', component: E_InputEmail },
     { path: '/example/InputNumber', name: 'example.InputNumber', component: E_InputNumber },
     { path: '/example/InputPassword', name: 'example.InputPassword', component: E_InputPassword },
-    { path: '/example/InputPrice', name: 'example.InputPrice', component: E_InputPrice },
     { path: '/example/InputRadio', name: 'example.InputRadio', component: E_InputRadio },
     { path: '/example/InputRange', name: 'example.InputRange', component: E_InputRange },
     { path: '/example/InputSelect', name: 'example.InputSelect', component: E_InputSelect },

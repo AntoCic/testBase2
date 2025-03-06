@@ -23,17 +23,17 @@ export default {
         return value.length <= max && value.length >= min;
     },
 
+    // ['number'](value, { min, max } = {}) {
+    //     min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 0;
+    //     max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
+
+    //     const intValue = parseInt(value, 10);
+    //     if (isNaN(intValue)) return false;
+    //     return intValue % 1 === 0 && intValue >= min && intValue <= max;
+    // },
     ['number'](value, { min, max } = {}) {
         min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 0;
         max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
-
-        const intValue = parseInt(value, 10);
-        if (isNaN(intValue)) return false;
-        return intValue % 1 === 0 && intValue >= min && intValue <= max;
-    },
-    ['decimal'](value, { min, max } = {}) {
-        min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 0.1;
-        max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 9999.99;
         const num = parseFloat(value);
         if (isNaN(num)) return false;
         return num >= min && num <= max;

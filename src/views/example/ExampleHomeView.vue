@@ -50,7 +50,6 @@ export default {
         { name: 'InputTel' },
         { hrKey: '3' },
         { name: 'InputNumber' },
-        { name: 'InputPrice' },
         { name: 'InputRange' },
         { hrKey: '4' },
         { name: 'InputSelect' },

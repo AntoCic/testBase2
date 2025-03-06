@@ -7,7 +7,7 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputNumber field="numeroX" v-model="form" label inputGroup :onChange="handleChange" />
+          <InputNumber field="numeroX" v-model="form" label inputGroup :onChange="handleChange" required/>
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
