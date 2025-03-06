@@ -43,7 +43,7 @@ export default {
       console.log(value, { min, max });
       return value.length <= max && value.length >= min
     },
-    handleChange(value, field) {
+    handleChange(value) {
       this.onChangeData = { [field]: value }
     },
     handleSubmit() {

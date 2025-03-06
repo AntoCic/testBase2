@@ -5,13 +5,11 @@
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" ></textarea>
     <textarea ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange" :rows="rows"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
-        :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"
-        :inputmode="inputmode" ></textarea>
+        :placeholder="placeholder" :disabled="disabled" :readonly="readonly"
+        :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"></textarea>
 </template>
 
 <script>
@@ -36,10 +34,8 @@ export default {
         rows: { type: Number, default: 3 },
         maxlength: { type: Number, required: false },
         minlength: { type: Number, required: false },
-        autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
         lang: { type: String, default: 'it' },
-        inputmode: { type: String, required: false },
     },
     data() {
         return { lazyTimer: null,  };
@@ -73,9 +69,10 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                this.modelValue.checkField(this.field);
+                const check = this.modelValue.checkField(this.field);
+                this.modelValue.onChange(value, check, this.field);
 
-                if (this.onChange) { this.onChange(value, this.field); }
+                if (this.onChange) { this.onChange({ value, check, field: this.field }); }
             }
         },
         idToSet() {

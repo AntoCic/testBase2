@@ -27,7 +27,7 @@ export default class FormValidator {
 
         // Lista dei metodi della classe
         const methodNames = Object.getOwnPropertyNames(FormValidator.prototype).filter(name => name !== 'constructor');
-       
+
         // Creiamo un oggetto per salvare lo stato iniziale di ogni campo
         this.state = {};
         for (const field in fields) {
@@ -109,6 +109,15 @@ export default class FormValidator {
     * Valida tutti i campi che hanno un validator definito.
     * Ritorna true se tutti i campi validati risultano validi.
     */
+    onChange(value = undefined, check = undefined, field = undefined) {
+        if (this.state.onChange) { return this.state.onChange({ value, check, field }); }
+        return null;
+    }
+
+    /**
+    * Valida tutti i campi che hanno un validator definito.
+    * Ritorna true se tutti i campi validati risultano validi.
+    */
     check() {
         let allValid = true;
         for (const field in this.state) {
@@ -158,14 +167,14 @@ export default class FormValidator {
     */
     checkField(field) {
         if (!this.state[field] || !this.state[field].validator) {
-            console.log('CheckField notRequired:', field, '=>', this.state[field].validated);
+            // console.log('CheckField notRequired:', field, '=>', this.state[field].validated);
             return true; // Se non è definito un validator, consideriamo il campo valido
         }
         const value = this[field];
         const validatorOptions = this.state[field].validatorOptions;
         const valid = validatorOptions !== null ? this.state[field].validator.call(this, value, validatorOptions) : this.state[field].validator.call(this, value);
         this.state[field].validated = valid ? true : this.state[field].validated === null ? null : false;
-        console.log('CheckField:', field, '=>', this.state[field].validated);
+        // console.log('CheckField:', field, '=>', this.state[field].validated);
         return this.state[field].validated;
     }
 

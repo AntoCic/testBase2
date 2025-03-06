@@ -7,9 +7,9 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputText style="background-color: yellow;" field="testo"
-            v-model="form" label='<span class="material-symbols-outlined">person</span> Username' inputGroup
-             :onChange="handleChange" />
+          <InputText style="background-color: yellow;" field="testo" v-model="form"
+            label='<span class="material-symbols-outlined">person</span> Username' inputGroup
+            :onChange="handleChange" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
@@ -43,7 +43,7 @@ export default {
       console.log(value, { min, max });
       return value.length <= max && value.length >= min
     },
-    handleChange(value, field) {
+    handleChange(value) {
       this.onChangeData = { [field]: value }
     },
     handleSubmit() {

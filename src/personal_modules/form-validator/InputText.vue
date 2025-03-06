@@ -1,6 +1,6 @@
 <template>
-    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
-        :style="labelStyle">
+    <label v-if="label || label === ''" :for="idToSet"
+        :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']" :style="labelStyle">
         <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
@@ -44,7 +44,7 @@ export default {
         list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null,  };
+        return { lazyTimer: null, };
     },
     methods: {
         handleInput(event) {
@@ -75,9 +75,9 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                this.modelValue.checkField(this.field);
-
-                if (this.onChange) { this.onChange(value, this.field); }
+                const check = this.modelValue.checkField(this.field);
+                this.modelValue.onChange(value, check, this.field);
+                if (this.onChange) { this.onChange({ value, check, field: this.field }); }
             }
         },
         idToSet() {

@@ -41,7 +41,7 @@ export default {
     };
   },
   methods: {
-    handleChange(value, field) {
+    handleChange(value) {
       this.onChangeData = { [field]: value }
     },
     handleSubmit() {

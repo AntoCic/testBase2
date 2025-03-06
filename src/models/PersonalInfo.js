@@ -16,7 +16,6 @@ export default class PersonalInfo extends UserDB {
             dateOfBirth: null,
             birthHideYear: null,
             email: null,
-            phonePrefix: null,
             phoneNumber: null,
             photoURL: null,
         };

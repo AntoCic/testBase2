@@ -71,9 +71,10 @@ export default {
             },
             set(value) {
                 this.modelValue[this.field] = value;
-                this.modelValue.checkField(this.field);
+                const check = this.modelValue.checkField(this.field);
+                this.modelValue.onChange(value, check, this.field);
 
-                if (this.onChange) { this.onChange(value, this.field); }
+                if (this.onChange) { this.onChange({ value, check, field: this.field }); }
             }
         },
         idToSet() {
