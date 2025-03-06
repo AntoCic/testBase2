@@ -71,11 +71,8 @@ export default {
     ['password'](value, { min, max } = {}) {
         min = min !== undefined && !isNaN(Number(min)) ? Number(min) : 8;
         max = max !== undefined && !isNaN(Number(max)) ? Number(max) : 255;
-        // migliorare la regex. deve controllare che non 
-        // siano presenti spazi e che ci sia una lettera grande e 
-        // un numero e un simbolo
         if (typeof value !== 'string') return false;
-        const regexPassword = /^(?=.*[A-Z])(?=.*\d)(?!.*\s).+$/;
+        const regexPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/;
         return value.length >= min && value.length <= max && regexPassword.test(value);
     },
 

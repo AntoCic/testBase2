@@ -7,7 +7,7 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputPassword field="personalPass" v-model="form" label inputGroup :onChange="handleChange" />
+          <InputPassword field="personalPass" v-model="form" label inputGroup :onChange="handleChange" btnShow/>
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>

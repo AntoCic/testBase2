@@ -1,19 +1,25 @@
 <template>
-    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
-        :style="labelStyle">
+    <label v-if="label || label === ''" :for="idToSet"
+        :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']" :style="labelStyle">
         <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
+    <input ref="inputRef" :type="typeToSet" :value="value" @input="handleInput" @change="handleChange"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
-        :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"
-        :inputmode="inputmode" :list="isList">
-    <datalist v-if="isList" :id="isList">
-        <option v-for="option in list" :key="option" :value="option"></option>
-    </datalist>
+        :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :inputmode="inputmode">
+    <button v-if="btnShow" type="button" :class="btnShowClass ?? 'btn btn-light'" @click="btnShowState = !btnShowState"
+        :style="btnShowStyle">
+        <span v-if="btnShowState" class="material-symbols-outlined">
+            visibility
+        </span>
+
+        <span v-else class="material-symbols-outlined">
+            visibility_off
+        </span>
+    </button>
 </template>
 
 <script>
@@ -26,11 +32,15 @@ export default {
         validation: { type: Object, default: {} },
         errorContent: { type: String, required: false },
         onChange: { type: Function, required: false },
+        show: { type: Boolean, default: undefined },
         inputGroup: { type: Boolean, default: false },
         id: { type: String, required: false },
         label: { type: [String, Boolean], required: false },
         labelClass: { type: String, required: false },
         labelStyle: { type: String, required: false },
+        btnShow: { type: Boolean, required: false },
+        btnShowClass: { type: String, required: false },
+        btnShowStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: true },
@@ -39,12 +49,10 @@ export default {
         minlength: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
-        lang: { type: String, default: 'it' },
         inputmode: { type: String, required: false },
-        list: { type: Array, default: () => [] },
     },
     data() {
-        return { lazyTimer: null,  };
+        return { lazyTimer: null, btnShowState: false };
     },
     methods: {
         handleInput(event) {
@@ -83,17 +91,19 @@ export default {
         idToSet() {
             return this.id ?? this.field
         },
+        typeToSet() {
+            console.log(this.show, this.btnShowState);
+
+            return this.show === undefined ? (this.btnShowState ? 'text' : 'password') : this.show ? 'text' : 'password';
+        },
         minToSet() {
             return this.minlength ?? (this.validation?.min ?? false);
         },
         maxToSet() {
             return this.maxlength ?? (this.validation?.max ?? false);
         },
-        isList() {
-            return this.list.length ? `list-${this.idToSet}` : null
-        },
         errorDefaultText() {
-            return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
+            return this.errorContent ? this.errorContent : `Il campo non deve contenere spazi e ci deve essere una lettera grande, un numero, un simbolo e tra ${this.validation?.min !== undefined ? this.validation.min : '8'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -117,7 +127,7 @@ export default {
         let validation = this.validation
         if (this.minToSet) validation = { min: this.minToSet, ...validation };
         if (this.maxToSet) validation = { max: this.maxToSet, ...validation };
-        this.modelValue.initField(this.field, 'text', this.required ? validation : false);
+        this.modelValue.initField(this.field, 'password', this.required ? validation : false);
         this.tooltips = new Tooltip(this.$refs.inputRef);
         this.tooltips.disable();
     },
