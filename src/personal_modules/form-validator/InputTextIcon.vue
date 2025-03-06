@@ -46,7 +46,7 @@ export default {
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
+        required: { type: Boolean, default: false },
         autofocus: { type: Boolean, default: false },
         maxlength: { type: Number, required: false },
         minlength: { type: Number, required: false },

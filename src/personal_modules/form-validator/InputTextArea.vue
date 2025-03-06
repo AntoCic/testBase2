@@ -5,15 +5,13 @@
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
+    <textarea class="form-control" id="exampleFormControlTextarea1" ></textarea>
+    <textarea ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange" :rows="rows"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
         :required="required" :autofocus="autofocus" :maxlength="maxToSet" :minlength="minToSet" :lang="lang"
-        :inputmode="inputmode" :list="isList">
-    <datalist v-if="isList" :id="isList">
-        <option v-for="option in list" :key="option" :value="option"></option>
-    </datalist>
+        :inputmode="inputmode" ></textarea>
 </template>
 
 <script>
@@ -33,15 +31,15 @@ export default {
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
+        required: { type: Boolean, default: false },
         autofocus: { type: Boolean, default: false },
+        rows: { type: Number, default: 3 },
         maxlength: { type: Number, required: false },
         minlength: { type: Number, required: false },
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
         lang: { type: String, default: 'it' },
         inputmode: { type: String, required: false },
-        list: { type: Array, default: () => [] },
     },
     data() {
         return { lazyTimer: null,  };
@@ -88,9 +86,6 @@ export default {
         },
         maxToSet() {
             return this.maxlength ?? (this.validation?.max ?? false);
-        },
-        isList() {
-            return this.list.length ? `list-${this.idToSet}` : null
         },
         errorDefaultText() {
             return this.errorContent ? this.errorContent : `Il campo deve contenere tra ${this.validation?.min !== undefined ? this.validation.min : '2'} a ${this.validation?.max !== undefined ? this.validation.max : '255'} caratteri`

@@ -7,12 +7,14 @@
       <div class="col-12 text-start">
         <hr>
         <div class="input-group">
-          <InputTel field="Cell" v-model="form" label inputGroup :onChange="handleChange" />
+          <InputTel field="telefono"
+            v-model="form" label inputGroup
+             :onChange="handleChange" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
         <hr>
-        <p class="">{{ form.Cell }}</p>
+        <p class="">{{ form.telefono }}</p>
         <hr>
         <pre class="bg-light text-dark text-start">form:{{ form }}<br/>onChangeData:{{ onChangeData }}</pre>
       </div>
@@ -30,13 +32,17 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        Cell: null,
+        telefono: '',
       }),
 
       onChangeData: {},
     };
   },
   methods: {
+    InputTelValidator(value, { min, max }) {
+      console.log(value, { min, max });
+      return value.length <= max && value.length >= min
+    },
     handleChange(value, field) {
       this.onChangeData = { [field]: value }
     },

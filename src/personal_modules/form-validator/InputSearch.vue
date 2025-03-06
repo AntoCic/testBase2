@@ -5,7 +5,7 @@
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
     </label>
-    <input ref="inputRef" type="text" :value="value" @input="handleInput" @change="handleChange"
+    <input ref="inputRef" type="search" :value="value" @input="handleInput" @change="handleChange"
         :class="[classValidator, $attrs.class ?? 'form-control']" :style="$attrs.style" :id="idToSet" :name="idToSet"
         data-bs-toggle="tooltip" data-bs-custom-class="bg-danger" :data-bs-title="errorDefaultText"
         :placeholder="placeholder" :autocomplete="autocomplete" :disabled="disabled" :readonly="readonly"
@@ -33,7 +33,7 @@ export default {
         labelStyle: { type: String, required: false },
         readonly: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        required: { type: Boolean, default: true },
+        required: { type: Boolean, default: false },
         autofocus: { type: Boolean, default: false },
         maxlength: { type: Number, required: false },
         minlength: { type: Number, required: false },

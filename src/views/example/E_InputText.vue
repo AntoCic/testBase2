@@ -9,7 +9,7 @@
         <div class="input-group">
           <InputText style="background-color: yellow;" field="testo"
             v-model="form" label='<span class="material-symbols-outlined">person</span> Username' inputGroup
-            :validation="{ validator: InputTextValidator, min: 5, max: 10 }" :onChange="handleChange" />
+             :onChange="handleChange" />
           <Btn @click="form.reset()" googleIcon="replay"></Btn>
           <Btn type="submit" @click="handleSubmit" googleIcon="send"></Btn>
         </div>
@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       form: new FormValidator({
-        testo: 'abc',
+        testo: '',
       }),
 
       onChangeData: {},
