@@ -24,21 +24,11 @@ export default class PersonalInfo extends UserDB {
         UserDB.build.call(this, personalInfo, required, optional);
     }
 
-    async parse(res) {
+    parse(res) {
+        console.log(this.constructor.mainPaths, ' parse(res) ', res);
         if (res) {
-            for (const key in res) { this[key] = res[key]; }
-            if (this.name === null && this.surname === null && user.displayName) {
-                const nameParts = user.displayName.split(' ');
-                if (nameParts.length >= 2) {
-                    this.name = nameParts[0]; // Primo elemento
-                    this.surname = nameParts.slice(1).join(' '); // Il resto
-                } 
-            }
-            if(this.email === null && user.email){ this.email = user.email}
-            if(this.phoneNumber === null && user.phoneNumber){ this.phoneNumber = user.phoneNumber}
-            if(user.photoURL){ this.photoURL = user.photoURL}
-            
-            if (!this.id) { this.id = this.constructor.mainPaths }
+            for (const key in res) { this[key] = res[key] }
+            this.localStorageSave();
             return this;
         }
         return res;

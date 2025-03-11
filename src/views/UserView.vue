@@ -2,32 +2,31 @@
   <div class="container my-auto">
     <div class="row text-center p-3">
       <div class="col-12">
-        <h1 class="text-danger">NEED FIX (remove) onChange from all input an use form.onChange</h1>
+        <h1 class="text-danger">NEED FIX (remove) onChange from all input an use form.onChange o provare con entrambi
+        </h1>
       </div>
       <div class="col">
         <img :src="user.photoURL" alt="User Photo" class="rounded-circle">
-        <p>{{ user.displayName }}</p>
-        <p v-if="user.personalInfo?.userName">{{ user.personalInfo.userName }}</p>
+        <p>{{ user.name }}</p>
         <div class="input-group">
-          <InputText inputGroup field="name" label v-model="form" :onChange="handeleChangeValue" />
+          <InputText inputGroup field="name" label v-model="form" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="surname" label v-model="form" :onChange="handeleChangeValue" />
+          <InputText inputGroup field="surname" label v-model="form" />
         </div>
         <div class="input-group">
           <InputSelect inputGroup field="gender" label v-model="form" :options="genderOptions"
-            emptyOption="Prefer not to say" :onChange="handeleChangeValue" />
+            emptyOption="Prefer not to say" />
         </div>
         <div class="input-group">
-          <InputDate inputGroup field="dateOfBirth" label v-model="form" :onChange="handeleChangeValue" />
-          <InputCheckbox inputGroup field="birthHideYear" v-model="form" label="Nascondi anno di nascita"
-            :onChange="handeleChangeValue" />
+          <InputDate inputGroup field="dateOfBirth" label v-model="form" />
+          <InputCheckbox inputGroup field="birthHideYear" v-model="form" label="Nascondi anno di nascita" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="email" label v-model="form" :onChange="handeleChangeValue" />
+          <InputText inputGroup field="email" label v-model="form" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="phoneNumber" label v-model="form" :onChange="handeleChangeValue" />
+          <InputText inputGroup field="phoneNumber" label v-model="form" />
         </div>
         <!-- <div class="input-group">
           <InputText inputGroup field="photoURL" label v-model="form" />
@@ -35,7 +34,7 @@
 
         <p>{{ user.uid }}</p>
         <button v-if="user.accessToken" @click="user.logout()" class="btn btn-outline-danger px-2">
-          <span v-if="user.displayName" class="me-1">{{ user.displayName }}</span>
+          <span v-if="user.name" class="me-1">{{ user.name }}</span>
           <span class="material-symbols-outlined align-top">
             logout
           </span>
@@ -78,15 +77,11 @@ export default {
     };
   },
   methods: {
-    handeleChangeValue() {
-      console.log('form ', this.form);
-      console.log('form check', this.form.check());
-      console.log('form get', this.form.get());
-    }
-
   },
   mounted() {
-    console.log('personalInfo ', this.user.personalInfo)
+    console.log('personalInfo ', this.user.personalInfo);
+    this.form.onChange = (trigger) => { console.log('formTrigger:', trigger) }
+    this.form.state.logsOn = true
   }
 };
 </script>

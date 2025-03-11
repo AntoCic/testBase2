@@ -48,7 +48,7 @@ export default {
                 this.modelValue[this.field] = value;
                 const check = this.modelValue.checkField(this.field);
                 if (this.onChange) { this.onChange({ value, check, field: this.field }); };
-                this.modelValue.onChange(value, check, this.field);
+                this.modelValue.triggerOnChange(value, check, this.field);
             }
         },
         idToSet() {

@@ -3,26 +3,42 @@ import { user } from "../stores/user";
 
 export default class UserDB {
     static build(item, required = {}, optional = {}) {
-        for (const key in { ...required, ...optional, id: undefined }) {
+        for (const key in { ...required, ...optional }) {
             this[key] = item[key] ?? required[key] ?? optional[key];
         }
     }
 
-    async parse(res) {
-        console.log(this.constructor.mainPaths,' parse(res) ',res);
+    parse(res) {
+        console.log(this.constructor.mainPaths, ' parse(res) ', res);
         if (res) {
             for (const key in res) { this[key] = res[key] }
-            if (!this.id) { this.id = this.constructor.mainPaths }
             return this;
         }
         return res;
     }
 
-    async init() { return this.id ? this : await this.get() }
+    async init() {
+        return (this._state && this._state === 'server') ? this : await this.get()
+    }
+
+
+    localStorageInit() {
+        const localData = this.localStorageGet();
+        if (localData) { return this.parse(localData); }
+        return undefined;
+    }
+    localStorageGet() {
+        const localData = localStorage.getItem(this.constructor.mainPaths);
+        if (localData) { return { ...(JSON.parse(localData)), _state: 'local' }; }
+        return undefined;
+    }
+    localStorageSave(objectToSave = this) { return localStorage.setItem(this.constructor.mainPaths, JSON.stringify({ ...objectToSave, _state: 'local' })); }
 
     async get() {
         return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
+                res.data._state = 'server'
+                console.log('Res from ' + '/api/user/' + this.constructor.mainPaths, res.data);
                 return await this.parse(res.data);
             })
             .catch((error) => {

@@ -5,53 +5,36 @@ import axios from 'axios'
 
 export const user = reactive({
 
+    providerInfo: null,
     isLogged: null,
     accessToken: '',
     uid: null,
     email: null,
-    displayName: null,
+    name: null,
     phoneNumber: null,
     photoURL: null,
+    birthHideYear: null,
+    dateOfBirth: null,
+    gender: null,
+    surname: null,
 
-    personalInfo: new PersonalInfo(),
-    // personalInfo: {
-    //     all: null,
-
-    //     async get() {
-    //         console.log(await personalInfo.get())
-    //         return
-    //     },
-
-    //     async add(newItem) {
-    //         const added = await Item.add(newItem, true);
-    //         if (added) {
-    //             this.all = { ...this.all, ...added }
-    //         } else {
-    //             console.error('Errore adding item');
-    //         }
-    //     },
-
-    // },
+    personalInfo: new PersonalInfo().localStorageInit(),
 
     checkLogged() {
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                console.log(currentUser);
-
-                const { accessToken, uid, email, displayName, phoneNumber, photoURL } = currentUser;
-                this.accessToken = accessToken;
-                this.uid = uid;
-                this.email = email;
-                this.displayName = displayName;
-                this.phoneNumber = phoneNumber;
-                this.photoURL = photoURL;
-                this.isLogged = true;
+                this.setter(currentUser);
                 try {
-                    await this.personalInfo?.init();
+                    if (!this.personalInfo || (this.personalInfo && this.personalInfo._state !== 'server')) {
+                        const serverPersonalInfo = await new PersonalInfo().init();
+                        if (serverPersonalInfo) {
+                            this.personalInfo = serverPersonalInfo
+                            this.setter(currentUser);
+                        }
+                    }
                 } catch (error) {
                     console.error('Errore personalInfo.init: ', error);
                 }
-
                 // store.loading.off();
             } else {
                 this.reset();
@@ -133,6 +116,7 @@ export const user = reactive({
 
 
     },
+
     // Metodo per eseguire il logout
     // async addUserName(userName) {
     //     // store.loading.on();
@@ -159,6 +143,7 @@ export const user = reactive({
     //         })
 
     // },
+    
     // Metodo per eseguire il logout
     async logout() {
         try {
@@ -169,15 +154,44 @@ export const user = reactive({
         this.reset();
     },
     // Metodo per eseguire il logout
+    setter(currentUser) {
+        const { accessToken, uid, email, displayName, phoneNumber, photoURL } = currentUser;
+        this.providerInfo = currentUser;
+        this.isLogged = true;
+        this.accessToken = accessToken;
+        this.uid = uid;
+
+
+        this.email = this.personalInfo?.email ?? email;
+        this.name = this.personalInfo?.name ?? displayName;
+        this.phoneNumber = this.personalInfo?.phoneNumber ?? phoneNumber;
+        this.photoURL = this.personalInfo?.photoURL ?? photoURL;
+
+        this.birthHideYear = this.personalInfo?.birthHideYear;
+        this.dateOfBirth = this.personalInfo?.dateOfBirth;
+        this.gender = this.personalInfo?.gender;
+        this.surname = this.personalInfo?.surname;
+
+        // store.loading.off();
+    },
+    // Metodo per eseguire il logout
     reset() {
+        this.providerInfo = null;
         this.isLogged = false;
         this.accessToken = '';
         this.uid = null;
         this.email = null;
-        this.displayName = null;
+        this.name = null;
         this.phoneNumber = null;
         this.photoURL = null;
-        this.personalInfo = new PersonalInfo();
+
+        this.birthHideYear = null;
+        this.dateOfBirth = null;
+        this.gender = null;
+        this.surname = null;
+
+        this.personalInfo.localStorageSave(undefined);
+        this.personalInfo = null;
         // store.loading.off();
     },
 

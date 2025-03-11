@@ -106,11 +106,10 @@ export default class FormValidator {
     }
 
     /**
-    * Valida tutti i campi che hanno un validator definito.
-    * Ritorna true se tutti i campi validati risultano validi.
     */
-    onChange(value = undefined, check = undefined, field = undefined) {
-        if (this.state.onChange) { return this.state.onChange({ value, check, field }); }
+    triggerOnChange(value = undefined, check = undefined, field = undefined) {
+        if (this.state.logsOn) { console.log({ trigger: { value, check, field } }) }
+        if (this.onChange) { return this.onChange({ value, check, field }); }
         return null;
     }
 
