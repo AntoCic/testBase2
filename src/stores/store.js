@@ -56,7 +56,7 @@ export const $s = reactive({
         console.log('- LOGOUT -');
     },
 
-    axiosErrror(error) {
+    axiosError(error) {
         const errorMsg = error.response?.data?.error ?? `Errore: ${error.response?.status} - ${error.response?.statusText}`
         console.error(errorMsg)
         console.log(error);

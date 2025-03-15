@@ -21,18 +21,19 @@ export default class UserDB {
         return (this._state && this._state === 'server') ? this : await this.get()
     }
 
-
-    localStorageInit() {
-        const localData = this.localStorageGet();
-        if (localData) { return this.parse(localData); }
-        return undefined;
-    }
     localStorageGet() {
         const localData = localStorage.getItem(this.constructor.mainPaths);
         if (localData) { return { ...(JSON.parse(localData)), _state: 'local' }; }
         return undefined;
     }
-    localStorageSave(objectToSave = this) { return localStorage.setItem(this.constructor.mainPaths, JSON.stringify({ ...objectToSave, _state: 'local' })); }
+    localStorageInit() {
+        const localData = this.localStorageGet();
+        if (localData) { return this.parse(localData); }
+        return undefined;
+    }
+    localStorageSave(objectToSave = this) {
+        return localStorage.setItem(this.constructor.mainPaths, JSON.stringify({ ...objectToSave, _state: 'local' }));
+    }
 
     async get() {
         return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { authorization: user.accessToken } })

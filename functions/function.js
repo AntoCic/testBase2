@@ -6,6 +6,23 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
+import axios from 'axios';
+
+const APP_NAME = 'testBase2';
+
+async function slackMsgHandler(event) {
+  let type = 'error';
+  switch (event.bodyParams?.type) {
+    case 'error':
+    case 'warning':
+    case 'info':
+      type = event.bodyParams.type;
+      break;
+  }
+
+  const msg = event.bodyParams?.msg ?? 'Errore' + new Date().toLocaleString()
+  return { sended: await slackMsg[type](msg) }
+}
 
 const routes = {
   notAuth: {
@@ -14,6 +31,7 @@ const routes = {
     },
     POST: {
       "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+      slackMsg: slackMsgHandler,
     },
     PUT: {
       "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
@@ -33,6 +51,7 @@ const routes = {
     },
     POST: {
       user: async (event) => await firebase?.user.post(event.pathParams),
+      slackMsg: slackMsgHandler,
     },
     PUT: {
       user: async (event) => await firebase?.user.put(event.pathParams),
@@ -362,7 +381,42 @@ if (routes.auth || typeof routes.auth === 'object') {
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-
+const slackMsg = {
+  send: async (webhookURL, msg) => {
+    if (!webhookURL) {
+      logWarning('IMPORTANTE: Non è stato settato il webhookURL per slack')
+      logError("Errore nell'invio della notifica");
+      return null
+    }
+    const payload = { text: `${APP_NAME}: ${JSON.stringify(msg)}` };
+    await axios.post(webhookURL, payload, { headers: { "Content-Type": "application/json" } })
+      .then(() => { return true })
+      .catch((error) => {
+        console.log('Slack webhookURL error', error);
+        logError("Errore nell'invio della notifica");
+        return false
+      });
+  },
+  error: async (msg) => {
+    const webhookURL = process.env.SLACK_WEBHOOK_ERROR;
+    const res = await slackMsg.send(webhookURL, msg);
+    logError(msg);
+    return res;
+  },
+  warning: async (msg) => {
+    const webhookURL = process.env.SLACK_WEBHOOK_WARNING;
+    const res = await slackMsg.send(webhookURL, msg);
+    logWarning(msg);
+    return res;
+  },
+  info: async (msg) => {
+    const webhookURL = process.env.SLACK_WEBHOOK_INFO;
+    const res = await slackMsg.send(webhookURL, msg);
+    logInfo(msg);
+    return res;
+  },
+  // async (event) => JSON.stringify({ success: await slackMsg.error(event.bodyParams?.msg ?? 'Errore' + new Date().toLocaleString()) }),
+}
 
 class EventHandler {
   constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }) {
@@ -382,8 +436,8 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
-    console.log({pathParams:this.pathParams, queryParams:this.queryParams, bodyParams:this.bodyParams});
-    console.log({pathParams:this.pathParams, queryParams:this.queryParams, bodyParams:this.bodyParams});
+    console.log({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams });
+    console.log({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams });
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
@@ -524,11 +578,11 @@ class EventHandler {
 
 }
 
-function logError(value) { console.log("\x1b[31m", value, "\x1b[0m"); };
-function logSuccess(value) { console.log("\x1b[32m", value, "\x1b[0m"); };
-function logWarning(value) { console.log("\x1b[33m", value, "\x1b[0m"); };
-function logInfo(value) { console.log("\x1b[35m", value, "\x1b[0m"); };
-function logMagenta(value) { console.log("\x1b[36m", value, "\x1b[0m"); };
+function logError(value) { value = JSON.stringify(value); console.log("\x1b[31m", value, "\x1b[0m"); };
+function logSuccess(value) { value = JSON.stringify(value); console.log("\x1b[32m", value, "\x1b[0m"); };
+function logWarning(value) { value = JSON.stringify(value); console.log("\x1b[33m", value, "\x1b[0m"); };
+function logInfo(value) { value = JSON.stringify(value); console.log("\x1b[35m", value, "\x1b[0m"); };
+function logMagenta(value) { value = JSON.stringify(value); console.log("\x1b[36m", value, "\x1b[0m"); };
 
 exports.handler = async function (event, context) {
   const call = new EventHandler(event);

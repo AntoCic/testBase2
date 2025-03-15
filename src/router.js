@@ -24,6 +24,7 @@ import E_InputDatetime from './views/example/E_InputDatetime.vue'
 import E_InputTextArea from './views/example/E_InputTextArea.vue'
 import E_InputSearch from './views/example/E_InputSearch.vue'
 import E_InputTel from './views/example/E_InputTel.vue'
+import E_SlackMsg from './views/example/E_SlackMsg.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
@@ -36,6 +37,7 @@ const fullRoutes = {
     // ! EXAMPLE VIEWS TO DELETE
     { path: '/example', name: 'example.home', component: ExampleHomeView },
     { path: '/example/call', name: 'example.call', component: E_Call },
+    { path: '/example/slackMsg', name: 'example.slackMsg', component: E_SlackMsg },
     { path: '/example/InputText', name: 'example.InputText', component: E_InputText },
     { path: '/example/InputTextIcon', name: 'example.InputTextIcon', component: E_InputTextIcon },
     { path: '/example/InputCheckbox', name: 'example.InputCheckbox', component: E_InputCheckbox },

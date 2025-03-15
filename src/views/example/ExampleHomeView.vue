@@ -5,7 +5,7 @@
       <div class="col-12">
         <h1>PAGINE ESEMPIO</h1>
       </div>
-      <template v-for="(page, index) in pages" :key="page.name?? page.hrKey">
+      <template v-for="(page, index) in pages" :key="page.name?? page.index+'_hrKey'">
         <div v-if="page.hrKey" class="col-12 mt-3">
           <h3 v-if="page.description" class="mb-0">
             {{ page.description }}
@@ -37,10 +37,12 @@ export default {
   data() {
     return {
       pages: [
-        { hrKey: '1', description: 'Esempio di tutte le chiamate axios' },
+        { hrKey: true, description: 'Esempio di tutte le chiamate axios' },
         { name: 'call', description: 'GET POST PUT PATCH DELETE' },
+        { hrKey: true, description: 'Test slack msg' },
+        { name: 'slackMsg', description: 'error warning info' },
 
-        { hrKey: '2', description: 'Input' },
+        { hrKey: true, description: 'Input' },
         { name: 'InputText' },
         { name: 'InputTextIcon' },
         { name: 'InputTextArea' },
@@ -48,15 +50,15 @@ export default {
         { name: 'InputPassword' },
         { name: 'InputSearch' },
         { name: 'InputTel' },
-        { hrKey: '3' },
+        { hrKey: true },
         { name: 'InputNumber' },
         { name: 'InputRange' },
-        { hrKey: '4' },
+        { hrKey: true },
         { name: 'InputSelect' },
         { name: 'InputCheckbox' },
         { name: 'InputBtnCheckbox' },
         { name: 'InputRadio' },
-        { hrKey: '5' },
+        { hrKey: true },
         { name: 'InputDate' },
         { name: 'InputTime' },
         { name: 'InputDatetime' },

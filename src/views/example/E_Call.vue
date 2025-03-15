@@ -50,7 +50,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.axiosErrror(err));
+          this.response.push(this.$s.axiosError(err));
         });
     },
 
@@ -69,7 +69,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.axiosErrror(err));
+          this.response.push(this.$s.axiosError(err));
         });
     },
     async putSender() {
@@ -82,7 +82,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.axiosErrror(err));
+          this.response.push(this.$s.axiosError(err));
         });
     },
     async patchSender() {
@@ -95,7 +95,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.axiosErrror(err));
+          this.response.push(this.$s.axiosError(err));
         });
     },
     async deleteSender() {
@@ -104,7 +104,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.this.$s.axiosErrror(err));
+          this.response.push(this.$s.this.$s.axiosError(err));
         });
     },
   },

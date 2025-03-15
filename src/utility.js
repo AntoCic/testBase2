@@ -95,4 +95,22 @@ export default {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
         return emailRegex.test(email)
     },
+
+    // Genere persone
+    genderOptions: [
+        { value: 'male', text: 'Male' },
+        { value: 'female', text: 'Female' },
+        { value: 'non-binary', text: 'Non-Binary' },
+        { value: 'genderfluid', text: 'Genderfluid' },
+        { value: 'agender', text: 'Agender' },
+        { value: 'bigender', text: 'Bigender' },
+        { value: 'demiboy', text: 'Demiboy' },
+        { value: 'demigirl', text: 'Demigirl' },
+        { value: 'two-spirit', text: 'Two-Spirit' },
+        { value: 'pangender', text: 'Pangender' },
+        { value: 'androgyne', text: 'Androgyne' },
+        { value: 'trans-male', text: 'Trans Male' },
+        { value: 'trans-female', text: 'Trans Female' },
+        { value: 'other', text: 'Other' }
+      ]
 }

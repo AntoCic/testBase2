@@ -1,10 +1,6 @@
 <template>
   <div class="container my-auto">
     <div class="row text-center p-3">
-      <div class="col-12">
-        <h1 class="text-danger">NEED FIX (remove) onChange from all input an use form.onChange o provare con entrambi
-        </h1>
-      </div>
       <div class="col">
         <img :src="user.photoURL" alt="User Photo" class="rounded-circle">
         <p>{{ user.name }}</p>
@@ -15,7 +11,7 @@
           <InputText inputGroup field="surname" label v-model="form" />
         </div>
         <div class="input-group">
-          <InputSelect inputGroup field="gender" label v-model="form" :options="genderOptions"
+          <InputSelect inputGroup field="gender" label v-model="form" :options="$u.genderOptions"
             emptyOption="Prefer not to say" />
         </div>
         <div class="input-group">
@@ -58,22 +54,7 @@ export default {
       user,
       form: new FormValidator({ ...user.personalInfo }),
 
-      genderOptions: [
-        { value: 'male', text: 'Male' },
-        { value: 'female', text: 'Female' },
-        { value: 'non-binary', text: 'Non-Binary' },
-        { value: 'genderfluid', text: 'Genderfluid' },
-        { value: 'agender', text: 'Agender' },
-        { value: 'bigender', text: 'Bigender' },
-        { value: 'demiboy', text: 'Demiboy' },
-        { value: 'demigirl', text: 'Demigirl' },
-        { value: 'two-spirit', text: 'Two-Spirit' },
-        { value: 'pangender', text: 'Pangender' },
-        { value: 'androgyne', text: 'Androgyne' },
-        { value: 'trans-male', text: 'Trans Male' },
-        { value: 'trans-female', text: 'Trans Female' },
-        { value: 'other', text: 'Other' }
-      ]
+      
     };
   },
   methods: {
