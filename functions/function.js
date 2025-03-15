@@ -6,7 +6,6 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-import axios from 'axios';
 
 const APP_NAME = 'testBase2';
 
@@ -19,7 +18,6 @@ async function slackMsgHandler(event) {
       type = event.bodyParams.type;
       break;
   }
-
   const msg = event.bodyParams?.msg ?? 'Errore' + new Date().toLocaleString()
   return { sended: await slackMsg[type](msg) }
 }
@@ -383,19 +381,28 @@ if (routes.auth || typeof routes.auth === 'object') {
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 const slackMsg = {
   send: async (webhookURL, msg) => {
+    const errorCase = "Slack webhookURL error nell'invio della notifica"
     if (!webhookURL) {
-      logWarning('IMPORTANTE: Non è stato settato il webhookURL per slack')
-      logError("Errore nell'invio della notifica");
-      return null
+      logWarning('IMPORTANTE: Non è stato settato il webhookURL per Slack');
+      logError(errorCase);
+      return false;
     }
     const payload = { text: `${APP_NAME}: ${JSON.stringify(msg)}` };
-    await axios.post(webhookURL, payload, { headers: { "Content-Type": "application/json" } })
-      .then(() => { return true })
-      .catch((error) => {
-        console.log('Slack webhookURL error', error);
-        logError("Errore nell'invio della notifica");
-        return false
+    try {
+      const response = await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+      if (!response.ok) {
+        logError(`${errorCase} -> ${response.status} - ${response.statusText}`);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      logError(`${errorCase} -> ${error}`);
+      return false;
+    }
   },
   error: async (msg) => {
     const webhookURL = process.env.SLACK_WEBHOOK_ERROR;
