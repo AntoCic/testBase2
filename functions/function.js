@@ -18,7 +18,7 @@ async function slackMsgHandler(event) {
       type = event.bodyParams.type;
       break;
   }
-  const msg = event.bodyParams?.msg ?? 'Errore' + new Date().toLocaleString()
+  const msg = event.bodyParams?.msg ?? 'ERRORE';
   return { sended: await slackMsg[type](msg) }
 }
 
@@ -431,6 +431,12 @@ class EventHandler {
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
+    console.log(body);
+    try {
+      this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
+    } catch (error) {
+      this.bodyParams = { msg: 'error JSON.parse(body): ' + typeof body }
+    }
     this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
     if (headers?.authorization) delete headers.authorization
