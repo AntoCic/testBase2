@@ -5,9 +5,22 @@
         <h1>Call</h1>
       </div>
       <div class="col-12">
-        <button type="button" class="btn btn-outline-light" @click="sendError">ERROR</button>
-        <button type="button" class="btn btn-outline-light" @click="sendWarning">WARNING</button>
-        <button type="button" class="btn btn-outline-light" @click="sendInfo">INFO</button>
+        <div class="input-group">
+          <InputText field="textLog" v-model="form" />
+          <Btn btn="outline-light" @click="log(form.textLog)">LOG (info)</Btn>
+        </div>
+        <div class="input-group">
+          <InputText field="textError" v-model="form" />
+          <Btn btn="outline-light" @click="sendError(form.textError)">ERROR</Btn>
+        </div>
+        <div class="input-group">
+          <InputText field="textWarning" v-model="form" />
+          <Btn btn="outline-light" @click="sendWarning(form.textWarning)">WARNING</Btn>
+        </div>
+        <div class="input-group">
+          <InputText field="textInfo" v-model="form" />
+          <Btn btn="outline-light" @click="sendInfo(form.textInfo)">INFO</Btn>
+        </div>
       </div>
       <div v-if="response.length" class="col-12">
         <pre class="bg-light text-dark">{{ response }}</pre>
@@ -18,28 +31,58 @@
 </template>
 
 <script>
-import axios from 'axios';
+import FormValidator from '../../personal_modules/form-validator/FormValidator.js';
+import InputText from '../../personal_modules/form-validator/InputText.vue';
+import Btn from '../../components/Btn.vue';
 export default {
+  components: { InputText, Btn },
   data() {
     return {
-      response: [],
+      response: '',
+      form: new FormValidator({
+        textLog: '',
+        textError: '',
+        textWarning: '',
+        textInfo: '',
+      }),
     };
   },
   methods: {
-    async sendError() {
-      await axios.post('/api/slackMsg', { msg: 'TEST oggi 123456' })
-        .then((res) => { this.response.push(res.data); })
-        .catch((err) => { this.response.push(this.$s.axiosError(err)); });
+    async log(content) {
+      this.$u.log(content).then((res) => {
+        if (res) {
+          this.response = 'msg sended (sendError)';
+        } else {
+          this.response = 'error NON inviato';
+        }
+      });
     },
-    async sendWarning() {
-      await axios.post('/api/slackMsg', { type: 'warning', msg: 'TEST oggi 123456' })
-        .then((res) => { this.response.push(res.data); })
-        .catch((err) => { this.response.push(this.$s.axiosError(err)); });
+    async sendError(content) {
+      this.$u.log.error(content).then((res) => {
+        if (res) {
+          this.response = 'msg sended (sendError)';
+        } else {
+          this.response = 'error NON inviato';
+        }
+      });
     },
-    async sendInfo() {
-      await axios.post('/api/slackMsg', { type: 'info', msg: 'TEST oggi 123456' })
-        .then((res) => { this.response.push(res.data); })
-        .catch((err) => { this.response.push(this.$s.axiosError(err)); });
+    async sendWarning(content) {
+      this.$u.log.warning(content).then((res) => {
+        if (res) {
+          this.response = 'msg sended (sendWarning)';
+        } else {
+          this.response = 'error NON inviato';
+        }
+      });
+    },
+    async sendInfo(content) {
+      this.$u.log.info(content).then((res) => {
+        if (res) {
+          this.response = 'msg sended (sendInfo)';
+        } else {
+          this.response = 'error NON inviato';
+        }
+      });
     },
   },
   created() {

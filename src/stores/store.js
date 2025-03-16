@@ -11,10 +11,10 @@ export const $s = reactive({
     appDescription: __APP_DESCRIPTION__,
     bkColor: __APP_BACKGROUND_COLOR__,
     logoPath: __APP_LOGO__,
-
-    isAppOnline: navigator.onLine,
+    
     isLogged: null,
     accessToken: '',
+    onLine: navigator.onLine,
 
     async start() {
         $loading.on()

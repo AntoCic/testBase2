@@ -6,7 +6,7 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-
+const onDevMod = process.env.NETLIFY_DEV === "true" || window.location.hostname === "localhost";
 const APP_NAME = 'testBase2';
 
 async function slackMsgHandler(event) {
@@ -18,8 +18,8 @@ async function slackMsgHandler(event) {
       type = event.bodyParams.type;
       break;
   }
-  const msg = event.bodyParams?.msg ?? 'ERRORE';
-  return { sended: await slackMsg[type](msg) }
+  const content = event.bodyParams?.content ?? 'ERRORE (body.content === undefined)';
+  return { sended: await log[type](content) }
 }
 
 const routes = {
@@ -76,7 +76,65 @@ const routes = {
 //  \___/  |_| |___|_____|___| |_| |___|_____|____/            |
 //                                                             |
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+const log = Object.assign(
+  async function (content) { return await slackMsg(content, 'info'); },
+  {
+    error: async (content) => await slackMsg(content, 'error'),
+    warning: async (content) => await slackMsg(content, 'warning'),
+    info: async (content) => await slackMsg(content, 'info'),
+    noMsg: {
+      error: (content) => logColor(content, 'error'),
+      warning: (content) => logColor(content, 'warning'),
+      info: (content) => logColor(content, 'info'),
+    },
+  }
+);
 
+function logColor(content, color = 'info') {
+  const strColors = {
+    white: "\x1b[37m", error: "\x1b[31m", warning: "\x1b[33m",
+    info: "\x1b[34m", success: "\x1b[32m", magenta: "\x1b[35m", black: "\x1b[30m"
+  };
+  const strColor = strColors[color] || strColors.info;
+  console.log(strColor, content, "\x1b[0m");
+}
+function hr(type = 'white', double = true, length = 10) {
+  const line = (double ? '=' : '-').repeat(length);
+  logColor(line, type);
+}
+const logInterno = (content, type) => { hr(type); console.log(content); hr(type, false); }
+async function slackMsg(content, type) {
+  const typeWebhookURL = {
+    error: process.env.SLACK_WEBHOOK_ERROR,
+    warning: process.env.SLACK_WEBHOOK_WARNING,
+    info: process.env.SLACK_WEBHOOK_INFO,
+  }
+  let webhookURL = typeWebhookURL[type];
+
+  if (!webhookURL) { log.noMsg.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
+  // if (onDevMod) { logInterno(content, type); return false; }
+  if (!webhookURL) { return false; }
+
+  const errorCase = "Slack webhookURL error nell'invio della notifica"
+  const payload = { text: `${APP_NAME}: ${JSON.stringify(content)}` };
+  try {
+    const response = await fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      log.noMsg.error(`${errorCase} -> ${response.status} - ${response.statusText}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    log.noMsg.error(`${errorCase} -> ${error}`);
+    return false;
+  }
+}
+
+// ===============================
 class FIREBASE {
   constructor(mainPaths = []) {
     // Fai attenzione, alcune di queste sono obbligatorie.
@@ -123,7 +181,7 @@ class FIREBASE {
     for (const key in required) {
       if (this[key] == null) {
         const error = `Il campo ${key} è obbligatorio e non può essere nullo o indefinito.`;
-        logError(error)
+        log.error(error)
         throw new Error();
       }
     }
@@ -373,57 +431,12 @@ try { firebase = new FIREBASE(); } catch (error) { console.log(error); }
 if (routes.auth || typeof routes.auth === 'object') {
   const IsSetAnyAuthRoutes = !(Object.keys(routes.auth).length === 0 || Object.values(routes.auth).every(value => typeof value === 'object' && Object.keys(value).length === 0));
   if (IsSetAnyAuthRoutes && !firebase) {
-    logError('non hai settato tutte le chiavi in env');
+    log.error('non hai settato tutte le chiavi in env');
   }
 }
 
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-const slackMsg = {
-  send: async (webhookURL, msg) => {
-    const errorCase = "Slack webhookURL error nell'invio della notifica"
-    if (!webhookURL) {
-      logWarning('IMPORTANTE: Non è stato settato il webhookURL per Slack');
-      logError(errorCase);
-      return false;
-    }
-    const payload = { text: `${APP_NAME}: ${JSON.stringify(msg)}` };
-    try {
-      const response = await fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) {
-        logError(`${errorCase} -> ${response.status} - ${response.statusText}`);
-        return false;
-      }
-      return true;
-    } catch (error) {
-      logError(`${errorCase} -> ${error}`);
-      return false;
-    }
-  },
-  error: async (msg) => {
-    const webhookURL = process.env.SLACK_WEBHOOK_ERROR;
-    const res = await slackMsg.send(webhookURL, msg);
-    logError(msg);
-    return res;
-  },
-  warning: async (msg) => {
-    const webhookURL = process.env.SLACK_WEBHOOK_WARNING;
-    const res = await slackMsg.send(webhookURL, msg);
-    logWarning(msg);
-    return res;
-  },
-  info: async (msg) => {
-    const webhookURL = process.env.SLACK_WEBHOOK_INFO;
-    const res = await slackMsg.send(webhookURL, msg);
-    logInfo(msg);
-    return res;
-  },
-  // async (event) => JSON.stringify({ success: await slackMsg.error(event.bodyParams?.msg ?? 'Errore' + new Date().toLocaleString()) }),
-}
 
 class EventHandler {
   constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }) {
@@ -431,11 +444,10 @@ class EventHandler {
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
-    console.log(body);
     try {
       this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     } catch (error) {
-      this.bodyParams = { msg: 'error JSON.parse(body): ' + typeof body }
+      this.bodyParams = { msg: 'EventHandler error on JSON.parse(body): typeof body = ' + typeof body }
     }
     this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
@@ -449,8 +461,7 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
-    console.log({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams });
-    console.log({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams });
+    logInterno({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams }, 'magenta');
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
@@ -474,11 +485,11 @@ class EventHandler {
 
   async isAuth() {
     if (!firebase) {
-      console.error("Devi settare tutte le chiavi di firebase nell'env");
+      log.error("Devi settare tutte le chiavi di firebase nell'env");
       return false;
     }
     if (!this.authorization) {
-      logError("401, |I| Unauthorized");
+      log.noMsg.error("401, |I| Unauthorized");
       this.user = undefined
       return false;
     }
@@ -487,8 +498,7 @@ class EventHandler {
       this.user = await admin.auth().getUser(decodedToken.uid);
       return true;
     } catch (error) {
-      logWarning(error);
-      logError("401, |I| Unauthorized");
+      log.error("401, |I| Unauthorized | authorization:" + this.authorization + '| error:' + JSON.stringify(error));
       this.user = undefined
       return false;
     }
@@ -590,12 +600,6 @@ class EventHandler {
   }
 
 }
-
-function logError(value) { value = JSON.stringify(value); console.log("\x1b[31m", value, "\x1b[0m"); };
-function logSuccess(value) { value = JSON.stringify(value); console.log("\x1b[32m", value, "\x1b[0m"); };
-function logWarning(value) { value = JSON.stringify(value); console.log("\x1b[33m", value, "\x1b[0m"); };
-function logInfo(value) { value = JSON.stringify(value); console.log("\x1b[35m", value, "\x1b[0m"); };
-function logMagenta(value) { value = JSON.stringify(value); console.log("\x1b[36m", value, "\x1b[0m"); };
 
 exports.handler = async function (event, context) {
   const call = new EventHandler(event);

@@ -3,7 +3,9 @@
 
     <div class="row justify-content-center align-items-center text-center">
       <div class="col-12">
-        <h1>PAGINE ESEMPIO</h1>
+        <h1>PAGINE ESEMPIO
+          <OnLineStatus />
+        </h1>
       </div>
       <template v-for="(page, index) in pages" :key="page.name?? page.index+'_hrKey'">
         <div v-if="page.hrKey" class="col-12 mt-3">
@@ -33,7 +35,9 @@
 </template>
 
 <script>
+import OnLineStatus from '../../components/OnLineStatus.vue';
 export default {
+  components: { OnLineStatus },
   data() {
     return {
       pages: [

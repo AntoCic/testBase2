@@ -1,5 +1,6 @@
 <!-- App.vue -->
 <template>
+  <DeveloperMode class="position-absolute top-0 end-0 m-2" />
   <CmpLoading v-if="$s.isLogged !== null ? $loading.state : false" />
 
   <template v-if="$s.isLogged !== null">
@@ -19,18 +20,18 @@
 <script>
 import { user } from './stores/user.js';
 import { routes } from './router.js';
-import AppHeader from './layout/AppHeader.vue'
-import AppFooter from './layout/AppFooter.vue'
-import CmpLoading from './components/CmpLoading.vue'
+import AppHeader from './layout/AppHeader.vue';
+import AppFooter from './layout/AppFooter.vue';
+import CmpLoading from './components/CmpLoading.vue';
+import DeveloperMode from './components/DeveloperMode.vue';
 export default {
-  components: { AppHeader, AppFooter, CmpLoading },
+  components: { AppHeader, AppFooter, CmpLoading, DeveloperMode },
   data() {
     return {
       user,
       routes,
     }
   },
-
   watch: {
     'user.isLogged'(newLog, oldLog) {
       if (newLog !== oldLog) {
@@ -49,7 +50,6 @@ export default {
         this.checkRoute();
       }
     },
-    'navigator.onLine'(newRoute, oldRoute) { this.$s.isAppOnline },
   },
 
   methods: {
@@ -63,10 +63,14 @@ export default {
           this.$router.push({ name: 'home' });
         }
       }
-    }
+    },
+    updateOnlineStatus() { this.$s.onLine = navigator.onLine; },
   },
 
   async mounted() {
+    window.addEventListener('online', this.updateOnlineStatus);
+    window.addEventListener('offline', this.updateOnlineStatus);
+
     await this.$s.start();
     this.user.checkLogged();
   },

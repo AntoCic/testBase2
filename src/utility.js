@@ -1,5 +1,11 @@
 // utility | $u
+
+import log from "./personal_modules/log";
+const onDevMod = import.meta.env.DEV || window.location.hostname === "localhost";
+
 export default {
+    onDevMod,
+    log,
 
     // crea un id univoco
     index: Math.floor(Math.random() * 100),
@@ -10,7 +16,6 @@ export default {
         newId += "-" + Date.now().toString(36) // converte in base 36
         return newId;
     },
-
 
     // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
     // DATE
@@ -112,5 +117,5 @@ export default {
         { value: 'trans-male', text: 'Trans Male' },
         { value: 'trans-female', text: 'Trans Female' },
         { value: 'other', text: 'Other' }
-      ]
+    ],
 }
