@@ -3,7 +3,7 @@
 // ||__|||__|||__|||__|||__|||__|||__||
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
-
+const APP_NAME = 'testBase2';
 function logColor(content, color = 'info') {
   const strColors = {
     white: "\x1b[37m", error: "\x1b[31m", warning: "\x1b[33m",
