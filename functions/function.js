@@ -7,7 +7,7 @@
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
 import { APP_NAME, onDevMod } from "./config";
-import { log, logInterno } from './logger';
+import { log } from './logger';
 
 async function slackMsgHandler(event) {
   let type = 'error';
@@ -406,7 +406,7 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
-    logInterno({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams }, 'magenta');
+    log.interno.magenta({ pathParams: this.pathParams, queryParams: this.queryParams, bodyParams: this.bodyParams });
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
@@ -434,7 +434,7 @@ class EventHandler {
       return false;
     }
     if (!this.authorization) {
-      log.noMsg.error("401, |I| Unauthorized");
+      log.colored.error("401, |I| Unauthorized");
       this.user = undefined
       return false;
     }

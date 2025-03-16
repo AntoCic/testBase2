@@ -3,6 +3,7 @@
 // ||__|||__|||__|||__|||__|||__|||__||
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 import { APP_NAME, onDevMod } from "./config";
+
 function logColor(content, color = 'info') {
   const strColors = {
     white: "\x1b[37m", error: "\x1b[31m", warning: "\x1b[33m",
@@ -15,7 +16,7 @@ function hr(type = 'white', double = true, length = 10) {
   const line = (double ? '=' : '-').repeat(length);
   logColor(line, type);
 }
-export function logInterno(content, type) {
+function logInterno(content, type) {
   hr(type); console.log(content); hr(type, false);
 }
 async function slackMsg(content, type) {
@@ -26,7 +27,7 @@ async function slackMsg(content, type) {
   }
   let webhookURL = typeWebhookURL[type];
 
-  if (!webhookURL) { log.noMsg.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
+  if (!webhookURL) { log.colored.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
   if (onDevMod) { logInterno(content, type); return false; }
   if (!webhookURL) { return false; }
 
@@ -39,12 +40,12 @@ async function slackMsg(content, type) {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      log.noMsg.error(`${errorCase} -> ${response.status} - ${response.statusText}`);
+      log.colored.error(`${errorCase} -> ${response.status} - ${response.statusText}`);
       return false;
     }
     return true;
   } catch (error) {
-    log.noMsg.error(`${errorCase} -> ${error}`);
+    log.colored.error(`${errorCase} -> ${error}`);
     return false;
   }
 }
@@ -54,10 +55,21 @@ export const log = Object.assign(
     error: async (content) => await slackMsg(content, 'error'),
     warning: async (content) => await slackMsg(content, 'warning'),
     info: async (content) => await slackMsg(content, 'info'),
-    noMsg: {
+
+    interno: {
+      error: (content) => logInterno(content, 'error'),
+      warning: (content) => logInterno(content, 'warning'),
+      info: (content) => logInterno(content, 'info'),
+      success: (content) => logInterno(content, 'success'),
+      magenta: (content) => logInterno(content, 'magenta')
+    },
+
+    colored: {
       error: (content) => logColor(content, 'error'),
       warning: (content) => logColor(content, 'warning'),
       info: (content) => logColor(content, 'info'),
+      success: (content) => logColor(content, 'success'),
+      magenta: (content) => logColor(content, 'magenta')
     },
   }
 );
