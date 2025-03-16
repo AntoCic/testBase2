@@ -7,20 +7,7 @@
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
 import { APP_NAME, onDevMod } from "./config";
-import { log } from './logger';
-
-async function slackMsgHandler(event) {
-  let type = 'error';
-  switch (event.bodyParams?.type) {
-    case 'error':
-    case 'warning':
-    case 'info':
-      type = event.bodyParams.type;
-      break;
-  }
-  const content = event.bodyParams?.content ?? 'ERRORE (body.content === undefined)';
-  return { sended: await log[type](content) }
-}
+import { log, handlerSlackMsg } from './logger';
 
 const routes = {
   notAuth: {
@@ -29,7 +16,7 @@ const routes = {
     },
     POST: {
       "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-      slackMsg: slackMsgHandler,
+      slackMsg: handlerSlackMsg,
     },
     PUT: {
       "aa": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
@@ -49,7 +36,7 @@ const routes = {
     },
     POST: {
       user: async (event) => await firebase?.user.post(event.pathParams),
-      slackMsg: slackMsgHandler,
+      slackMsg: handlerSlackMsg,
     },
     PUT: {
       user: async (event) => await firebase?.user.put(event.pathParams),

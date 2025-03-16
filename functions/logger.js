@@ -73,3 +73,16 @@ export const log = Object.assign(
     },
   }
 );
+
+export async function handlerSlackMsg(event) {
+  let type = 'error';
+  switch (event.bodyParams?.type) {
+    case 'error':
+    case 'warning':
+    case 'info':
+      type = event.bodyParams.type;
+      break;
+  }
+  const content = event.bodyParams?.content ?? 'ERRORE (body.content === undefined)';
+  return { sended: await log[type](content) }
+}
