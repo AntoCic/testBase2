@@ -190,7 +190,7 @@ export const user = reactive({
         this.gender = null;
         this.surname = null;
 
-        this.personalInfo.localStorageSave(undefined);
+        this.personalInfo?.localStorageSave(undefined);
         this.personalInfo = null;
         // store.loading.off();
     },

@@ -6,7 +6,7 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-const onDevMod = process.env.NETLIFY_DEV === "true" || window.location.hostname === "localhost";
+const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
 const APP_NAME = 'testBase2';
 
 async function slackMsgHandler(event) {
@@ -116,7 +116,7 @@ async function slackMsg(content, type) {
   if (!webhookURL) { return false; }
 
   const errorCase = "Slack webhookURL error nell'invio della notifica"
-  const payload = { text: `${APP_NAME}: ${JSON.stringify(content)}` };
+  const payload = { text: `${process.env.NETLIFY_DEV}:${process.env.NODE_ENV}: ${APP_NAME}: ${JSON.stringify(content)}` };
   try {
     const response = await fetch(webhookURL, {
       method: "POST",
