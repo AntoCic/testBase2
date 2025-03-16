@@ -6,11 +6,8 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
+import { APP_NAME, onDevMod } from "./config";
 import { log, logInterno } from './logger';
-
-const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
-
-const APP_NAME = 'testBase2';
 
 async function slackMsgHandler(event) {
   let type = 'error';

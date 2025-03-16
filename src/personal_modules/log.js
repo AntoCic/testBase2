@@ -2,10 +2,10 @@
 const onDevMod = import.meta.env.DEV || window.location.hostname === "localhost";
 
 async function slackMsg(type, content) {
-    // if (onDevMod) {
-    //     console.log(`🔹LOG[${type}]: `, content);
-    //     return false;
-    // }
+    if (onDevMod) {
+        console.log(`🔹LOG[${type}]: `, content);
+        return false;
+    }
     if (navigator.onLine) {
         return await fetch('/api/slackMsg', {
             method: "POST",

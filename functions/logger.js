@@ -2,8 +2,7 @@
 // ||A |||n |||t |||o |||C |||i |||c ||
 // ||__|||__|||__|||__|||__|||__|||__||
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
-const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
-const APP_NAME = 'testBase2';
+import { APP_NAME, onDevMod } from "./config";
 function logColor(content, color = 'info') {
   const strColors = {
     white: "\x1b[37m", error: "\x1b[31m", warning: "\x1b[33m",
@@ -28,7 +27,7 @@ async function slackMsg(content, type) {
   let webhookURL = typeWebhookURL[type];
 
   if (!webhookURL) { log.noMsg.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
-  // if (onDevMod) { logInterno(content, type); return false; }
+  if (onDevMod) { logInterno(content, type); return false; }
   if (!webhookURL) { return false; }
 
   const errorCase = "Slack webhookURL error nell'invio della notifica"
