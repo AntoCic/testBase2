@@ -112,7 +112,7 @@ async function slackMsg(content, type) {
   let webhookURL = typeWebhookURL[type];
 
   if (!webhookURL) { log.noMsg.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
-  // if (onDevMod) { logInterno(content, type); return false; }
+  if (onDevMod) { logInterno(content, type); return false; }
   if (!webhookURL) { return false; }
 
   const errorCase = "Slack webhookURL error nell'invio della notifica"
