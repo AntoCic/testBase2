@@ -75,6 +75,7 @@ export const log = Object.assign(
 );
 
 export async function handlerSlackMsg(event) {
+  if (!event.isOriginAllowed) { return; }
   let type = 'error';
   switch (event.bodyParams?.type) {
     case 'error':

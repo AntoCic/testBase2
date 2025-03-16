@@ -6,7 +6,7 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-import { APP_NAME, onDevMod } from "./config";
+import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 import { log, handlerSlackMsg } from './logger';
 
 const routes = {
@@ -385,6 +385,22 @@ class EventHandler {
     this.authorization = headers?.authorization;
     if (headers?.authorization) delete headers.authorization
     // this.headers = headers;
+
+
+    try {
+      const urlObj = new URL(rawUrl);
+      const originWithoutPort = `${urlObj.protocol}//${urlObj.hostname}`;
+      if (allowedOrigins.includes(originWithoutPort)) {
+        this.isOriginAllowed = true;
+      } else {
+        log.error('Request from not allowed origin ' + rawUrl)
+        this.isOriginAllowed = false;
+      }
+
+    } catch (error) {
+      log.error("Errore nel parsing dell'URL:", error);
+      this.isOriginAllowed = false;
+    }
 
     this.routes = routes;
     this.pathIndex = 0;
