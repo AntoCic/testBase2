@@ -2,6 +2,7 @@ import { auth, provider, getAuth, GoogleAuthProvider, createUserWithEmailAndPass
 import PersonalInfo from '../models/PersonalInfo.js';
 import { reactive } from 'vue'
 import axios from 'axios'
+import log from '../personal_modules/log.js';
 
 export const user = reactive({
 
@@ -33,7 +34,7 @@ export const user = reactive({
                         }
                     }
                 } catch (error) {
-                    console.error('Errore personalInfo.init: ', error);
+                    log.error('Errore personalInfo' + String(error));
                 }
                 // store.loading.off();
             } else {
@@ -143,7 +144,7 @@ export const user = reactive({
     //         })
 
     // },
-    
+
     // Metodo per eseguire il logout
     async logout() {
         try {

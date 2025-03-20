@@ -29,6 +29,7 @@ export default {
         labelStyle: { type: String, required: false },
         disabled: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
+        readonly: { type: Boolean, default: false },
         inputGroup: { type: Boolean, default: false },
     },
     data() { return {  }; },

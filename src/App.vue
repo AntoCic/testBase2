@@ -1,6 +1,5 @@
 <!-- App.vue -->
 <template>
-  <DeveloperMode class="position-absolute top-0 end-0 m-2" />
   <CmpLoading v-if="$s.isLogged !== null ? $loading.state : false" />
 
   <template v-if="$s.isLogged !== null">
@@ -15,6 +14,8 @@
   store:{{ $s }}
   user:{{ user }}
   </pre> -->
+
+  <DeveloperMode />
 </template>
 
 <script>

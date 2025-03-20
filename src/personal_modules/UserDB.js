@@ -1,5 +1,6 @@
 import axios from "axios";
 import { user } from "../stores/user";
+import log from "./log";
 
 export default class UserDB {
     static build(item, required = {}, optional = {}) {
@@ -16,6 +17,9 @@ export default class UserDB {
         }
         return res;
     }
+
+    // TODO cambiare _state in _localStorage che puo essere true false o undefined se non si vuole salvare nel localStorage
+    // TODO capire che fare se si fa una delete di this e che succede se si è in locale e non viene comunicata la delete
 
     async init() {
         return (this._state && this._state === 'server') ? this : await this.get()
@@ -48,61 +52,80 @@ export default class UserDB {
             });
     }
 
-    async add(resource, id = false) {
-        return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { authorization: user.accessToken } })
+    // async add(resource, id = false) {
+    //     return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { authorization: user.accessToken } })
+    //         .then(async (res) => {
+    //             return await this.parse(res.data);
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //             return false;
+    //         });
+    // }
+
+    async set(newResource = this) {
+        if (newResource === null || newResource === undefined) {
+            log.error(`${this.constructor.mainPaths} -> La newResource è null || undefined. Se vuoi puoi fare delete ma non set`);
+            return false;
+        }
+        try {
+            await this.parse(res.data);
+        } catch (error) {
+            log.error(String(error));
+            return false;
+        }
+        return await this.save();
+    }
+    async save() {
+        return await axios.post('/api/user/' + this.constructor.mainPaths, this, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
-                return await this.parse(res.data);
+                log(res);
+                return this
             })
             .catch((error) => {
-                console.error(error);
+                log.error(error);
                 return false;
             });
     }
 
-    async update(newResource = {}) {
-        const updateResource = {
-            ...JSON.parse(JSON.stringify(this)),
-            ...JSON.parse(JSON.stringify(newResource))
-        };
-        if (updateResource.files) {
-            updateResource.files = Object.keys(updateResource.files).reduce((acc, key) => {
-                acc[key] = updateResource.files[key].fileName;
-                return acc;
-            }, {});
-        }
-
-        if (newResource != null) {
-            return await axios.put('/api/user/' + this.constructor.mainPaths, { data: updateResource, id: this.id }, { headers: { authorization: user.accessToken } })
-                .then(async (res) => {
-                    return await this.constructor.parse(res.data);
-                })
-                .catch((error) => {
-                    console.error(error);
-                    return false;
-                });
-        } else {
-            console.error('La newResource è null.');
+    async update(newResource) {
+        if (newResource === null || newResource === undefined) {
+            log.error(`${this.constructor.mainPaths} -> La newResource è null || undefined. Se vuoi puoi fare delete ma non update`);
             return false;
         }
+        for (const key in this) {
+            if (newResource?.[key] === undefined) continue
+            this[key] = newResource[key];
+        }
+        return await axios.put('/api/user/' + this.constructor.mainPaths, newResource, { headers: { authorization: user.accessToken } })
+            .then(async (res) => {
+                log(res);
+                return this
+            })
+            .catch((error) => {
+                log.error(error);
+                return false;
+            });
     }
 
-    async delete(id = '', propPath = null) {
-        if (id === '') {
-            id = this.id
-        }
-        if (propPath !== null) {
-            propPath = '/' + propPath
+    async delete(propPath) {
+        let fullPath = `/api/user/${this.constructor.mainPaths}`;
+        if (propPath) {
+            if (propPath in this) {
+                fullPath += `/${propPath}`;
+                this[propPath] = null;
+            } else {
+                log.error(`${this.constructor.mainPaths} -> Il propPath non è presente tra le key.`);
+            }
         } else {
-            propPath = ''
+            for (const key in this) {
+                this[key] = null;
+                // Object.keys(this).forEach(key => delete this[key]);
+            }
         }
-        return await axios.delete('/api/user/' + this.constructor.mainPaths + propPath, { data: { id }, headers: { authorization: user.accessToken } })
+        return await axios.delete(fullPath, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 if (res.data.deleted) {
-                    if (id === this.id) {
-                        for (const filekey in this.files) {
-                            await this.deleteFile(filekey)
-                        }
-                    }
                     return res.data.deleted;
                 } else {
                     return false;
@@ -114,92 +137,4 @@ export default class UserDB {
             });
     }
 
-
-    // async getFiles() {
-    //     return await axios.post(`/api/user/g-files/${this.id}`, { fileNames: this.files }, {
-    //         headers: {
-    //             authorization: user.accessToken
-    //         }
-    //     }).then((res) => {
-    //         if (res.data.urls) {
-    //             this.files = res.data.urls
-    //             return res.data.urls
-    //         } else {
-    //             console.error('Failed to get files:', res.data.message);
-    //             return null
-    //         }
-    //     }).catch((error) => {
-    //         console.error('Get files error:', error);
-    //         return null
-    //     })
-
-    // }
-
-    // async uploadFiles(selectedFiles) {
-    //     if (!selectedFiles || selectedFiles.length === 0) {
-    //         console.error('No file selected!');
-    //         return null;
-    //     }
-
-    //     try {
-    //         const resFiles = {}
-    //         for (const file of selectedFiles) {
-    //             // Converti il file in base64 utilizzando una Promise
-    //             const base64Data = await new Promise((resolve, reject) => {
-    //                 const reader = new FileReader();
-    //                 reader.readAsDataURL(file);
-    //                 reader.onload = () => resolve(reader.result.split(',')[1]);
-    //                 reader.onerror = reject;
-    //             });
-
-    //             const fileName = file.name;
-
-    //             // Effettua la richiesta di upload
-    //             const res = await axios.post(`/api/user/a-file/${this.id}`, {
-    //                 base64Data,
-    //                 fileName
-    //             }, {
-    //                 headers: {
-    //                     authorization: user.accessToken
-    //                 }
-    //             })
-
-    //             if (res.data) {
-    //                 const [key, fileData] = Object.entries(res.data)[0]
-    //                 resFiles[key] = fileData
-    //                 const files = { ...this.files, ...resFiles }
-
-    //                 this.files = files
-    //                 await this.update()
-    //             } else {
-    //                 console.error('Upload failed:', res);
-    //                 return null;
-    //             }
-    //         }
-    //         return resFiles
-    //     } catch (error) {
-    //         console.error('Upload error:', error);
-    //         return null;
-    //     }
-
-
-    // }
-
-    // async deleteFile(filekey) {
-    //     const fileName = this.files[filekey].fileName
-    //     axios.post(`/api/user/d-file/${this.id}`, { fileName }, {
-    //         headers: {
-    //             Authorization: user.accessToken,
-    //         },
-    //     }).then(async (res) => {
-    //         if (res.data.deleted) {
-    //             await this.delete(filekey, this.id + '/files')
-    //             delete this.files[filekey]
-    //         } else {
-    //             console.error('Delete failed:', res.data);
-    //         }
-    //     }).catch((error) => {
-    //         console.error('Delete error:', error);
-    //     })
-    // }
 }

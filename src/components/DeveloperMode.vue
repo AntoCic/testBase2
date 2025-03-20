@@ -1,9 +1,105 @@
 <template>
-  <span v-if="$u.onDevMod" class="material-symbols-outlined text-info" :class="$attrs.class" :style="$attrs.style"> developer_mode
-  </span>
+  <div v-if="isChecked" class="dev-container max-z-index vh-100 vw-100 d-flex flex-column text-white">
+
+    <nav class="nav-scoped flex-shrink-0">
+      <div class="nav nav-tabs border-0" id="nav-tab" role="tablist">
+
+        <button v-for="(tab, i) in tabs" :class="`nav-link text-info${i === 0 ? ' active' : ''}`"
+          :id="`nav-dev-mode-${tab.name}-tab`" data-bs-toggle="tab" :data-bs-target="`#nav-dev-mode-${tab.name}`"
+          type="button" role="tab" :aria-controls="`nav-dev-mode-${tab.name}`"
+          :aria-selected="i === 0 ? 'true' : 'false'">
+          <span class="material-symbols-outlined"> {{ tab.icon }} </span> {{ tab.title }}
+        </button>
+
+      </div>
+    </nav>
+
+    <div class="tab-content scoped p-2 overflow-y-auto flex-grow-1" id="nav-developer_mode">
+
+      <div v-for="(tab, i) in tabs" :class="`tab-pane fade${i === 0 ? ' show active' : ''}`"
+        :id="`nav-dev-mode-${tab.name}`" role="tabpanel" :aria-labelledby="`nav-dev-mode-${tab.name}-tab`" tabindex="0">
+        <p v-if="tab.content" class="m-0">{{ tab.content }}</p>
+        <pre v-if="tab.pre" class="w-100"> {{ tab.pre }} </pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Checkbox con icona in lable per attivare il div di sopra -->
+  <input type="checkbox" id="devModeToggle" class="d-none" v-model="isChecked" />
+  <label for="devModeToggle" v-if="$u.onDevMod" type="button"
+    class="position-fixed max-z-index top-0 end-0 m-2 material-symbols-outlined text-info" :class="$attrs.class"
+    :style="$attrs.style">
+    developer_mode
+  </label>
 </template>
 
 <script>
+import { user } from '../stores/user';
+
+export default {
+  data() {
+    return {
+      user,
+      isChecked: false, // Controlla lo stato del div
+
+      tabs: [
+        {
+          name: 'home',
+          icon: 'home',
+          content: 'HOME DEV MODE'
+        },
+        {
+          name: 'data',
+          icon: 'database',
+          title: 's',
+          pre: this.$s,
+        },
+        {
+          name: 'user',
+          icon: 'person',
+          pre: user,
+        },
+        {
+          name: 'router',
+          icon: 'route',
+          title: 'ROUTER',
+          pre: this.$router,
+        }
+      ]
+    };
+  }
+};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.max-z-index {
+  z-index: 99999999;
+}
+
+.dev-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999998;
+  background-color: rgba(0, 0, 0, 0.88);
+}
+
+.nav-scoped {
+  padding-right: 38px;
+}
+
+.tab-content.scoped {
+  border-top: 2px solid #fff;
+}
+
+.tab-pane.scoped {
+  overflow-y: auto;
+}
+
+.nav-link.text-info.active {
+  color: #000000 !important;
+}
+</style>

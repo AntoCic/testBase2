@@ -32,18 +32,18 @@ const routes = {
   auth: {
     GET: {
       "": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
-      user: async (event) => await firebase?.user.get(event.pathParams),
+      user: async (event) => await firebase?.user.get(event),
     },
     POST: {
-      user: async (event) => await firebase?.user.post(event.pathParams),
+      user: async (event) => await firebase?.user.post(event),
       slackMsg: handlerSlackMsg,
     },
     PUT: {
-      user: async (event) => await firebase?.user.put(event.pathParams),
+      user: async (event) => await firebase?.user.put(event),
     },
     PATCH: {},
     DELETE: {
-      user: async (event) => await firebase?.user.delete(event.pathParams),
+      user: async (event) => await firebase?.user.delete(event),
     },
   }
 }
@@ -157,9 +157,9 @@ class FIREBASE {
       newMainPaths[pathName] = {
         pathName,
 
-        async get(pathParams = []) {
+        async get(event) {
           try {
-            const fullPath = this.getFullPath(pathParams)
+            const fullPath = this.getFullPath(event.pathParams, event.user)
             const snapshot = await firebase.database.ref(fullPath).once('value');
             return snapshot.val() || {};
           } catch (error) {
@@ -167,146 +167,45 @@ class FIREBASE {
           }
         },
 
-        async add(data, pathParams = [], id = false) {
+        async post(event) {
           try {
-            const fullPath = this.getFullPath(pathParams)
-            const newId = id === true ? '/' + firebase.newId() : id === false ? '' : '/' + id;
-
-            console.log('newId', newId);
-            if (id === true) {
-              id = newId.substring(1)
-              await firebase.database.ref(fullPath + newId).set({ ...data, id });
-              return { [id]: { ...data, id } };
-            } else {
-              console.log('data', data);
-
-              await firebase.database.ref(fullPath + newId).set(data);
-              if (id === false) {
-                return data
-              }
-              return { [id]: data }
-            }
+            const fullPath = this.getFullPath(event.pathParams, event.user);
+            await firebase.database.ref(fullPath).set(event.bodyParams);
+            return;
           } catch (error) {
+            log.error(String(error))
             throw new Error(String(error));
           }
         },
 
-        async update(id, data, pathParams = []) {
+        async put(event) {
           try {
-            const fullPath = this.getFullPath(pathParams)
-            const content = { [id]: data }
-            await firebase.database.ref(fullPath).update(content);
-
-            return content;
+            const fullPath = this.getFullPath(event.pathParams, event.user);
+            await firebase.database.ref(fullPath).update(event.bodyParams);
+            return;
           } catch (error) {
+            log.error(String(error))
             throw new Error(String(error));
           }
         },
 
-        async delete(id, pathParams = []) {
+        async delete(event) {
           try {
-            const fullPath = this.getFullPath(pathParams)
-
-            await firebase.database.ref(`${fullPath}/${id}`).remove();
-
-            return { deleted: id };
+            const fullPath = this.getFullPath(event.pathParams, event.user);
+            await firebase.database.ref(fullPath).remove();
+            return { deleted: event.pathParams.at(-1) };
           } catch (error) {
+            log.error(String(error))
             throw new Error(String(error));
           }
 
         },
 
-        // async getFiles(fileNames = null, pathParams = []) {
-        //   const fullPath = this.getFullPath(pathParams);
-        //   try {
-        //     // Ottiene tutti i file con il prefisso specificato
-        //     const [files] = await firebase.bucket.getFiles({ prefix: fullPath });
-
-        //     const urls = {};
-        //     // Mappa su ogni file e crea un oggetto con i file richiesti e i rispettivi URL
-        //     for (const file of files) {
-        //       const fileName = file.name.split('/').pop(); // Ottiene solo il nome del file
-
-        //       if (!fileNames) {
-        //         const url = await this.getUrlFile(file);
-        //         urls[fileName] = { url };
-        //       } else if (Object.values(fileNames).includes(fileName)) {
-        //         const key = Object.keys(fileNames).find(key => fileNames[key] === fileName);
-        //         const url = await this.getUrlFile(file);
-
-        //         urls[key] = { fileName, url };
-        //       }
-        //     }
-
-        //     // Restituisce gli URL dei file trovati
-        //     return { urls };
-        //   } catch (error) {
-        //     throw new Error(String(error));
-        //   }
-        // },
-
-        // async addFile(base64Data, fileName, pathParams = []) {
-        //   try {
-        //     // Decodifica i dati da base64
-        //     const buffer = Buffer.from(base64Data, 'base64');
-
-        //     // Determina il tipo di contenuto (MIME type) basato sull'estensione del file
-        //     const extension = fileName.split('.').pop().toLowerCase();
-        //     const contentTypes = {
-        //       'jpg': 'image/jpeg',
-        //       'jpeg': 'image/jpeg',
-        //       'png': 'image/png',
-        //       'gif': 'image/gif',
-        //       'svg': 'image/svg+xml',
-        //       'txt': 'text/plain',
-        //       'pdf': 'application/pdf',
-        //       'doc': 'application/msword',
-        //       'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        //       'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        //       'csv': 'text/csv',
-        //     };
-        //     const contentType = contentTypes[extension];
-        //     if (!contentType) {
-        //       throw new Error(String(error));
-        //     }
-
-        //     // Genera un nuovo nome per il file
-        //     const fullName = `${firebase.newId()}_${fileName}`;
-
-        //     // Costruisce il percorso nel bucket
-        //     const fullPath = this.getFullPath(pathParams)
-        //     const file = firebase.bucket.file(`${fullPath}/${fullName}`);
-
-        //     // Salva il file nel bucket con il tipo di contenuto corretto
-        //     await file.save(buffer, { contentType });
-
-        //     // Ottiene l'URL firmato per l'accesso al file
-        //     const url = await this.getUrlFile(file)
-
-        //     const key = fullName.split('_')[0]
-        //     // Restituisce l'URL del file caricato
-        //     return { [key]: { fileName: fullName, url } };
-        //   } catch (error) {
-        //     throw new Error(String(error));
-        //   }
-
-        // },
-
-        // async deleteFile(fileName, pathParams = []) {
-
-        //   const fullPath = this.getFullPath(pathParams)
-
-        //   try {
-        //     await firebase.bucket.file(`${fullPath}/${fileName}`).delete();
-
-        //     return { deleted: fileName };
-        //   } catch (error) {
-        //     throw new Error(String(error));
-        //   }
-        // },
-
-        getFullPath(pathParams) {
+        getFullPath(pathParams, user) {
           let databasePath = '';
+          if (typeof pathParams === '') {
+
+          }
           if (pathParams.length >= 2) {
             for (let index = 1; index < pathParams.length; index++) {
               databasePath += '/' + pathParams[index];
@@ -314,39 +213,19 @@ class FIREBASE {
           }
 
           let fullPath = this.pathName
-          fullPath += this.userData ? '/' + this.userData.uid : ''
-          fullPath += databasePath
-
-          console.log([fullPath]);
-
+          if (this.pathName === 'user') {
+            if (user) {
+              fullPath += '/' + user.uid;
+            } else {
+              log.error('try to access to user data but no user');
+            }
+          }
+          fullPath += databasePath;
           return fullPath
         },
-
-        async getUrlFile(file) {
-          let expires = new Date();
-          expires.setDate(expires.getDate() + 1);
-          expires = expires.toISOString();
-
-          const [url] = await file.getSignedUrl({
-            action: 'read',
-            expires,
-          });
-
-          return url
-        }
       }
 
       if (pathName === 'user') {
-        newMainPaths[pathName].logged = async function (idToken) {
-          this.userData = null;
-          try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            this.userData = await admin.auth().getUser(decodedToken.uid);
-            return true;
-          } catch (error) {
-            throw new Error(String(error));
-          }
-        };
 
       }
     }
@@ -427,7 +306,7 @@ class EventHandler {
     for (let index = 0; index < 2; index++) {
       pathParams.shift();
     }
-    if (pathParams.length === 0) pathParams.push('')
+    if (pathParams.length === 0) pathParams.push('');
     return pathParams
   }
 

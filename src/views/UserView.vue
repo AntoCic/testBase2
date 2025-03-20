@@ -53,15 +53,19 @@ export default {
     return {
       user,
       form: new FormValidator({ ...user.personalInfo }),
-
-      
     };
   },
   methods: {
   },
   mounted() {
     console.log('personalInfo ', this.user.personalInfo);
-    this.form.onChange = (trigger) => { console.log('formTrigger:', trigger) }
+    this.form.onChange = (trigger) => {
+      if (trigger.check) {
+        user.personalInfo.update({ [trigger.field]: trigger.value })
+      }
+
+      console.log('formTrigger:', trigger)
+    }
     this.form.state.logsOn = true
   }
 };
