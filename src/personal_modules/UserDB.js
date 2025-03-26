@@ -1,6 +1,7 @@
 import axios from "axios";
 import { user } from "../stores/user";
 import log from "./log";
+import u from '../utility.js';
 
 export default class UserDB {
     static build(item, required = {}, optional = {}) {
@@ -18,16 +19,13 @@ export default class UserDB {
         return res;
     }
 
-    // TODO cambiare _state in _localStorage che puo essere true false o undefined se non si vuole salvare nel localStorage
-    // TODO capire che fare se si fa una delete di this e che succede se si è in locale e non viene comunicata la delete
-
     async init() {
-        return (this._state && this._state === 'server') ? this : await this.get()
+        return (this._localStorage && this._localStorage === false) ? this : await this.get();
     }
 
     localStorageGet() {
         const localData = localStorage.getItem(this.constructor.mainPaths);
-        if (localData) { return { ...(JSON.parse(localData)), _state: 'local' }; }
+        if (localData) { return { ...(JSON.parse(localData)), _localStorage: true }; }
         return undefined;
     }
     localStorageInit() {
@@ -36,15 +34,30 @@ export default class UserDB {
         return undefined;
     }
     localStorageSave(objectToSave = this) {
-        return localStorage.setItem(this.constructor.mainPaths, JSON.stringify({ ...objectToSave, _state: 'local' }));
+        return localStorage.setItem(this.constructor.mainPaths, JSON.stringify({ ...objectToSave, _localStorage: true }));
     }
+    localStorageDelete() {
+        if (localStorage.getItem(this.constructor.mainPaths)) {
+            localStorage.removeItem(this.constructor.mainPaths);
+        }
+    }
+    canSet_localStorage(state) {
+        if (state !== undefined && this._localStorage !== undefined) {
+            this._localStorage = state
+        }
+        return this._localStorage !== undefined
+    }
+
 
     async get() {
         return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
-                res.data._state = 'server'
-                console.log('Res from ' + '/api/user/' + this.constructor.mainPaths, res.data);
-                return await this.parse(res.data);
+                console.log(`get res: user/${this.constructor.mainPaths} ->`, res);
+                await this.parse(res.data);
+                if (this.canSet_localStorage(false)) {
+                    this.localStorageSave();
+                }
+                return this
             })
             .catch((error) => {
                 console.error(error);
@@ -52,16 +65,10 @@ export default class UserDB {
             });
     }
 
-    // async add(resource, id = false) {
-    //     return await axios.post('/api/user/' + this.constructor.mainPaths, { data: resource, id }, { headers: { authorization: user.accessToken } })
-    //         .then(async (res) => {
-    //             return await this.parse(res.data);
-    //         })
-    //         .catch((error) => {
-    //             console.error(error);
-    //             return false;
-    //         });
-    // }
+    async add(resource) {
+        const key = u.newId();
+        return await this.update({ key: resource });
+    }
 
     async set(newResource = this) {
         if (newResource === null || newResource === undefined) {
@@ -77,9 +84,12 @@ export default class UserDB {
         return await this.save();
     }
     async save() {
+        if (this.canSet_localStorage()) { this.localStorageSave(); }
         return await axios.post('/api/user/' + this.constructor.mainPaths, this, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
-                log(res);
+                this.canSet_localStorage(false);
+                console.log(`save res: user/${this.constructor.mainPaths} ->`, res);
+
                 return this
             })
             .catch((error) => {
@@ -93,13 +103,14 @@ export default class UserDB {
             log.error(`${this.constructor.mainPaths} -> La newResource è null || undefined. Se vuoi puoi fare delete ma non update`);
             return false;
         }
-        for (const key in this) {
-            if (newResource?.[key] === undefined) continue
-            this[key] = newResource[key];
-        }
+        for (const key in newResource) { this[key] = newResource[key]; }
+        
+        if (this.canSet_localStorage()) { this.localStorageSave(); }
         return await axios.put('/api/user/' + this.constructor.mainPaths, newResource, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
-                log(res);
+                this.canSet_localStorage(false);
+                console.log(`update res: user/${this.constructor.mainPaths} ->`, res);
+
                 return this
             })
             .catch((error) => {
@@ -113,28 +124,39 @@ export default class UserDB {
         if (propPath) {
             if (propPath in this) {
                 fullPath += `/${propPath}`;
-                this[propPath] = null;
+                delete this[propPath];
+                this.localStorageSave();
             } else {
                 log.error(`${this.constructor.mainPaths} -> Il propPath non è presente tra le key.`);
+                fullPath = false;
             }
         } else {
             for (const key in this) {
-                this[key] = null;
-                // Object.keys(this).forEach(key => delete this[key]);
-            }
-        }
-        return await axios.delete(fullPath, { headers: { authorization: user.accessToken } })
-            .then(async (res) => {
-                if (res.data.deleted) {
-                    return res.data.deleted;
-                } else {
-                    return false;
+                if (typeof this[key] !== 'function') {
+                    this[key] = null;
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-                return false;
-            });
+            }
+            this._deleted = true;
+            this.localStorageDelete();
+        }
+
+        if (fullPath) {
+            return await axios.delete(fullPath, { headers: { authorization: user.accessToken } })
+                .then(async (res) => {
+                    if (res.data.deleted) {
+                        this.canSet_localStorage(false);
+                        return res.data.deleted;
+                    } else {
+                        return false;
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    return false;
+                });
+        } else {
+            return false;
+        }
     }
 
 }

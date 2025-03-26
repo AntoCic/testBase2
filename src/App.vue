@@ -9,12 +9,7 @@
     </main>
     <AppFooter />
   </template>
-  <p v-else>.</p>
-  <!-- <pre>
-  store:{{ $s }}
-  user:{{ user }}
-  </pre> -->
-
+  <div v-else class="starter-loader"></div>
   <DeveloperMode />
 </template>
 

@@ -5,10 +5,10 @@
         <img :src="user.photoURL" alt="User Photo" class="rounded-circle">
         <p>{{ user.name }}</p>
         <div class="input-group">
-          <InputText inputGroup field="name" label v-model="form" />
+          <InputText inputGroup field="name" label lazy v-model="form" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="surname" label v-model="form" />
+          <InputText inputGroup field="surname" label lazy v-model="form" />
         </div>
         <div class="input-group">
           <InputSelect inputGroup field="gender" label v-model="form" :options="$u.genderOptions"
@@ -19,10 +19,10 @@
           <InputCheckbox inputGroup field="birthHideYear" v-model="form" label="Nascondi anno di nascita" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="email" label v-model="form" />
+          <InputText inputGroup field="email" lazy label v-model="form" />
         </div>
         <div class="input-group">
-          <InputText inputGroup field="phoneNumber" label v-model="form" />
+          <InputText inputGroup field="phoneNumber" lazy label v-model="form" />
         </div>
         <!-- <div class="input-group">
           <InputText inputGroup field="photoURL" label v-model="form" />

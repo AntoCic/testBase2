@@ -55,7 +55,7 @@ export default {
                 };
                 this.lazyTimer = setTimeout(() => {
                     this.value = event.target.value;
-                }, 500);
+                }, 300);
             } else {
                 this.value = event.target.value;
             }

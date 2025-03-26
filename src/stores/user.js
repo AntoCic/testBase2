@@ -26,7 +26,7 @@ export const user = reactive({
             if (currentUser) {
                 this.setter(currentUser);
                 try {
-                    if (!this.personalInfo || (this.personalInfo && this.personalInfo._state !== 'server')) {
+                    if (!this.personalInfo || (this.personalInfo && this.personalInfo._localStorage === true)) {
                         const serverPersonalInfo = await new PersonalInfo().init();
                         if (serverPersonalInfo) {
                             this.personalInfo = serverPersonalInfo
@@ -114,37 +114,7 @@ export const user = reactive({
                 // store.loading.off();
                 return null
             })
-
-
     },
-
-    // Metodo per eseguire il logout
-    // async addUserName(userName) {
-    //     // store.loading.on();
-
-    //     const id = 'userName'
-    //     const data = userName
-
-    //     return await axios.post('/api/a/userdata', { id, data }, {
-    //         headers: {
-    //             "Authorization": this.accessToken
-    //         }
-    //     })
-    //         .then((res) => {
-    //             if (res.data.userName) {
-    //                 return res.data.userName
-    //             } else {
-    //                 return null
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.error(error)
-    //             // store.loading.off();
-    //             return null
-    //         })
-
-    // },
-
     // Metodo per eseguire il logout
     async logout() {
         try {
@@ -177,6 +147,8 @@ export const user = reactive({
     },
     // Metodo per eseguire il logout
     reset() {
+        console.log('reset()AAAA');
+        
         this.providerInfo = null;
         this.isLogged = false;
         this.accessToken = '';

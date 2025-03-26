@@ -5,7 +5,8 @@ export default class PersonalInfo extends UserDB {
     static mainPaths = "personalInfo"; // Definisci qui il mainPaths per firebase 
 
     constructor(personalInfo = {}) {
-        super()
+        super();
+        this._localStorage = personalInfo._localStorage !== undefined ? personalInfo._localStorage : null;
         const required = {
         };
 
@@ -27,8 +28,7 @@ export default class PersonalInfo extends UserDB {
     parse(res) {
         console.log(this.constructor.mainPaths, ' parse(res) ', res);
         if (res) {
-            for (const key in res) { this[key] = res[key] }
-            this.localStorageSave();
+            for (const key in res) { this[key] = res[key] };
             return this;
         }
         return res;
