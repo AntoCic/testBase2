@@ -24,14 +24,5 @@ export default class PersonalInfo extends UserDB {
         // Costruisci l'oggetto usando il metodo build
         UserDB.build.call(this, personalInfo, required, optional);
     }
-
-    parse(res) {
-        console.log(this.constructor.mainPaths, ' parse(res) ', res);
-        if (res) {
-            for (const key in res) { this[key] = res[key] };
-            return this;
-        }
-        return res;
-    }
 }
 

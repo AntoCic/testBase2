@@ -25,6 +25,7 @@ import E_InputTextArea from './views/example/E_InputTextArea.vue'
 import E_InputSearch from './views/example/E_InputSearch.vue'
 import E_InputTel from './views/example/E_InputTel.vue'
 import E_SlackMsg from './views/example/E_SlackMsg.vue'
+import E_todoTyped from './views/example/E_todoTyped.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
@@ -54,6 +55,7 @@ const fullRoutes = {
     { path: '/example/InputTextArea', name: 'example.InputTextArea', component: E_InputTextArea },
     { path: '/example/InputSearch', name: 'example.InputSearch', component: E_InputSearch },
     { path: '/example/InputTel', name: 'example.InputTel', component: E_InputTel },
+    { path: '/example/todoTyped', name: 'example.todoTyped', component: E_todoTyped },
 
   ],
 

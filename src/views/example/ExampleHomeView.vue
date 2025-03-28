@@ -45,6 +45,8 @@ export default {
         { name: 'call', description: 'GET POST PUT PATCH DELETE' },
         { hrKey: true, description: 'Test slack msg' },
         { name: 'slackMsg', description: 'error warning info' },
+        { hrKey: true, description: 'Model' },
+        { name: 'todoTyped', description: 'esempio di una todo list tipizzata' },
 
         { hrKey: true, description: 'Input' },
         { name: 'InputText' },

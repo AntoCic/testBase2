@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     async callGet() {
-      await axios.get('/api/')
+      await axios.get('/api/public/test')
         .then((res) => {
           this.response.push(res.data);
         })
@@ -45,7 +45,7 @@ export default {
     },
 
     async callGetAuth() {
-      await axios.get('/api/', { params: { test: 'hola' }, headers: { authorization: this.$s.accessToken } })
+      await axios.get('/api/auth/test', { params: { test: 'hola' }, headers: { authorization: this.$s.accessToken } })
         .then((res) => {
           this.response.push(res.data);
         })
@@ -56,7 +56,7 @@ export default {
 
 
     async postSender() {
-      await axios.post('/api/aa/bb/cc', {
+      await axios.post('/api/public/test/bb/cc', {
         firstName: 'Fred',
         lastName: 'Flintstone'
       }, {
@@ -73,7 +73,7 @@ export default {
         });
     },
     async putSender() {
-      await axios.put('/api/aa/bb/cc', { msg: 'PUT' }, {
+      await axios.put('/api/public/test/bb/cc', { msg: 'PUT' }, {
         params: {
           ID: 12345
         },
@@ -86,7 +86,7 @@ export default {
         });
     },
     async patchSender() {
-      await axios.patch('/api/aa/bb/cc', { msg: 'PATCH' }, {
+      await axios.patch('/api/public/test/bb/cc', { msg: 'PATCH' }, {
         params: {
           ID: 12345
         },
@@ -99,7 +99,7 @@ export default {
         });
     },
     async deleteSender() {
-      await axios.delete('/api/aa/bb/cc', { params: { chiave: 1234567890000999 }, headers: { holla: 'pippo' } })
+      await axios.delete('/api/public/test/bb/cc', { params: { chiave: 1234567890000999 }, headers: { holla: 'pippo' } })
         .then((res) => {
           this.response.push(res.data);
         })

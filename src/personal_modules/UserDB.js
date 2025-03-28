@@ -50,7 +50,7 @@ export default class UserDB {
 
 
     async get() {
-        return await axios.get('/api/user/' + this.constructor.mainPaths, { headers: { authorization: user.accessToken } })
+        return await axios.get(`/api/auth/user/${user.uid}/`+ this.constructor.mainPaths, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 console.log(`get res: user/${this.constructor.mainPaths} ->`, res);
                 await this.parse(res.data);
@@ -67,7 +67,7 @@ export default class UserDB {
 
     async add(resource) {
         const key = u.newId();
-        return await this.update({ key: resource });
+        return await this.update({ [key]: resource });
     }
 
     async set(newResource = this) {
@@ -85,7 +85,7 @@ export default class UserDB {
     }
     async save() {
         if (this.canSet_localStorage()) { this.localStorageSave(); }
-        return await axios.post('/api/user/' + this.constructor.mainPaths, this, { headers: { authorization: user.accessToken } })
+        return await axios.post(`/api/auth/user/${user.uid}/` + this.constructor.mainPaths, this, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 this.canSet_localStorage(false);
                 console.log(`save res: user/${this.constructor.mainPaths} ->`, res);
@@ -104,9 +104,9 @@ export default class UserDB {
             return false;
         }
         for (const key in newResource) { this[key] = newResource[key]; }
-        
+
         if (this.canSet_localStorage()) { this.localStorageSave(); }
-        return await axios.put('/api/user/' + this.constructor.mainPaths, newResource, { headers: { authorization: user.accessToken } })
+        return await axios.put(`/api/auth/user/${user.uid}/` + this.constructor.mainPaths, newResource, { headers: { authorization: user.accessToken } })
             .then(async (res) => {
                 this.canSet_localStorage(false);
                 console.log(`update res: user/${this.constructor.mainPaths} ->`, res);
@@ -120,7 +120,7 @@ export default class UserDB {
     }
 
     async delete(propPath) {
-        let fullPath = `/api/user/${this.constructor.mainPaths}`;
+        let fullPath = `/api/auth/user/${user.uid}/${this.constructor.mainPaths}`;
         if (propPath) {
             if (propPath in this) {
                 fullPath += `/${propPath}`;

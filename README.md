@@ -1,3 +1,121 @@
+il progetto su cui sto lavorando è un progetto di base per poi creare altri progetti in futuro partendo da questo. è fatto con vite, vue 3 options e caricato su netlify e usa le serverless function di netlify e sto usando firebase per gestire authenticazione e il realtime db perche mi piace.
+devo fare un cambio drastico al mio progetto che mi sono accorto di un po di errori strutturali.
+Per prima cosa devo sistemare il file function se c'è qualcosa da sistemare adesso devo gestire una struttura 
+root
+├── public
+│    └── ...
+├── auth
+│    ├── users : $userId: userdata
+│    └── ...
+
+sapendo questo devo gestire principalmente chiamate per gestire chiamate a oggetti dentro pablic a cui possono accedere tutti ma posso scrivere solo io
+poi chiamate a auth in cui ci saranno tutti gli oggetti a cui possono accedere tutti gli auth e scrivere. 
+poi ci sono le chiamate a auth/user/$userId in cui dentro ci saranno tutti gli oggetti il cui permesso di scrittura e riservato solo agli utenti in questione. ovviamente il mio utente deve avere accesso di lettura e scrittura a tutto. una volta registrato sistemo le regole di firebase aggiungendo il mio id dove serve.
+percio come avrai capito mi serve una nuova versione di function e una nuova versione di delle regole di firebase reltime db
+
+dopo devo cominciare a sistemare la classe che utilizzo per estendere e creare le classi/model per l'interazione con gli oggetti del db
+per il momento ho solo userDB ma sbagliato perche devo togliere la logica relativa a localStorage perche la devo gestire in unaltra maniera. al suo posto devo creare db che poi utilizzero per estendere publicDB, authDB. authDB lo devo usare per estendere userDB. li usero tutti per creare dei model per oggetti che utilizzero come tabelle.
+
+a questo punto devi creare una tabella che usero in futuro per gestire muotiutente e lo stato di salvataggio di alcune tabelle in locale e si chiamera localDBMetadata e dentro avra lastUpdate: Date, justServer: boolean, isLocalStorage: boolean
+che si aggiornera a ogni interazione con il db
+
+di seguito tutti i codici che devi sistemare mi servono sistemati e tutti i file che mancano se puoi dammi direttamente i file da scaricare se no mi scrivi tutti i codici in chat
+
+
+
+
+Step 1: Progettazione Struttura dei Dati Firebase
+ 1.1 Definire chiaramente le tre categorie di dati:
+
+Dati Pubblici: Accessibili a tutti, anche non autenticati.
+
+Dati Autenticati (auth): Accessibili solo da utenti autenticati, lettura/scrittura limitata.
+
+Dati Personali Utenti (user): Accessibili esclusivamente dal proprietario o admin.
+
+ 1.2 Progettare una struttura Firebase simile a:
+
+```sh
+
+root
+├── public            // Lettura pubblica, scrittura solo da te
+|    └── ...
+├── auth              // Lettura/scrittura da chiunque autenticato
+│   ├── users         // Struttura utenti
+│   │    └── $userId   // Lettura/scrittura solo proprietario
+│   │          └── ... 
+│   └── ... 
+
+```
+
+
+
+
+Step 2: Modificare le Regole di Sicurezza Firebase
+ 2.1 Aggiornare le regole Firebase per separare chiaramente i permessi:
+
+/public → read: true, write: false (o regole specifiche).
+
+/auth → read/write: se autenticato.
+
+/auth/users/{userId} → read/write: se userId corrisponde a auth.uid o admin.
+
+ 2.2 Verificare e testare le regole con Firebase Emulator.
+
+Step 3: Refactoring delle Functions Firebase
+ 3.1 Aggiornare la logica nelle Cloud Functions in base alla nuova struttura dati.
+
+ 3.2 Implementare correttamente gestione autenticazione e autorizzazione nei nuovi percorsi.
+
+Step 4: Creazione Classi DB (Frontend)
+ 4.1 Creare una classe di base DB che contenga logica comune (es. inizializzazione Firebase).
+
+ 4.2 Creare classi specifiche che estendono DB:
+
+PublicDB: solo operazioni su /public.
+
+AuthDB: operazioni su /auth (dati per utenti autenticati).
+
+UserDB: operazioni su /auth/users/{userId} (solo utente proprietario).
+
+ 4.3 Implementare chiaramente il concetto di ereditarietà per evitare duplicazioni di codice.
+
+Step 5: Gestione Salvataggio LocalStorage
+ 5.1 Non inserire più variabili come _isLocalStorage direttamente nei dati Firebase.
+
+ 5.2 Creare una tabella separata in LocalStorage tipo localDBMetadata che registri:
+
+javascript
+Copia
+Modifica
+localDBMetadata = {
+  dbName1: {
+    lastUpdate: "2025-03-27T15:00:00Z",
+    isLocalStorage: true
+  },
+  dbName2: {
+    lastUpdate: "2025-03-27T16:20:00Z",
+    isLocalStorage: false
+  }
+}
+ 5.3 Implementare metodi per aggiornare/verificare lo stato dei dati locali.
+
+Step 6: Testing e Validazione
+ 6.1 Eseguire test unitari delle nuove classi DB e delle logiche relative ai permessi Firebase.
+
+ 6.2 Testare manualmente casi reali di lettura/scrittura dati Firebase in ambiente locale e produzione.
+
+Step 7: Documentazione
+ 7.1 Scrivere documentazione chiara sul nuovo modello dati.
+
+ 7.2 Documentare i metodi e gli attributi delle classi DB.
+
+ 7.3 Descrivere la logica della gestione del LocalStorage.
+
+
+
+
+
 # Template base Vue, Bootstrap, sass, firebase
 
 ### Guida per Iniziare con Firebase
