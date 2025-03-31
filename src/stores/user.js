@@ -19,7 +19,7 @@ export const user = reactive({
     gender: null,
     surname: null,
 
-    personalInfo: new PersonalInfo().getLocal(),
+    personalInfo: new PersonalInfo().assignLocal(),
 
     checkLogged() {
         onAuthStateChanged(auth, async (currentUser) => {
@@ -140,15 +140,10 @@ export const user = reactive({
         this.dateOfBirth = this.personalInfo?.dateOfBirth;
         this.gender = this.personalInfo?.gender;
         this.surname = this.personalInfo?.surname;
-        console.log(this);
-
-
         // store.loading.off();
     },
     // Metodo per eseguire il logout
     reset() {
-        console.log('reset()AAAA');
-
         this.providerInfo = null;
         this.isLogged = false;
         this.accessToken = '';

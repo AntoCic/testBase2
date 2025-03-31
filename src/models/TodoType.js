@@ -1,12 +1,9 @@
-import UserDB from "../personal_modules/UserDB_old.js";
-import { user } from "../stores/user.js";
+import {authDB} from "../personal_modules/mainsDB.js";
+export default class TodoType extends authDB {
+    // Definisci il mainPath specifico per firebase.
+    static mainPath = "TodoType";
 
-export default class TodoType extends UserDB {
-    static mainPaths = "TodoType"; // Definisci qui il mainPaths per firebase 
-
-    constructor(personalInfo = {}) {
+    constructor(data = {}) {
         super();
-        // this._localStorage = personalInfo._localStorage !== undefined ? personalInfo._localStorage : null;
     }
 }
-
