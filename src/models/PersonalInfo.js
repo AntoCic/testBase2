@@ -1,28 +1,23 @@
-import UserDB from "../personal_modules/UserDB.js";
-import { user } from "../stores/user.js";
+import {userDB} from "../personal_modules/mainsDB.js";
+export default class PersonalInfo extends userDB {
+    // Definisci il mainPath specifico per firebase.
+    static mainPath = "personalInfo";
 
-export default class PersonalInfo extends UserDB {
-    static mainPaths = "personalInfo"; // Definisci qui il mainPaths per firebase 
-
-    constructor(personalInfo = {}) {
+    constructor(data = {}) {
         super();
-        this._localStorage = personalInfo._localStorage !== undefined ? personalInfo._localStorage : null;
-        const required = {
-        };
-
-        const optional = {
-            name: null,
-            surname: null,
-            gender: null,
-            dateOfBirth: null,
-            birthHideYear: null,
-            email: null,
-            phoneNumber: null,
-            photoURL: null,
-        };
-
-        // Costruisci l'oggetto usando il metodo build
-        UserDB.build.call(this, personalInfo, required, optional);
+        const keys = [
+            "name",
+            "surname",
+            "gender",
+            "dateOfBirth",
+            "birthHideYear",
+            "email",
+            "phoneNumber",
+            "photoURL"
+        ]
+        for (const key of keys) {
+            this[key] = data[key] !== undefined ? data[key] : null;
+        }
     }
 }
 

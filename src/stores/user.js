@@ -19,19 +19,17 @@ export const user = reactive({
     gender: null,
     surname: null,
 
-    personalInfo: new PersonalInfo().localStorageInit(),
+    personalInfo: new PersonalInfo().getLocal(),
 
     checkLogged() {
         onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 this.setter(currentUser);
                 try {
-                    if (!this.personalInfo || (this.personalInfo && this.personalInfo._localStorage === true)) {
-                        const serverPersonalInfo = await new PersonalInfo().init();
-                        if (serverPersonalInfo) {
-                            this.personalInfo = serverPersonalInfo
-                            this.setter(currentUser);
-                        }
+                    const serverPersonalInfo = await new PersonalInfo().get();
+                    if (serverPersonalInfo) {
+                        this.personalInfo = serverPersonalInfo
+                        this.setter(currentUser);
                     }
                 } catch (error) {
                     log.error('Errore personalInfo' + String(error));
@@ -142,13 +140,15 @@ export const user = reactive({
         this.dateOfBirth = this.personalInfo?.dateOfBirth;
         this.gender = this.personalInfo?.gender;
         this.surname = this.personalInfo?.surname;
+        console.log(this);
+
 
         // store.loading.off();
     },
     // Metodo per eseguire il logout
     reset() {
         console.log('reset()AAAA');
-        
+
         this.providerInfo = null;
         this.isLogged = false;
         this.accessToken = '';
@@ -163,7 +163,7 @@ export const user = reactive({
         this.gender = null;
         this.surname = null;
 
-        this.personalInfo?.localStorageSave(undefined);
+        this.personalInfo?.deleteLocal();
         this.personalInfo = null;
         // store.loading.off();
     },
