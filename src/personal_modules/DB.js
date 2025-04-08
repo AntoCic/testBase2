@@ -21,7 +21,7 @@ export default class DB {
     }
     localPath() {
         const localPrefix = this.constructor.localPrefix || '_';
-        return `${localPrefix}/${sanitazeMainPath(this.constructor.mainPath)}`;
+        return `${localPrefix}${sanitazeMainPath(this.constructor.mainPath)}`;
     }
     headers() {
         return this.constructor.addAuthorization ? { authorization: user.accessToken } : {};

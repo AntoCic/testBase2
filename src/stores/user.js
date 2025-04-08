@@ -28,6 +28,7 @@ export const user = reactive({
                 try {
                     const serverPersonalInfo = await new PersonalInfo().get();
                     if (serverPersonalInfo) {
+                        serverPersonalInfo.saveLocal()
                         this.personalInfo = serverPersonalInfo
                         this.setter(currentUser);
                     }

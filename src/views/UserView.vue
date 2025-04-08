@@ -61,10 +61,8 @@ export default {
     console.log('personalInfo ', this.user.personalInfo);
     this.form.onChange = (trigger) => {
       if (trigger.check) {
-        user.personalInfo.update({ [trigger.field]: trigger.value })
+        user.personalInfo.updateAndSyncLocal({ [trigger.field]: trigger.value })
       }
-
-      console.log('formTrigger:', trigger)
     }
     this.form.state.logsOn = true
   }
