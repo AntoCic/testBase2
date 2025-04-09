@@ -18,7 +18,7 @@
 
       <div v-for="(tab, i) in tabs" :class="`tab-pane fade${i === 0 ? ' show active' : ''}`"
         :id="`nav-dev-mode-${tab.name}`" role="tabpanel" :aria-labelledby="`nav-dev-mode-${tab.name}-tab`" tabindex="0">
-        <p v-if="tab.content" class="m-0">{{ tab.content }}</p>
+        <component v-if="tab.content" :is="tab.content" />
         <pre v-if="tab.pre" class="w-100"> {{ tab.pre }} </pre>
       </div>
 
@@ -36,8 +36,11 @@
 
 <script>
 import { user } from '../stores/user';
+import DeveloperModeHome from './DeveloperModeHome.vue';
 
 export default {
+  name: 'DeveloperMode',
+  components: { DeveloperModeHome },
   data() {
     return {
       user,
@@ -47,7 +50,7 @@ export default {
         {
           name: 'home',
           icon: 'home',
-          content: 'HOME DEV MODE'
+          content: DeveloperModeHome
         },
         {
           name: 'data',

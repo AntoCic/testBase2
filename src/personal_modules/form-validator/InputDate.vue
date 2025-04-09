@@ -16,6 +16,7 @@
 import { Tooltip } from 'bootstrap';
 import { dateToStringInput } from './utility/toStringInput.js';
 export default {
+    name: 'InputDate',
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },

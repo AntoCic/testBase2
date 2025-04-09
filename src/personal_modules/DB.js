@@ -74,6 +74,7 @@ export default class DB {
     updateLocal(newData) {
         const data = this.getLocal() ?? {};
         const updated = { ...data, ...newData };
+        Object.assign(this, updated);
         localStorage.setItem(this.localPath(), JSON.stringify(updated));
     }
     async updateAndSyncLocal(newData) {

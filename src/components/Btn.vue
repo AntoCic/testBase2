@@ -1,8 +1,7 @@
 <template>
   <button :type="type ?? 'button'" :class="`btn btn-${btn}`" :disabled="isDisabled">
     <span v-if="loading" :class="`spinner-grow spinner-grow-sm${isShowTextLoading ? ' me-1' : ''}`"></span>
-    <template v-if="isShowTextLoading">
-
+    <template v-else>
       <span v-if="!!googleIcon" :class="`material-symbols-outlined${!!$slots.default ? ' me-1' : ''}`">
         {{ googleIcon }}
       </span>
@@ -18,6 +17,7 @@
 
 <script>
 export default {
+  name: 'Btn',
   props: {
     type: {
       type: String,

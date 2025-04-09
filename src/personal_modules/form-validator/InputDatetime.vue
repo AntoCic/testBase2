@@ -1,6 +1,7 @@
+<!-- InputDatetime -->
 <template>
-    <label v-if="label || label === ''" :for="idToSet" :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']"
-        :style="labelStyle">
+    <label v-if="label || label === ''" :for="idToSet"
+        :class="labelClass ?? [inputGroup ? 'input-group-text' : 'form-label mb-1']" :style="labelStyle">
         <template v-if="label === true || label === ''"> {{ idToSet }} </template>
         <span v-else v-html="label"></span>
         <span v-if="required" class="text-danger">*</span>
@@ -17,6 +18,7 @@
 import { Tooltip } from 'bootstrap';
 import { dateTimetoStringInput } from './utility/toStringInput.js';
 export default {
+    name: 'InputDatetime',
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },
@@ -38,7 +40,7 @@ export default {
         autocomplete: { type: String, required: false },
         placeholder: { type: String, required: false },
     },
-    data() { return {  }; },
+    data() { return {}; },
     methods: {
     },
     computed: {
@@ -65,7 +67,7 @@ export default {
             return this.max ? dateTimetoStringInput(this.max) : (this.validation?.max ? dateTimetoStringInput(this.validation.max) : false);
         },
         errorDefaultText() {
-            return this.errorContent ? this.errorContent : `Seleziona una data${this.minToSet ? ', dopo il ' + new Date(this.minToSet).toLocaleString()  : ''}${this.maxToSet ? ', prima del ' + new Date(this.maxToSet).toLocaleString()  : ''}.`;
+            return this.errorContent ? this.errorContent : `Seleziona una data${this.minToSet ? ', dopo il ' + new Date(this.minToSet).toLocaleString() : ''}${this.maxToSet ? ', prima del ' + new Date(this.maxToSet).toLocaleString() : ''}.`;
         },
         classValidator() {
             const classValidator = this.modelValue.classValidator(this.field);
@@ -84,6 +86,11 @@ export default {
             }
             return classValidator
         },
+    },
+    created() {
+        if (this.modelValue === undefined) {
+            throw new Error("non hai passato form in v-model o errato");
+        }
     },
     mounted() {
         let validation = this.validation

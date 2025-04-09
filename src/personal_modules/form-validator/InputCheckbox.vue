@@ -15,6 +15,7 @@
 <script>
 import { Tooltip } from 'bootstrap';
 export default {
+    name: 'InputCheckbox',
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },

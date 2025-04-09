@@ -18,6 +18,7 @@
 <script>
 import { Tooltip } from 'bootstrap';
 export default {
+    name: 'InputNumber',
     props: {
         field: { type: String, required: true },
         modelValue: { type: Object, required: true },

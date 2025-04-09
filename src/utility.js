@@ -50,6 +50,7 @@ export default {
         if (!(date instanceof Date)) {
             date = new Date(date);
         }
+        if (isNaN(date.getTime())) { return '-'; }
         return date.toLocaleString().slice(0, 17);
     },
 
@@ -118,4 +119,18 @@ export default {
         { value: 'trans-female', text: 'Trans Female' },
         { value: 'other', text: 'Other' }
     ],
+
+    // Contolla se una var è vuota
+    isEmpty(value) {
+        if (value == null) return true; // null o undefined
+        if (typeof value === 'boolean') return !value; // false è vuoto
+        if (typeof value === 'number') return value === 0; // 0 è vuoto
+        if (typeof value === 'string') return value.trim() === ''; // stringa vuota o solo spazi
+        if (Array.isArray(value)) return value.length === 0; // array vuoto
+        if (typeof value === 'object') return Object.keys(value).length === 0; // oggetto vuoto
+
+        return false; // tutto il resto è considerato non vuoto
+    },
+    // Contolla se una var non è vuota
+    isNotEmpty(value) { return !this.isEmpty(value); },
 }
