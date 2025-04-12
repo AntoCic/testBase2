@@ -31,6 +31,8 @@
               <th scope="col">type</th>
               <th scope="col">task</th>
               <th scope="col">Data</th>
+              <th scope="col"> </th>
+              <th scope="col"> </th>
             </tr>
           </thead>
           <tbody>
@@ -39,6 +41,15 @@
               <td>{{ todo.type }}</td>
               <td>{{ todo.task }}</td>
               <td>{{ $u.dateToEasyRead(todo.date) }}</td>
+              <td>
+                <BtnModal :name="'deleteTodo' + key" @onConfirm="todos.deleteAndSyncLocal(key)" />
+              </td>
+              <td>
+                <button type="button" class="btn btn-outline-warning rounded-circle p-1 border-0" data-bs-toggle="modal"
+                  :data-bs-target="`#editTodo`" @click="setCurrentTodoEdit(key)">
+                  <span class="material-symbols-outlined d-block"> edit_square </span>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -56,18 +67,42 @@
     </div>
 
   </div>
+
+  <div class="modal fade text-dark" id="editTodo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="modalLabel" aria-hidden="true">
+    <div :class="`modal-dialog modal-dialog-centered`">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5">Modifica</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="() => { }">
+            <InputSelect label :options="optionsTodoTypes" field="type" v-model="formTodoEdit" />
+            <InputText label labelClass="mt-2" field="task" lazy v-model="formTodoEdit" required />
+            <InputDatetime label labelClass="mt-2" field="date" v-model="formTodoEdit" />
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">indietro</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="editTodo">Modifica</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 // TODO add loading state in form.state di form-validator
 import Btn from '../../components/Btn.vue';
+import BtnModal from '../../components/BtnModal.vue';
 import FormValidator from '../../personal_modules/form-validator/FormValidator';
 import InputText from '../../personal_modules/form-validator/InputText.vue';
 import InputDatetime from '../../personal_modules/form-validator/InputDatetime.vue';
 import InputSelect from '../../personal_modules/form-validator/InputSelect.vue';
 import { todoTypes, todos } from '../../stores/todos';
 export default {
-  components: { InputText, InputDatetime, InputSelect, Btn },
+  components: { InputText, InputDatetime, InputSelect, Btn, BtnModal },
   data() {
     return {
       todoTypes,
@@ -78,6 +113,12 @@ export default {
         type: null,
         date: null,
       }),
+      formTodoEdit: new FormValidator({
+        task: '',
+        type: null,
+        date: null,
+      }),
+      currentEditing: '',
       loadingSenderType: false,
       loadingSenderTodo: false
     };
@@ -108,7 +149,24 @@ export default {
 
       }
 
-    }
+    },
+    async setCurrentTodoEdit(key) {
+      const todo = this.todos[key];
+      this.currentEditing = key
+      
+      this.formTodoEdit.task = todo.task
+      this.formTodoEdit.type = todo.type
+      this.formTodoEdit.date = new Date(todo.date) 
+    },
+    async editTodo() {
+      if (this.formTodoEdit.check()) {
+        const resorce = this.formTodoEdit.get()
+        if (resorce !== undefined) {
+          const newData = { [this.currentEditing]: resorce }
+          await this.todos.updateAndSyncLocal(newData);
+        }
+      }
+    },
   },
   computed: {
     optionsTodoTypes() {

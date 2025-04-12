@@ -1,22 +1,20 @@
 <template>
   
-  <BtnModalConfirm name="test" @onConfirm="elimina" @onHide="annulla" />
+  <BtnModal name="test" @onConfirm="elimina" @onHide="annulla" />
 </template>
 
 <script>
-import BtnModalConfirm from './BtnModalConfirm.vue';
+import BtnModal from './BtnModal.vue';
 
 export default {
   name: 'DeveloperModeHome',
-  components: { BtnModalConfirm },
+  components: { BtnModal },
   methods: {
     elimina() {
       console.log('elimino');
-
     },
     annulla() {
       console.log('annulla');
-
     }
   },
   data() { return {}; }

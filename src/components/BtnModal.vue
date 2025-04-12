@@ -11,19 +11,19 @@
         aria-labelledby="modalLabel" aria-hidden="true">
         <div :class="`modal-dialog modal-dialog-centered modal-dialog-scrollable${modalSize}`">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5">{{ header }}</h2>
+                <div class="modal-header" v-if="showHeader">
+                    <h2 v-if="header && header !== ''" class="modal-title fs-5">{{ header }}</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="$emit('onHide')"></button>
                 </div>
                 <div class="modal-body">
                     {{ body }}
                 </div>
-                <div class="modal-footer">
-                    <button v-if="btnBack !== ''" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        @click="$emit('onHide')">{{ btnBack }}</button>
-                    <button v-if="btnSend !== ''" type="button" class="btn btn-success" data-bs-dismiss="modal"
-                        @click="confirm">{{ btnSend }}</button>
+                <div class="modal-footer" v-if="showFooter">
+                    <button v-if="btnBack && btnBack !== ''" type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal" @click="$emit('onHide')">{{ btnBack }}</button>
+                    <button v-if="btnSend && btnSend !== ''" type="button" class="btn btn-success"
+                        data-bs-dismiss="modal" @click="$emit('onConfirm')">{{ btnSend }}</button>
                 </div>
             </div>
         </div>
@@ -31,14 +31,14 @@
 </template>
 
 <script>
-// todo add prop closeBtnShow headerShow footerShow 
 export default {
-    name: 'BtnModalConfirm',
+    name: 'BtnModal',
     data() { return {}; },
     props: {
         name: { type: String, required: true },
         body: { type: String, default: 'Sei sicuro di voler eliminare?' },
-        header: { type: String, default: '' },
+        header: { type: [String, Boolean], default: false },
+        btnColse: { type: Boolean, default: true },
         btn: { type: String, default: 'secondary' },
         btnBack: { type: String, default: 'Indietro' },
         btnSend: { type: String, default: 'Conferma' },
@@ -47,17 +47,11 @@ export default {
         size: { type: String, default: '' },
     },
     methods: {
-        confirm() {
-            this.$emit('onConfirm');
-            //   const modal = bootstrap.Modal.getInstance(document.getElementById(this.name));
-            //   if (modal) modal.hide();
-        }
     },
     computed: {
-        modalSize() {
-            if (this.size === '') return ''
-            return `modal-${this.size}`
-        }
+        modalSize() { return this.size === '' ? '' : `modal-${this.size}` },
+        showHeader() { return this.header || this.btnColse },
+        showFooter() { return this.btnBack || this.btnSend },
     }
 }
 </script>
