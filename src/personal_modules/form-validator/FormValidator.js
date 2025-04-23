@@ -29,7 +29,7 @@ export default class FormValidator {
         const methodNames = Object.getOwnPropertyNames(FormValidator.prototype).filter(name => name !== 'constructor');
 
         // Creiamo un oggetto per salvare lo stato iniziale di ogni campo
-        this.state = {};
+        this.state = { _loading: false };
         for (const field in fields) {
             if (Object.prototype.hasOwnProperty.call(fields, field)) {
                 // Controlliamo se il campo ha un nome riservato
@@ -98,7 +98,7 @@ export default class FormValidator {
     */
     reset() {
         for (const field in this.state) {
-            if (Object.prototype.hasOwnProperty.call(this.state, field)) {
+            if (Object.prototype.hasOwnProperty.call(this.state, field) && field !== '_loading') {
                 this[field] = this.state[field].initialValue;
                 this.state[field].validated = null;
             }

@@ -4,7 +4,6 @@ import { user } from './user';
 import log from '../personal_modules/log';
 
 export const sanitazeMainPath = (mainPath) => mainPath.replace(/[.#$/\[\]]/g, "_");
-
 class DbSync {
     static mainPath = "auth/dbSync";
     constructor(tables = {}) {
@@ -19,13 +18,55 @@ class DbSync {
         return res;
     }
 
+
+    async tableToUpdate() {
+        return axios.get(this.fullPath(), {
+            headers: { authorization: user.accessToken }
+        }).then(res => {
+            const dbSyncServer = res.data;
+            const tableToSync = []
+
+            for (const tabNameKey in dbSyncServer) {
+                if (this?.[tabNameKey]?.updatedAt !== undefined) {
+                    if (!dbSyncServer[tabNameKey]?.updatedAt) { log.error(`La tabella ${tabNameKey} non aveva updatedAt`); }
+                    const lastUpdateServer = new Date(dbSyncServer[tabNameKey]?.updatedAt ?? 0);
+                    const lastUpdateLocal = new Date(this[tabNameKey].updatedAt);
+
+                    if (lastUpdateServer > lastUpdateLocal) {
+                        tableToSync.push(tabNameKey);
+                    } else {
+                        // Se la data del server è più vecchia o uguale a quella locale, non fare nulla
+                        // console.log(`La tabella ${tabNameKey} è già aggiornata`);
+                    }
+                } else {
+                    tableToSync.push(tabNameKey);
+                }
+            }
+            if (!!tableToSync?.length) {
+                this.parse(res.data);
+                this.saveToLocal();
+            }
+            return tableToSync ?? [];
+        })
+    }
+
+    syncTab(tabNameKey) {
+        const functionToGetAndSync = this.tableToSync[tabNameKey];
+        if (!functionToGetAndSync) {
+            log.error(`La tabella ${tabNameKey} non è presente in tableToSync`);
+            return
+        }
+        functionToGetAndSync();
+    }
+
     async get() {
         return axios.get(this.fullPath(), {
             headers: { authorization: user.accessToken }
         }).then(res => {
             this.parse(res.data);
+            this.saveToLocal();
             return this;
-        }).catch(log.error);
+        })
     }
 
     async update(tabPathm, newData) {
@@ -39,6 +80,11 @@ class DbSync {
         }).catch(log.error);
     }
 
+    deleteLocal(key) {
+        if (this?.[key] !== undefined) { delete this?.[key]; }
+        this.saveToLocal();
+    }
+
     saveToLocal() {
         localStorage.setItem('dbSync', JSON.stringify(this));
     }
@@ -49,25 +95,11 @@ class DbSync {
         return this
     }
 
-    // start() {
-    //     if (store.repeatSync.state) {
-    //         await store.SYNC()
-    //         const fixBugHeaderTitle = store.headerTitle
+    clearLocal() {
+        localStorage.removeItem('dbSync');
+        return this;
+    }
 
-    //         if (store.routeName !== 'calendar') {
-    //             store.headerTitle = fixBugHeaderTitle;
-    //         } else {
-    //             store.calendar.generateCalendar();
-    //         }
-
-    //         setTimeout(store.repeatSync.start, (3 * 1000));
-    //     }
-    //     this.state = true
-    //     store.repeatSync.action()
-    // },
-    // stop() {
-    //     this.state = false
-    // },
 }
 
 export const dbSync = reactive(new DbSync().loadFromLocal());

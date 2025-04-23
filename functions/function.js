@@ -8,6 +8,7 @@
 import admin from 'firebase-admin';
 import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 import { log, handlerSlackMsg } from './logger';
+import { errorsList } from './errorsList';
 
 const routes = {
   public: {
@@ -153,7 +154,11 @@ class FIREBASE {
     try {
       const fullPath = this.getFullPath(event)
       const snapshot = await firebase.database.ref(fullPath).once('value');
-      return snapshot.val() || {};
+      const data = snapshot.val();
+      if (data === null) {
+        throw new Error(errorsList.notFound.key);
+      }
+      return data;
     } catch (error) {
       throw new Error(String(error));
     }
@@ -251,7 +256,7 @@ class EventHandler {
     this.bodyResponse = {};
 
     this.user = null;
-    log.interno.magenta(this);
+    log.interno.magenta(`${this.httpMethod} :: ${this.pathParams ? this.pathParams.join('/') : '_'} :: ${!!this.authorization ? 'AUTH KEY' : 'NO AUTH KEY'}`);
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
@@ -336,6 +341,13 @@ class EventHandler {
     }
   }
 
+  handlerError(error) {
+    const key = (error.message || '').replace(/^Error:\s*/, '').trim();
+    const code = errorsList[key].code ?? errorsList.unknown.code;
+    const msg = errorsList[key].msg ?? errorsList.unknown.msg;
+    return this.errorResponse(code, msg);
+  }
+
   async getroutesFunction(routes, oldDefaultFunction = undefined) {
     if (routes !== undefined) {
       const routToCheck = routes[this.pathParams?.[this.pathIndex]];
@@ -343,7 +355,11 @@ class EventHandler {
       if (routToCheck) {
         switch (typeof routToCheck) {
           case 'function':
-            return this.setResponse(await routToCheck(this));
+            return await routToCheck(this)
+              .then((response) => {
+                return this.setResponse(response);
+              })
+              .catch((error) => this.handlerError(error));
 
           case 'object':
             const currentFunction = routToCheck?.['']
@@ -366,7 +382,11 @@ class EventHandler {
         if (oldDefaultFunction !== undefined || routes[this.pathParams?.[this.pathIndex - 1]]) {
           switch (typeof oldDefaultFunction) {
             case 'function':
-              return this.setResponse(await oldDefaultFunction(this));
+              return await oldDefaultFunction(this)
+                .then((response) => {
+                  return this.setResponse(response);
+                })
+                .catch((error) => this.handlerError(error));
             case 'boolean':
             case 'string':
             case 'number':

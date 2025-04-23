@@ -12,7 +12,7 @@
         <h3>Add type</h3>
         <div class="input-group">
           <InputText field="todoType" lazy v-model="formType" inputGroup required />
-          <Btn type="submit" :loading="loadingSenderType" googleIcon="send"></Btn>
+          <Btn type="submit" :loading="formType.state._loading" googleIcon="send"></Btn>
           <Btn @click="formType.reset()" googleIcon="replay"></Btn>
         </div>
       </form>
@@ -60,7 +60,7 @@
           <InputSelect :options="optionsTodoTypes" field="type" v-model="formTodo" inputGroup />
           <InputText field="task" lazy v-model="formTodo" inputGroup required />
           <InputDatetime field="date" v-model="formTodo" inputGroup />
-          <Btn type="submit" :loading="loadingSenderTodo" googleIcon="send"></Btn>
+          <Btn type="submit" :loading="formTodo.state._loading" googleIcon="send"></Btn>
           <Btn @click="formTodo.reset()" googleIcon="replay"></Btn>
         </div>
       </form>
@@ -93,7 +93,6 @@
 </template>
 
 <script>
-// TODO add loading state in form.state di form-validator
 import Btn from '../../components/Btn.vue';
 import BtnModal from '../../components/BtnModal.vue';
 import FormValidator from '../../personal_modules/form-validator/FormValidator';
@@ -118,9 +117,7 @@ export default {
         type: null,
         date: null,
       }),
-      currentEditing: '',
-      loadingSenderType: false,
-      loadingSenderTodo: false
+      currentEditing: ''
     };
   },
   methods: {
@@ -128,9 +125,9 @@ export default {
       if (this.formType.check()) {
         const resorce = this.formType.get()?.todoType
         if (resorce !== undefined) {
-          this.loadingSenderType = true;
+          this.formType.state._loading = true;
           await todoTypes.add(resorce);
-          this.loadingSenderType = false;
+          this.formType.state._loading = false;
           this.formType.reset();
           this.todoTypes.saveLocal();
         }
@@ -140,9 +137,11 @@ export default {
       if (this.formTodo.check()) {
         const resorce = this.formTodo.get();
         if (resorce !== undefined) {
-          this.loadingSenderTodo = true;
-          todos.addAndSyncLocal(resorce);
-          this.loadingSenderTodo = false;
+          this.formTodo.state._loading = true;
+          await this.todos.addAndSyncLocal(resorce);
+          this.formTodo.state._loading = false;
+          console.log(this.formTodo);
+          
           this.formTodo.reset();
         }
       } else {

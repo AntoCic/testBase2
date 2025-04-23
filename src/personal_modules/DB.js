@@ -43,6 +43,12 @@ export default class DB {
         const data = this.getLocal();
         return data ? this.assign(data) : this;
     }
+    async getAndSyncLocal() {
+        const res = await this.get();
+        if (res instanceof Error) { throw res; }
+        this.saveLocal();
+        return this;
+    }
 
     // SAVE
     async save() {
@@ -115,6 +121,11 @@ export default class DB {
     async deleteAndSyncLocal(key) {
         this.deleteLocal(key);
         return this.delete(key);
+    }
+
+    clearLocal() {
+        localStorage.removeItem(this.localPath());
+        return this;
     }
 
     // Notifica l'aggiornamento tramite dbSync (ad es. per sincronizzazione su altre schede)

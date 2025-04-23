@@ -47,6 +47,7 @@ export default {
     },
 
     dateToEasyRead(date) {
+        if (!date) { return '-'; }
         if (!(date instanceof Date)) {
             date = new Date(date);
         }

@@ -16,6 +16,8 @@ export const $s = reactive({
     accessToken: '',
     onLine: navigator.onLine,
 
+    pingSyncMS: (3 * 1000), // tempo di ping in millisecondi se 0 non viene eseguito
+
     async start() {
         $loading.on()
         setTimeout(async () => {
