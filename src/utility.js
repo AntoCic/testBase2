@@ -5,6 +5,7 @@ const onDevMod = import.meta.env.DEV || window.location.hostname === "localhost"
 
 export default {
     onDevMod,
+    isMaster: (email) => email === 'anto.cic.127@gmail.com',
     log,
 
     // crea un id univoco
