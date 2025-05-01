@@ -352,12 +352,18 @@ class EventHandler {
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
+    // try {
+    //   this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
+    // } catch (error) {
+    //   this.bodyParams = { msg: 'EventHandler error on JSON.parse(body): typeof body = ' + typeof body }
+    // }
     try {
       this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     } catch (error) {
-      this.bodyParams = { msg: 'EventHandler error on JSON.parse(body): typeof body = ' + typeof body }
+      log.error("Errore nel parsing del body:", error);
+      this.bodyParams = {};
     }
-    this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
+    // this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
     if (headers?.authorization) delete headers.authorization
     // this.headers = headers;
@@ -515,7 +521,6 @@ class EventHandler {
       if (routToCheck) {
         switch (typeof routToCheck) {
           case 'function':
-            console.log('routToCheck', routToCheck);
             try {
               const response = await routToCheck(this);
               return this.setResponse(response);
