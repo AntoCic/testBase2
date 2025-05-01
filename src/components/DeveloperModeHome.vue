@@ -1,6 +1,5 @@
 <template>
-
-  <BtnModal name="test" @onConfirm="elimina" @onHide="annulla" />
+  <BtnModal name="test" @onConfirm="cleanLocalStorage" @onHide="annulla" icon="autorenew" body="Sei sicuro di voler cancellare tutto il contenuto del local storage?" header="Clean localStorage" />
   <hr>
   <button type="button" class="btn btn-primary" @click="dbSyncGet"> call </button>
   <div v-if="response.length" class="col-12">
@@ -23,8 +22,13 @@ export default {
         .then((res) => { this.response.push(res); })
         .catch((err) => { this.response.push(this.$s.axiosError(err)); });
     },
-    elimina() {
-      console.log('elimino');
+    cleanLocalStorage() {
+      localStorage.removeItem('user_personalInfo');
+      localStorage.removeItem('auth_todo');
+      localStorage.removeItem('auth_todoType');
+      localStorage.removeItem('dbSync');
+      this.response.push('Local Storage pulito');
+      
     },
     annulla() {
       console.log('annulla');
