@@ -5,6 +5,7 @@
 
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+let contatore = 0;
 import admin from 'firebase-admin';
 // import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
@@ -427,18 +428,45 @@ class EventHandler {
   }
 
   async response() {
+    if (contatore < 2) {
+      contatore++;
+      return this.setResponse('step A:' + contatore);
+    }
     const firstPathParam = this.pathParams[0];
     if (firstPathParam === 'public') {
+
+      if (contatore < 4) {
+        contatore++;
+        return this.setResponse('step B:' + contatore);
+      }
       this.pathIndex++
       return this.getroutesFunction(this.routes.public?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
     }
     if (firstPathParam === 'auth') {
+
+      if (contatore < 4) {
+        contatore++;
+        return this.setResponse('step C:' + contatore);
+      }
       if (await this.isAuth()) {
+        if (contatore < 6) {
+          contatore++;
+          return this.setResponse('step D:' + contatore);
+        }
         if (this.pathParams[1] === 'user') {
+
+          if (contatore < 8) {
+            contatore++;
+            return this.setResponse('step user:' + contatore);
+          }
           const requestedUserId = this.pathParams?.[2];
           if (requestedUserId !== this.user.uid) {
             return this.errorResponse(403, 'Forbidden: userId does not match authenticated user');
           }
+        }
+        if (contatore < 9) {
+          contatore++;
+          return this.setResponse('step E:' + contatore);
         }
         this.pathIndex++
         return this.getroutesFunction(this.routes.auth?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
@@ -480,6 +508,10 @@ class EventHandler {
       const routToCheck = routes[this.pathParams?.[this.pathIndex]];
 
 
+      if (contatore < 11) {
+        contatore++;
+        return this.setResponse('step routes:' + contatore);
+      }
       if (routToCheck) {
         switch (typeof routToCheck) {
           case 'function':

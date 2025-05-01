@@ -104,7 +104,7 @@ export default {
           this.response.push(res.data);
         })
         .catch((err) => {
-          this.response.push(this.$s.this.$s.axiosError(err));
+          this.response.push(this.$s.axiosError(err));
         });
     },
   },
