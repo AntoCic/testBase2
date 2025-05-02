@@ -6,142 +6,18 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-// import { APP_NAME, onDevMod, allowedOrigins } from "./config";
-const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
-const APP_NAME = 'testBase2';
-const allowedOrigins = [
-  'http://localhost',
-  'https://tempbase2.netlify.app'
-];
-
-const errorsList = {
-  badRequest: { code: 400, msg: "Bad request", key: "badRequest" },
-  unauthorized: { code: 401, msg: "Unauthorized", key: "unauthorized" },
-  forbidden: { code: 403, msg: "Forbidden", key: "forbidden" },
-  notFound: { code: 404, msg: "Not found", key: "notFound" },
-  routeNotFound: { code: 404, msg: "Route not found", key: "routeNotFound" },
-  methodNotAllowed: { code: 405, msg: "Method not allowed", key: "methodNotAllowed" },
-  notAcceptable: { code: 406, msg: "Not acceptable", key: "notAcceptable" },
-  conflict: { code: 409, msg: "Conflict", key: "conflict" },
-  gone: { code: 410, msg: "Gone", key: "gone" },
-  unsupportedMedia: { code: 415, msg: "Unsupported media type", key: "unsupportedMedia" },
-  unprocessable: { code: 422, msg: "Unprocessable entity", key: "unprocessable" },
-  tooManyRequests: { code: 429, msg: "Too many requests", key: "tooManyRequests" },
-
-  internal: { code: 500, msg: "Internal server error", key: "internal" },
-  notImplemented: { code: 501, msg: "Not implemented", key: "notImplemented" },
-  badGateway: { code: 502, msg: "Bad gateway", key: "badGateway" },
-  serviceUnavailable: { code: 503, msg: "Service unavailable", key: "serviceUnavailable" },
-  gatewayTimeout: { code: 504, msg: "Gateway timeout", key: "gatewayTimeout" },
-
-  invalidToken: { code: 401, msg: "Invalid or expired token", key: "invalidToken" },
-  missingToken: { code: 401, msg: "Authorization token missing", key: "missingToken" },
-  invalidParams: { code: 400, msg: "Invalid parameters", key: "invalidParams" },
-  invalidBody: { code: 400, msg: "Invalid request body", key: "invalidBody" },
-  missingFields: { code: 400, msg: "Required fields are missing", key: "missingFields" },
-  validationFailed: { code: 422, msg: "Validation failed", key: "validationFailed" },
-  dbConnection: { code: 500, msg: "Database connection error", key: "dbConnection" },
-  firebaseInit: { code: 500, msg: "Firebase not initialized correctly", key: "firebaseInit" },
-  originNotAllowed: { code: 403, msg: "Origin not allowed", key: "originNotAllowed" },
-
-  fileTooLarge: { code: 413, msg: "Uploaded file is too large", key: "fileTooLarge" },
-  fileFormatInvalid: { code: 415, msg: "Invalid file format", key: "fileFormatInvalid" },
-  fileNotFound: { code: 404, msg: "File not found", key: "fileNotFound" },
-
-  unknown: { code: 500, msg: "An unknown error occurred", key: "unknown" },
-};
-
-function logColor(content, color = 'info') {
-  const strColors = {
-    white: "\x1b[37m", error: "\x1b[31m", warning: "\x1b[33m",
-    info: "\x1b[34m", success: "\x1b[32m", magenta: "\x1b[35m", black: "\x1b[30m"
-  };
-  const strColor = strColors[color] || strColors.info;
-  console.log(strColor, content, "\x1b[0m");
-}
-function hr(type = 'white', double = true, length = 10) {
-  const line = (double ? '=' : '-').repeat(length);
-  logColor(line, type);
-}
-function logInterno(content, type) {
-  hr(type); console.log(content); hr(type, false);
-}
-async function slackMsg(content, type) {
-  const typeWebhookURL = {
-    error: process.env.SLACK_WEBHOOK_ERROR,
-    warning: process.env.SLACK_WEBHOOK_WARNING,
-    info: process.env.SLACK_WEBHOOK_INFO,
-  }
-  let webhookURL = typeWebhookURL[type];
-
-  if (!webhookURL) { log.colored.warning('IMPORTANTE: Non è stato settato il webhookURL per Slack'); }
-  if (onDevMod) { logInterno(content, type); return false; }
-  if (!webhookURL) { return false; }
-
-  const errorCase = "Slack webhookURL error nell'invio della notifica"
-  const payload = { text: `${APP_NAME}: ${JSON.stringify(content)}` };
-  try {
-    const response = await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!response.ok) {
-      log.colored.error(`${errorCase} -> ${response.status} - ${response.statusText}`);
-      return false;
-    }
-    return true;
-  } catch (error) {
-    log.colored.error(`${errorCase} -> ${error}`);
-    return false;
-  }
-}
-const log = Object.assign(
-  async function (content) { return await slackMsg(content, 'info'); },
-  {
-    error: async (content) => await slackMsg(content, 'error'),
-    warning: async (content) => await slackMsg(content, 'warning'),
-    info: async (content) => await slackMsg(content, 'info'),
-
-    interno: {
-      error: (content) => logInterno(content, 'error'),
-      warning: (content) => logInterno(content, 'warning'),
-      info: (content) => logInterno(content, 'info'),
-      success: (content) => logInterno(content, 'success'),
-      magenta: (content) => logInterno(content, 'magenta')
-    },
-
-    colored: {
-      error: (content) => logColor(content, 'error'),
-      warning: (content) => logColor(content, 'warning'),
-      info: (content) => logColor(content, 'info'),
-      success: (content) => logColor(content, 'success'),
-      magenta: (content) => logColor(content, 'magenta')
-    },
-  }
-);
-
-async function handlerSlackMsg(event) {
-  if (!event.isOriginAllowed) { return; }
-  let type = 'error';
-  switch (event.bodyParams?.type) {
-    case 'error':
-    case 'warning':
-    case 'info':
-      type = event.bodyParams.type;
-      break;
-  }
-  const content = event.bodyParams?.content ?? 'ERRORE (body.content === undefined)';
-  return { sended: await log[type](content) }
-}
-
-// import { log, handlerSlackMsg } from './logger';
+import { APP_NAME, onDevMod, allowedOrigins } from "./config";
+import { log, handlerSlackMsg } from './logger';
+import { errorsList } from './errorsList';
 
 const routes = {
   public: {
     GET: {
       "": async (event) => await firebase.get(event),
       "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
+      "importTest": (event) => {
+        return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: ${JSON.stringify(errorsList)}`
+      },
     },
     POST: {
       "": async (event) => await firebase.post(event),
