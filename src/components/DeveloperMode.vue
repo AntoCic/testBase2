@@ -19,7 +19,7 @@
       <div v-for="(tab, i) in tabs" :class="`tab-pane fade${i === 0 ? ' show active' : ''}`"
         :id="`nav-dev-mode-${tab.name}`" role="tabpanel" :aria-labelledby="`nav-dev-mode-${tab.name}-tab`" tabindex="0">
         <component v-if="tab.content" :is="tab.content" />
-        <pre v-if="tab.pre" class="w-100"> {{ tab.pre }} </pre>
+        <pre v-if="tab.pre" class="w-100"> {{ format(tab.pre) }} </pre>
       </div>
 
     </div>
@@ -75,6 +75,27 @@ export default {
   watch: {
     isChecked(val) {
       console.log('Developer mode:', val);
+    },
+  },
+  methods: {
+    format(obj) {
+      try {
+        return JSON.stringify(obj, this.circularReplacer(), 2);
+      } catch (e) {
+        return '[object with circular references]';
+      }
+    },
+    circularReplacer() {
+      const seen = new WeakSet();
+      return (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return '[Circular]';
+          }
+          seen.add(value);
+        }
+        return value;
+      };
     }
   },
   computed: {
