@@ -2,7 +2,7 @@
   <div class="container my-auto text-white">
     <div class="row justify-content-center text-center">
       <div class="col-12 mb-3">
-        <h1>Call</h1>
+        <h1>Slack Msg</h1>
       </div>
       <div class="col-12">
         <div class="input-group">

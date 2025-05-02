@@ -7,7 +7,7 @@ async function slackMsg(type, content) {
         return false;
     }
     if (navigator.onLine) {
-        return await fetch('/api/slackMsg', {
+        return await fetch('/api/public/slackMsg', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ type, content }),

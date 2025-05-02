@@ -16,7 +16,7 @@ const routes = {
       "": async (event) => await firebase.get(event),
       "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
       "importTest": (event) => {
-        return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: ${JSON.stringify(errorsList)}`
+        return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
       },
     },
     POST: {

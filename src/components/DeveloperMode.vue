@@ -27,7 +27,7 @@
 
   <!-- Checkbox con icona in lable per attivare il div di sopra -->
   <input type="checkbox" id="devModeToggle" class="d-none" v-model="isChecked" />
-  <label for="devModeToggle" v-if="showButton" type="button"
+  <label for="devModeToggle" v-show="showButton" type="button"
     class="position-fixed max-z-index top-0 end-0 m-2 material-symbols-outlined text-info" :class="$attrs.class"
     :style="$attrs.style">
     developer_mode
@@ -72,8 +72,8 @@ export default {
       ]
     };
   },
-  computed:{
-    showButton(){
+  computed: {
+    showButton() {
       return this.$u.onDevMod || this.$u.isMaster(this.user.email);
     }
   }
