@@ -79,7 +79,12 @@ const routes = Object.keys(fullRoutes).reduce((acc, key) => {
   return acc;
 }, {});
 
+const routesList = Object.keys(fullRoutes).reduce((acc, key) => {
+  acc[key] = fullRoutes[key].map(route => (`[${route.path}]: ${route.name}`));
+  return acc;
+}, {});
+
 const routerRoutes = [...fullRoutes.public, ...fullRoutes.notAuth, ...fullRoutes.auth];
 const router = createRouter({ history: createWebHistory(), routes: routerRoutes })
 
-export { router, routes };
+export { router, routes, routesList };

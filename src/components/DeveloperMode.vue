@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { routesList } from '../router';
 import { user } from '../stores/user';
 import DeveloperModeHome from './DeveloperModeHome.vue';
 
@@ -67,42 +68,37 @@ export default {
           name: 'router',
           icon: 'route',
           title: 'ROUTER',
-          pre: this.$router,
+          pre: routesList,
         }
       ]
-    };
+  };
+},
+methods: {
+  format(obj) {
+    try {
+      return JSON.stringify(obj, this.circularReplacer(), 2);
+    } catch (e) {
+      return '[object with circular references]';
+    }
   },
-  watch: {
-    isChecked(val) {
-      console.log('Developer mode:', val);
-    },
-  },
-  methods: {
-    format(obj) {
-      try {
-        return JSON.stringify(obj, this.circularReplacer(), 2);
-      } catch (e) {
-        return '[object with circular references]';
-      }
-    },
-    circularReplacer() {
-      const seen = new WeakSet();
-      return (key, value) => {
-        if (typeof value === 'object' && value !== null) {
-          if (seen.has(value)) {
-            return '[Circular]';
-          }
-          seen.add(value);
+  circularReplacer() {
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
         }
-        return value;
-      };
-    }
-  },
-  computed: {
-    showButton() {
-      return this.$u.onDevMod || this.$u.isMaster(this.user.email);
-    }
+        seen.add(value);
+      }
+      return value;
+    };
   }
+},
+computed: {
+  showButton() {
+    return this.$u.onDevMod || this.$u.isMaster(this.user.email);
+  }
+}
 };
 </script>
 
@@ -118,7 +114,7 @@ export default {
   right: 0;
   bottom: 0;
   z-index: 9999998;
-  background-color: rgba(0, 0, 0, 0.88);
+  background-color: rgba(0, 0, 0, 0.94);
 }
 
 .nav-scoped {
