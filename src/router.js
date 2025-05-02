@@ -26,6 +26,7 @@ import E_InputSearch from './views/example/E_InputSearch.vue'
 import E_InputTel from './views/example/E_InputTel.vue'
 import E_SlackMsg from './views/example/E_SlackMsg.vue'
 import E_todoTyped from './views/example/E_todoTyped.vue'
+import E_Toast from './views/example/E_Toast.vue'
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 
 const fullRoutes = {
@@ -39,6 +40,7 @@ const fullRoutes = {
     { path: '/example', name: 'example.home', component: ExampleHomeView },
     { path: '/example/call', name: 'example.call', component: E_Call },
     { path: '/example/slackMsg', name: 'example.slackMsg', component: E_SlackMsg },
+    { path: '/example/toast', name: 'example.toast', component: E_Toast },
     { path: '/example/InputText', name: 'example.InputText', component: E_InputText },
     { path: '/example/InputTextIcon', name: 'example.InputTextIcon', component: E_InputTextIcon },
     { path: '/example/InputCheckbox', name: 'example.InputCheckbox', component: E_InputCheckbox },

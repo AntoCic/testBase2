@@ -2,6 +2,7 @@
 <template>
   <CmpLoading v-if="$s.isLogged !== null ? $loading.state : false" />
 
+  <Toast />
   <template v-if="$s.isLogged !== null">
     <AppHeader />
     <main class="d-flex">
@@ -24,8 +25,10 @@ import DeveloperMode from './components/DeveloperMode.vue';
 import { todos } from './stores/todos.js';
 import { todoTypes } from './stores/todos.js';
 import log from './personal_modules/log.js';
+import Toast from './components/toast/Toast.vue';
+
 export default {
-  components: { AppHeader, AppFooter, CmpLoading, DeveloperMode },
+  components: { AppHeader, AppFooter, CmpLoading, DeveloperMode, Toast },
   data() {
     return {
       user,

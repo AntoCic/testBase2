@@ -65,6 +65,11 @@ export default {
           pre: user,
         },
         {
+          name: 'toast',
+          icon: 'mode_comment',
+          pre: this.$toastQueue,
+        },
+        {
           name: 'router',
           icon: 'route',
           title: 'ROUTER',

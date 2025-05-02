@@ -4,6 +4,7 @@ import './style/general.scss'
 import * as bootstrap from 'bootstrap'
 import { router } from './router'
 import { $s } from './stores/store.js'
+import { $toast } from './stores/toast.js'
 import { $loading } from './stores/loading.js'
 import $u from './utility.js'
 
@@ -12,6 +13,7 @@ app.use(router)
 app.config.globalProperties.$s = $s;
 app.config.globalProperties.$u = $u;
 app.config.globalProperties.$loading = $loading;
+app.config.globalProperties.$toast = $toast;
 
 app.mount('#app')
 
