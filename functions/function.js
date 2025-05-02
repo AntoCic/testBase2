@@ -360,7 +360,7 @@ class EventHandler {
     try {
       this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     } catch (error) {
-      log.error("Errore nel parsing del body:", error);
+      log.error(`Errore nel parsing del body: ${String(body)} :: ${error}`);
       this.bodyParams = {};
     }
     // this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
