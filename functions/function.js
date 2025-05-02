@@ -5,7 +5,6 @@
 
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-let contatore = 0;
 import admin from 'firebase-admin';
 // import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 const onDevMod = process.env.NETLIFY_DEV === "true" || process.env.NODE_ENV === "development";
@@ -352,18 +351,14 @@ class EventHandler {
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
-    // try {
-    //   this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
-    // } catch (error) {
-    //   this.bodyParams = { msg: 'EventHandler error on JSON.parse(body): typeof body = ' + typeof body }
-    // }
     try {
       this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     } catch (error) {
-      log.error(`Errore nel parsing del body: ${String(body)} :: ${error}`);
-      this.bodyParams = {};
+      this.bodyParams = body;
+      if (body !== null && body !== '') {
+        log.error(`Errore nel parsing del body: ${String(body)} :: ${error}`);
+      }
     }
-    // this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     this.authorization = headers?.authorization;
     if (headers?.authorization) delete headers.authorization
     // this.headers = headers;
@@ -434,45 +429,19 @@ class EventHandler {
   }
 
   async response() {
-    if (contatore < 2) {
-      contatore++;
-      return this.setResponse('step A:' + contatore);
-    }
     const firstPathParam = this.pathParams[0];
     if (firstPathParam === 'public') {
-
-      if (contatore < 4) {
-        contatore++;
-        return this.setResponse('step B:' + contatore);
-      }
       this.pathIndex++
       return this.getroutesFunction(this.routes.public?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
     }
     if (firstPathParam === 'auth') {
 
-      if (contatore < 4) {
-        contatore++;
-        return this.setResponse('step C:' + contatore);
-      }
       if (await this.isAuth()) {
-        if (contatore < 6) {
-          contatore++;
-          return this.setResponse('step D:' + contatore);
-        }
         if (this.pathParams[1] === 'user') {
-
-          if (contatore < 8) {
-            contatore++;
-            return this.setResponse('step user:' + contatore);
-          }
           const requestedUserId = this.pathParams?.[2];
           if (requestedUserId !== this.user.uid) {
             return this.errorResponse(403, 'Forbidden: userId does not match authenticated user');
           }
-        }
-        if (contatore < 9) {
-          contatore++;
-          return this.setResponse('step E:' + contatore);
         }
         this.pathIndex++
         return this.getroutesFunction(this.routes.auth?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
@@ -512,12 +481,6 @@ class EventHandler {
   async getroutesFunction(routes, oldDefaultFunction = undefined) {
     if (routes !== undefined) {
       const routToCheck = routes[this.pathParams?.[this.pathIndex]];
-
-
-      if (contatore < 11) {
-        contatore++;
-        return this.setResponse('step routes:' + contatore);
-      }
       if (routToCheck) {
         switch (typeof routToCheck) {
           case 'function':
@@ -573,6 +536,16 @@ class EventHandler {
 }
 
 exports.handler = async function (event, context) {
-  const call = new EventHandler(event, routes);
-  return call.response();
+  try {
+    const call = new EventHandler(event, routes);
+    return call.response();
+  } catch (error) {
+    log.error(String(error));
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(error),
+    }
+  }
+
 };
