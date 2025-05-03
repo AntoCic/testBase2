@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import { $loading } from './loading.js'
+import { $toast } from './toast.js';
 import axios from "axios";
 
 // store
@@ -62,7 +63,7 @@ export const $s = reactive({
         const errorMsg = error.response?.data?.error ?? `Errore: ${error.response?.status} - ${error.response?.statusText}`
         console.error(errorMsg)
         console.log(error);
-        // todo tost
+        $toast.error(errorMsg)
         return errorMsg
     }
 

@@ -6,8 +6,16 @@
       </div>
       <div class="col-12 col-md-6 border border-light pb-3">
         <h3>All type</h3>
-        <p v-for="(todoType, key) in todoTypes" :key="key">{{ `${key}:${todoType}` }}</p>
+
+        <div class="input-group mb-3" v-for="(todoType, key) in todoTypes" :key="key">
+          <span class="input-group-text form-control">
+            {{ todoType }}
+          </span>
+          <BtnModal :name="'deleteTodoType' + key" class="btn btn-outline-secondary rounded-end"
+            @onConfirm="handleDeleteTypes(key)" />
+        </div>
       </div>
+
       <form @submit.prevent="handleSubmitTypes" class="col-12 col-md-6 border border-light pb-3">
         <h3>Add type</h3>
         <div class="input-group">
@@ -133,6 +141,10 @@ export default {
         }
       }
     },
+    async handleDeleteTypes(key) {
+      todoTypes.deleteAndSyncLocal(key).then(() => { this.$toast.success('Deleted'); })
+
+    },
     async handleSubmitTodo() {
       if (this.formTodo.check()) {
         const resorce = this.formTodo.get();
@@ -141,7 +153,7 @@ export default {
           await this.todos.addAndSyncLocal(resorce);
           this.formTodo.state._loading = false;
           console.log(this.formTodo);
-          
+
           this.formTodo.reset();
         }
       } else {
@@ -152,10 +164,10 @@ export default {
     async setCurrentTodoEdit(key) {
       const todo = this.todos[key];
       this.currentEditing = key
-      
+
       this.formTodoEdit.task = todo.task
       this.formTodoEdit.type = todo.type
-      this.formTodoEdit.date = new Date(todo.date) 
+      this.formTodoEdit.date = new Date(todo.date)
     },
     async editTodo() {
       if (this.formTodoEdit.check()) {
