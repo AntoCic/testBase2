@@ -7,11 +7,34 @@ import { nanoid } from 'nanoid';
 export default class DB {
 
     parse(res) {
+        if (res && typeof res === 'object' && !Array.isArray(res)) {
+            const parsed = {};
+            for (const [key, val] of Object.entries(res)) {
+                if (key.startsWith('date') && typeof val === 'string') {
+                    parsed[key] = new Date(val);
+                } else {
+                    parsed[key] = val;
+                }
+            }
+            return parsed;
+        }
         return res;
     }
     assign(res) {
         const parsed = this.parse(res)
         if (parsed) Object.assign(this, parsed);
+        return this;
+    }
+    set(res) {
+        const parsed = this.parse(res);
+        if (parsed) {
+            for (const key in this) {
+                if (Object.prototype.hasOwnProperty.call(this, key)) {
+                    delete this[key];
+                }
+            }
+            Object.assign(this, parsed);
+        }
         return this;
     }
 
@@ -32,7 +55,7 @@ export default class DB {
         return axios.get(this.fullPath(), {
             headers: this.headers()
         }).then(res => {
-            return this.assign(res.data);
+            return this.set(res.data);
         }).catch(error => { log.error(error); return error; });
     }
     getLocal() {
@@ -106,12 +129,11 @@ export default class DB {
     // DELETE
     async delete(key) {
         delete this[key];
-        return axios.put(this.fullPath(), { [key]: null }, {
-            headers: this.headers()
-        }).then(res => {
-            this.tabUpdated();
-            return this;
-        }).catch(error => { log.error(error); throw error; });
+        return axios.delete(this.fullPath(), { params: { key }, headers: this.headers() })
+            .then(res => {
+                this.tabUpdated();
+                return this;
+            }).catch(error => { log.error(error); throw error; });
     }
     deleteLocal(key) {
         const data = this.getLocal() ?? {};

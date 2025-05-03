@@ -192,7 +192,9 @@ class FIREBASE {
   async delete(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).remove();
+      const key = event?.queryParams?.key;
+      if (!key) { throw new Error("Try to delete, params: { key } non presente"); }
+      await firebase.database.ref(fullPath + '/' + key).remove();
       return { deleted: event.pathParams.at(-1) };
     } catch (error) {
       log.error(String(error))

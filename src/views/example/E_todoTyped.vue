@@ -152,7 +152,6 @@ export default {
           this.formTodo.state._loading = true;
           await this.todos.addAndSyncLocal(resorce);
           this.formTodo.state._loading = false;
-          console.log(this.formTodo);
 
           this.formTodo.reset();
         }
@@ -189,8 +188,6 @@ export default {
     }
   },
   created() {
-    console.log(todos);
-
     this.todos.assignLocal().get();
     this.todoTypes.assignLocal().get();
   }
