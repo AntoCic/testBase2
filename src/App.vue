@@ -38,6 +38,7 @@ export default {
       todoTypes,
 
       pingInterval: null,
+      isPinging: false,
       failedPings: 0,
     }
   },
@@ -93,56 +94,73 @@ export default {
       window.addEventListener('online', this.updateOnlineStatus);
       window.addEventListener('offline', this.updateOnlineStatus);
     },
-    forceGetTabs(tabsName) {
-      if (!tabsName.length) return;
-      console.log('Tabs to get and sync', tabsName);
 
-      const catchGetTab = (error, tabNameToGet) => {
-        console.log('Errore nel recupero della tab ' + tabNameToGet, error);
-        this.dbSync.deleteLocal(tabNameToGet);
-      };
+    async drainOfflineActions() {
+      localStorage.setItem('offlineActions', JSON.stringify(appointmentLocalToPush));
+    },
 
-      for (const tabNameToGet of tabsName) {
-        switch (tabNameToGet) {
-          case 'auth_todo':
-            todos.getAndSyncLocal().catch((error) => { catchGetTab(error, tabNameToGet); });
-            break;
+    async forceGetTabs(tabsName) {
+      if (tabsName.length) {
+        const catchGetTab = (error, tabNameToGet) => {
+          console.log('Errore nel recupero della tab ' + tabNameToGet, error);
+          this.dbSync.deleteLocal(tabNameToGet);
+        };
 
-          case 'auth_todoType':
-            todoTypes.getAndSyncLocal().catch((error) => { catchGetTab(error, tabNameToGet); });
-            break;
+        const promises = tabsName.map((tabNameToGet) => {
+          switch (tabNameToGet) {
+            case 'auth_todo':
+              return todos.getAndSyncLocal()
+                .catch((error) => catchGetTab(error, tabNameToGet));
 
-          case 'user_personalInfo':
-            user.personalInfo.getAndSyncLocal().catch((error) => { catchGetTab(error, tabNameToGet); });
-            break;
+            case 'auth_todoType':
+              return todoTypes.getAndSyncLocal()
+                .catch((error) => catchGetTab(error, tabNameToGet));
 
-          default:
-            log.warn(`Sync tab ${tabNameToGet} non gestito`);
-            break;
-        }
+            case 'user_personalInfo':
+              return user.personalInfo.getAndSyncLocal()
+                .catch((error) => catchGetTab(error, tabNameToGet));
 
+            default:
+              log.warn(`Sync tab ${tabNameToGet} non gestito`);
+              return Promise.resolve();
+          }
+        });
+        await Promise.allSettled(promises);
       }
+      await this.$s.offlineActions.drain();
     },
 
     startPingLoop() {
       if (this.pingInterval || this.$s.pingSyncMS <= 0 || !this.$s.isLogged) return;
+      this.isPinging = true;
       this.dbSync.tableToUpdate()
-        .then((res) => { this.forceGetTabs(res); this.failedPings = 0; })
-        .catch((error) => { console.warn('Ping falliti', error); })
+        .then(async (res) => { await this.forceGetTabs(res); this.isPinging = false; this.failedPings = 0; })
+        .catch((error) => { console.warn('Ping falliti', error); this.isPinging = false; })
+
       this.pingInterval = setInterval(async () => {
-        if (this.failedPings > 0) {
-          this.failedPings++;
-          if (this.failedPings >= 3) {
-            console.warn(`Ping Falliti ${this.failedPings} volte.`);
-          }
-          return;
+        if (this.isPinging === false) {
+          this.isPinging = true;
+
+          return await this.dbSync.tableToUpdate()
+            .then(async (res) => {
+              await this.forceGetTabs(res);
+              this.isPinging = false;
+              this.failedPings = 0;
+            })
+            .catch((error) => {
+              this.failedPings++;
+              this.isPinging = false;
+
+              if (this.failedPings === 1) {
+                console.warn('Ping falliti', error);
+                this.$toast.warning({ title: 'Ops! Ritardo sincronizzazione', message: 'Stiamo incontrando qualche difficoltà a recuperare i dati. Riproviamo...' });
+              } else if (this.failedPings % 10 === 0) {
+                console.warn(`Ancora problemi dopo ${this.failedPings} tentativi:`, error);
+                this.$toast.error({ title: 'Problema persistente. Aggiorna!!', message: `Non riusciamo a sincronizzare i dati dopo ${this.failedPings} tentativi. Prova a ricaricare la pagina o controlla la connessione.` });
+              }
+
+            })
         }
-
-        this.failedPings = 1;
-
-        await this.dbSync.tableToUpdate()
-          .then((res) => { this.forceGetTabs(res); this.failedPings = 0; })
-          .catch((error) => { console.warn('Ping falliti', error); })
 
       }, this.$s.pingSyncMS);
     },
