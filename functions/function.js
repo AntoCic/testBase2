@@ -156,7 +156,7 @@ class FIREBASE {
   async get(event) {
     try {
       const fullPath = this.getFullPath(event)
-      const snapshot = await firebase.database.ref(fullPath).once('value');
+      const snapshot = await this.database.ref(fullPath).once('value');
       const data = snapshot.val();
       if (data === null) {
         throw new Error(errorsList.notFound.key);
@@ -170,7 +170,7 @@ class FIREBASE {
   async post(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).set(event.bodyParams);
+      await this.database.ref(fullPath).set(event.bodyParams);
       return;
     } catch (error) {
       log.error(String(error))
@@ -181,7 +181,7 @@ class FIREBASE {
   async put(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).update(event.bodyParams);
+      await this.database.ref(fullPath).update(event.bodyParams);
       return;
     } catch (error) {
       log.error(String(error))
@@ -194,7 +194,7 @@ class FIREBASE {
       const fullPath = this.getFullPath(event);
       const key = event?.queryParams?.key;
       if (!key) { throw new Error("Try to delete, params: { key } non presente"); }
-      await firebase.database.ref(fullPath + '/' + key).remove();
+      await this.database.ref(fullPath + '/' + key).remove();
       return { deleted: event.pathParams.at(-1) };
     } catch (error) {
       log.error(String(error))

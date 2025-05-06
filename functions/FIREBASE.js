@@ -75,19 +75,10 @@ export default class FIREBASE {
     this.bucket = this.storageBucket ? admin.storage().bucket() : undefined;
   }
 
-  // Method che risponde con un nuovo unique id ogni volta che viene chiamata
-  // newId() {
-  //   let newId = this.idIndex.toString(36)
-  //   this.idIndex++;
-  //   newId += Math.random().toString(36).substring(2, 7) // stringa casuale
-  //   newId += "-" + Date.now().toString(36) // converte in base 36
-  //   return newId;
-  // }
-
   async get(event) {
     try {
       const fullPath = this.getFullPath(event)
-      const snapshot = await firebase.database.ref(fullPath).once('value');
+      const snapshot = await this.database.ref(fullPath).once('value');
       const data = snapshot.val();
       if (data === null) {
         throw new Error(errorsList.notFound.key);
@@ -101,7 +92,7 @@ export default class FIREBASE {
   async post(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).set(event.bodyParams);
+      await this.database.ref(fullPath).set(event.bodyParams);
       return;
     } catch (error) {
       log.error(String(error))
@@ -112,7 +103,7 @@ export default class FIREBASE {
   async put(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).update(event.bodyParams);
+      await this.database.ref(fullPath).update(event.bodyParams);
       return;
     } catch (error) {
       log.error(String(error))
@@ -123,19 +114,15 @@ export default class FIREBASE {
   async delete(event) {
     try {
       const fullPath = this.getFullPath(event);
-      await firebase.database.ref(fullPath).remove();
+      const key = event?.queryParams?.key;
+      if (!key) { throw new Error("Try to delete, params: { key } non presente"); }
+      await this.database.ref(fullPath + '/' + key).remove();
       return { deleted: event.pathParams.at(-1) };
     } catch (error) {
       log.error(String(error))
       throw new Error(String(error));
     }
 
-  }
-
-  async getUser(authorization) {
-    const decodedToken = await admin.auth().verifyIdToken(authorization);
-    const user = await admin.auth().getUser(decodedToken.uid);
-    return user
   }
 
   getFullPath(event) { return '/' + event.pathParams.join('/'); }
