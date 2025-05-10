@@ -11,51 +11,107 @@ import { log, handlerSlackMsg } from './logger';
 import { errorsList } from './errorsList';
 import { FIREBASE } from './FIREBASE';
 
+// const routes = {
+//   public: {
+//     GET: {
+//       "": async (event) => await firebase.get(event),
+//       "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
+//       "importTest": (event) => {
+//         return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
+//       },
+//     },
+//     POST: {
+//       "": async (event) => await firebase.post(event),
+//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+//       slackMsg: handlerSlackMsg,
+//     },
+//     PUT: {
+//       "": async (event) => await firebase.put(event),
+//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+//     },
+//     PATCH: {
+//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+//     },
+//     DELETE: {
+//       "": async (event) => await firebase.delete(event),
+//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+//     },
+//   },
+
+//   auth: {
+//     GET: {
+//       "": async (event) => await firebase.get(event),
+//       "test": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
+//     },
+//     POST: {
+//       "": async (event) => await firebase.post(event),
+//       slackMsg: handlerSlackMsg,
+//     },
+//     PUT: {
+//       "": async (event) => await firebase.put(event),
+//     },
+//     PATCH: {},
+//     DELETE: {
+//       "": async (event) => await firebase.delete(event),
+//     },
+//   }
+// }
+
 const routes = {
-  public: {
-    GET: {
+  GET: {
+    public: {
       "": async (event) => await firebase.get(event),
       "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
       "importTest": (event) => {
         return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
       },
     },
-    POST: {
-      "": async (event) => await firebase.post(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-      slackMsg: handlerSlackMsg,
-    },
-    PUT: {
-      "": async (event) => await firebase.put(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-    PATCH: {
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-    DELETE: {
-      "": async (event) => await firebase.delete(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-  },
-
-  auth: {
-    GET: {
+    auth: {
       "": async (event) => await firebase.get(event),
       "test": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
     },
-    POST: {
+  },
+
+  POST: {
+    public: {
+      "": async (event) => await firebase.post(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+      slackMsg: handlerSlackMsg,
+    },
+    auth: {
       "": async (event) => await firebase.post(event),
       slackMsg: handlerSlackMsg,
     },
-    PUT: {
+  },
+
+  PUT: {
+    public: {
+      "": async (event) => await firebase.put(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    auth: {
       "": async (event) => await firebase.put(event),
     },
-    PATCH: {},
-    DELETE: {
+  },
+
+  PATCH: {
+    public: {
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    auth: {},
+  },
+
+  DELETE: {
+    public: {
+      "": async (event) => await firebase.delete(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    auth: {
       "": async (event) => await firebase.delete(event),
     },
-  }
-}
+  },
+};
+
 
 
 
@@ -94,7 +150,7 @@ if (routes.auth || typeof routes.auth === 'object') {
 
 // manca anche firebase e admin da passare
 class EventHandler {
-  constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }, routes) {
+  constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }, functionToResolve, user) {
     this.rawUrl = rawUrl;
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
@@ -126,13 +182,12 @@ class EventHandler {
       this.isOriginAllowed = false;
     }
 
-    this.routes = routes;
-    this.pathIndex = 0;
+    this.functionToResolve = functionToResolve;
     this.statusCode = 200;
     this.headersResponse = { "Content-Type": "application/json" };
     this.bodyResponse = {};
 
-    this.user = null;
+    this.user = user;
     log.interno.magenta(`${this.httpMethod} :: ${this.pathParams ? this.pathParams.join('/') : '_'} :: ${!!this.authorization ? 'AUTH KEY' : 'NO AUTH KEY'}`);
   }
 
@@ -155,49 +210,18 @@ class EventHandler {
     return pathParams
   }
 
-  async isAuth() {
-    if (!firebase) {
-      log.error("Devi settare tutte le chiavi di firebase nell'env");
-      return false;
-    }
-    if (!this.authorization) {
-      log.error("401, |I| Unauthorized");
-      this.user = undefined
-      return false;
-    }
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(this.authorization);
-      this.user = await admin.auth().getUser(decodedToken.uid);
-      return true;
-    } catch (error) {
-      log.error("401, |I| Unauthorized | authorization:" + this.authorization + '| error:' + JSON.stringify(error));
-      this.user = undefined
-      return false;
-    }
-  }
-
   async response() {
-    const firstPathParam = this.pathParams[0];
-    if (firstPathParam === 'public') {
-      this.pathIndex++
-      return this.getroutesFunction(this.routes.public?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
+    if (this.pathParams[0] === 'user' || this.pathParams[0] === 'public') {
+      return this.errorResponse(405, 'Rout Not Allowed. Miss /user o /public ');
     }
-    if (firstPathParam === 'auth') {
 
-      if (await this.isAuth()) {
-        if (this.pathParams[1] === 'user') {
-          const requestedUserId = this.pathParams?.[2];
-          if (requestedUserId !== this.user.uid) {
-            return this.errorResponse(403, 'Forbidden: userId does not match authenticated user');
-          }
-        }
-        this.pathIndex++
-        return this.getroutesFunction(this.routes.auth?.[this.httpMethod]) ?? this.errorResponse(404, 'Route not found');
-      } else {
-        return this.errorResponse(401, 'Unauthorized');
-      }
+    try {
+      const response = await this.functionToResolve(this);
+      return this.setResponse(response);
+    } catch (error) {
+      return this.handlerError(error)
     }
-    return this.errorResponse(403, 'Invalid route: must start with "public" or "auth"');
+
   }
 
   errorResponse(statusCode = 400, error = '400 Bad Request') {
@@ -226,67 +250,60 @@ class EventHandler {
     return this.errorResponse(code, msg);
   }
 
-  async getroutesFunction(routes, oldDefaultFunction = undefined) {
-    if (routes !== undefined) {
-      const routToCheck = routes[this.pathParams?.[this.pathIndex]];
-      if (routToCheck) {
-        switch (typeof routToCheck) {
-          case 'function':
-            try {
-              const response = await routToCheck(this);
-              return this.setResponse(response);
-            } catch (error) {
-              return this.handlerError(error)
-            }
-
-          case 'object':
-            const currentFunction = routToCheck?.['']
-            this.pathIndex++
-            return await this.getroutesFunction(routToCheck, currentFunction);
-
-          case 'boolean':
-          case 'string':
-          case 'number':
-            return this.setResponse(routToCheck);
-
-          default:
-            log.error('Rout dichiarata male, non è una function o un object');
-            return this.errorResponse(500, 'Rout dichiarata male, non è una function o un object');
-        }
-      } else {
-        if (this.pathIndex === 1) {
-          oldDefaultFunction = routes?.['']
-        }
-        if (oldDefaultFunction !== undefined || routes[this.pathParams?.[this.pathIndex - 1]]) {
-          switch (typeof oldDefaultFunction) {
-            case 'function':
-              try {
-                const response = await oldDefaultFunction(this);
-                return this.setResponse(response);
-              } catch (error) {
-                return this.handlerError(error)
-              }
-            case 'boolean':
-            case 'string':
-            case 'number':
-              return this.setResponse(oldDefaultFunction);
-            default:
-              log.error('Rout dichiarata male, non è una function o un object');
-              return this.errorResponse(500, 'Rout dichiarata male, non è una function o un object');
-          }
-        }
-        return this.errorResponse(404, 'Route not found');
-      }
-    } else {
-      return this.errorResponse(404, 'Route not found');
-    }
-  }
 }
 
 exports.handler = async function (event, context) {
+  const pathParams = event.path.split('/').slice(2);
+  if (pathParams.length === 0) pathParams.push('');
+
   try {
-    const call = new EventHandler(event, routes);
+    let user = undefined;
+    if (pathParams?.[0] === 'auth') {
+      if (event.headers?.authorization) {
+        const authorization = event.headers.authorization
+        try {
+          const decodedToken = await admin.auth().verifyIdToken(authorization);
+          user = await admin.auth().getUser(decodedToken.uid);
+        } catch (error) {
+          log.error("401, |I| Unauthorized: authorization not valid :" + authorization + '| error:' + JSON.stringify(error));
+          this.user = undefined
+          return {
+            statusCode: 401,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify('|I| Unauthorized: authorization not valid'),
+          }
+        }
+
+      } else {
+        return {
+          statusCode: 401,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify('|I| Unauthorized. Miss headers.authorization'),
+        }
+      }
+    }
+    const httpMethod = event?.httpMethod;
+    if (!httpMethod) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify("Missing or invalid HTTP method"),
+      }
+    };
+    
+    const functionToResolve = getRoutesFunction(routes[httpMethod], pathParams);
+
+    if (typeof functionToResolve === 'string') {
+      return {
+        statusCode: functionToResolve === 'Route not found' ? 404 : 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(functionToResolve),
+      }
+    }
+
+    const call = new EventHandler(event, functionToResolve, user);
     return call.response();
+
   } catch (error) {
     log.error(String(error));
     return {
@@ -297,3 +314,48 @@ exports.handler = async function (event, context) {
   }
 
 };
+
+function getRoutesFunction(_routes, pathParams, oldDefaultFunction = undefined, pathIndex = 0) {
+  if (_routes !== undefined) {
+    const routToCheck = _routes[pathParams?.[pathIndex]];
+
+    if (routToCheck) {
+      switch (typeof routToCheck) {
+        case 'function':
+          return routToCheck
+
+        case 'object':
+          const currentFunction = routToCheck?.['']
+          return getRoutesFunction(routToCheck, pathParams, currentFunction, pathIndex + 1);
+
+        case 'boolean':
+        case 'string':
+        case 'number':
+          return () => routToCheck;
+
+        default:
+          return 'Rout dichiarata male.';
+      }
+    } else {
+      if (pathIndex === 1) {
+        oldDefaultFunction = _routes?.['']
+      }
+      if (oldDefaultFunction !== undefined || _routes[pathParams?.[pathIndex - 1]]) {
+        switch (typeof oldDefaultFunction) {
+          case 'function':
+            return oldDefaultFunction;
+
+          case 'boolean':
+          case 'string':
+          case 'number':
+            return () => oldDefaultFunction;
+          default:
+            return 'Rout dichiarata male.';
+        }
+      }
+      return 'Route not found';
+    }
+  } else {
+    return 'Route not found';
+  }
+}
