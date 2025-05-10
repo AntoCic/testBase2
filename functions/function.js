@@ -10,71 +10,6 @@ import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 import { log, handlerSlackMsg } from './logger';
 import { errorsList } from './errorsList';
 
-const routes = {
-  public: {
-    GET: {
-      "": async (event) => await firebase.get(event),
-      "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
-      "importTest": (event) => {
-        return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
-      },
-    },
-    POST: {
-      "": async (event) => await firebase.post(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-      slackMsg: handlerSlackMsg,
-    },
-    PUT: {
-      "": async (event) => await firebase.put(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-    PATCH: {
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-    DELETE: {
-      "": async (event) => await firebase.delete(event),
-      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-    },
-  },
-
-  auth: {
-    GET: {
-      "": async (event) => await firebase.get(event),
-      "test": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
-    },
-    POST: {
-      "": async (event) => await firebase.post(event),
-      slackMsg: handlerSlackMsg,
-    },
-    PUT: {
-      "": async (event) => await firebase.put(event),
-    },
-    PATCH: {},
-    DELETE: {
-      "": async (event) => await firebase.delete(event),
-    },
-  }
-}
-
-
-
-
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-//  ____  _____ _____ _   _   _ _   _____                      |
-// |  _ \| ____|  ___/ \ | | | | | |_   _|                     |
-// | | | |  _| | |_ / _ \| | | | |   | |                       |
-// | |_| | |___|  _/ ___ \ |_| | |___| |                       |
-// |____/|_____|_|/_/   \_\___/|_____|_|_____ ____             |
-// | | | |_   _|_ _| |   |_ _|_   _|_ _| ____/ ___|            |
-// | | | | | |  | || |    | |  | |  | ||  _| \___ \            |
-// | |_| | | |  | || |___ | |  | |  | || |___ ___) |           |
-//  \___/  |_| |___|_____|___| |_| |___|_____|____/            |
-//                                                             |
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-
-
-
-// ===============================
 class FIREBASE {
   constructor() {
     // Fai attenzione, alcune di queste sono obbligatorie.
@@ -206,10 +141,76 @@ class FIREBASE {
   getFullPath(event) { return '/' + event.pathParams.join('/'); }
 
 }
+
+const routes = {
+  public: {
+    GET: {
+      "": async (event) => await firebase.get(event),
+      "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
+      "importTest": (event) => {
+        return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
+      },
+    },
+    POST: {
+      "": async (event) => await firebase.post(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+      slackMsg: handlerSlackMsg,
+    },
+    PUT: {
+      "": async (event) => await firebase.put(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    PATCH: {
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+    DELETE: {
+      "": async (event) => await firebase.delete(event),
+      "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
+    },
+  },
+
+  auth: {
+    GET: {
+      "": async (event) => await firebase.get(event),
+      "test": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
+    },
+    POST: {
+      "": async (event) => await firebase.post(event),
+      slackMsg: handlerSlackMsg,
+    },
+    PUT: {
+      "": async (event) => await firebase.put(event),
+    },
+    PATCH: {},
+    DELETE: {
+      "": async (event) => await firebase.delete(event),
+    },
+  }
+}
+
+
+
+
+// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+//  ____  _____ _____ _   _   _ _   _____                      |
+// |  _ \| ____|  ___/ \ | | | | | |_   _|                     |
+// | | | |  _| | |_ / _ \| | | | |   | |                       |
+// | |_| | |___|  _/ ___ \ |_| | |___| |                       |
+// |____/|_____|_|/_/   \_\___/|_____|_|_____ ____             |
+// | | | |_   _|_ _| |   |_ _|_   _|_ _| ____/ ___|            |
+// | | | | | |  | || |    | |  | |  | ||  _| \___ \            |
+// | |_| | | |  | || |___ | |  | |  | || |___ ___) |           |
+//  \___/  |_| |___|_____|___| |_| |___|_____|____/            |
+//                                                             |
+// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
+
+
+
+// ===============================
+
 // ATTENZIONE inizializzare FIREBASE esattamente cosi.
 let firebase = null
 try { firebase = new FIREBASE(); } catch (error) { log.error(String(error)); }
-
 
 // Controlla se ci sono chiavi dentro auth
 if (routes.auth || typeof routes.auth === 'object') {

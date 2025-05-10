@@ -2,7 +2,11 @@
 // ||A |||n |||t |||o |||C |||i |||c ||
 // ||__|||__|||__|||__|||__|||__|||__||
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
+
+// !! rimuovere contatore
+
 import { APP_NAME, onDevMod } from "./config";
+let contatore = 3;
 
 function logColor(content, color = 'info') {
   const strColors = {
@@ -33,6 +37,8 @@ async function slackMsg(content, type) {
 
   const errorCase = "Slack webhookURL error nell'invio della notifica"
   const payload = { text: `${APP_NAME}: ${JSON.stringify(content)}` };
+  if (contatore <= 0) { return false }
+  contatore--;
   try {
     const response = await fetch(webhookURL, {
       method: "POST",
