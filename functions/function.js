@@ -10,52 +10,8 @@ import { APP_NAME, onDevMod, allowedOrigins } from "./config";
 import { log, handlerSlackMsg } from './logger';
 import { errorsList } from './errorsList';
 import { FIREBASE } from './FIREBASE';
+import { EventHandler } from './EventHandler';
 
-// const routes = {
-//   public: {
-//     GET: {
-//       "": async (event) => await firebase.get(event),
-//       "test": `[GET][NOT_AUTH]/: Chiamata test senza authorization`,
-//       "importTest": (event) => {
-//         return `${APP_NAME} :: ${onDevMod} :: ${JSON.stringify(allowedOrigins)} :: errorsList.length=${Object.keys(errorsList).length}`
-//       },
-//     },
-//     POST: {
-//       "": async (event) => await firebase.post(event),
-//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-//       slackMsg: handlerSlackMsg,
-//     },
-//     PUT: {
-//       "": async (event) => await firebase.put(event),
-//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-//     },
-//     PATCH: {
-//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-//     },
-//     DELETE: {
-//       "": async (event) => await firebase.delete(event),
-//       "test": (event) => `[GET][AUTH]/: pathParams ${JSON.stringify(event.pathParams ?? { pathParams: 'vuoto' })}. QueryParams/${JSON.stringify(event.queryParams ?? { queryParams: 'vuoto' })}. bodyParams/${JSON.stringify(event.bodyParams ?? { bodyParams: 'vuoto' })}`,
-//     },
-//   },
-
-//   auth: {
-//     GET: {
-//       "": async (event) => await firebase.get(event),
-//       "test": (event) => `[GET][AUTH]/: Chiamata test da ${event.user?.displayName}. QueryParams [test:${event.queryParams?.test}]`,
-//     },
-//     POST: {
-//       "": async (event) => await firebase.post(event),
-//       slackMsg: handlerSlackMsg,
-//     },
-//     PUT: {
-//       "": async (event) => await firebase.put(event),
-//     },
-//     PATCH: {},
-//     DELETE: {
-//       "": async (event) => await firebase.delete(event),
-//     },
-//   }
-// }
 
 const routes = {
   GET: {
@@ -145,113 +101,6 @@ if (routes.auth || typeof routes.auth === 'object') {
   }
 }
 
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-// %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
-
-// manca anche firebase e admin da passare
-class EventHandler {
-  constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }, functionToResolve, user) {
-    this.rawUrl = rawUrl;
-    this.httpMethod = httpMethod;
-    this.pathParams = this.parsePathParams(path);
-    this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
-    try {
-      this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
-    } catch (error) {
-      this.bodyParams = body;
-      if (body !== null && body !== '') {
-        log.error(`Errore nel parsing del body: ${String(body)} :: ${error}`);
-      }
-    }
-    this.authorization = headers?.authorization;
-    if (headers?.authorization) delete headers.authorization
-    // this.headers = headers;
-
-    try {
-      const urlObj = new URL(rawUrl);
-      const originWithoutPort = `${urlObj.protocol}//${urlObj.hostname}`;
-      if (allowedOrigins.includes(originWithoutPort)) {
-        this.isOriginAllowed = true;
-      } else {
-        log.error('Request from not allowed origin ' + rawUrl)
-        this.isOriginAllowed = false;
-      }
-
-    } catch (error) {
-      log.error("Errore nel parsing dell'URL:", error);
-      this.isOriginAllowed = false;
-    }
-
-    this.functionToResolve = functionToResolve;
-    this.statusCode = 200;
-    this.headersResponse = { "Content-Type": "application/json" };
-    this.bodyResponse = {};
-
-    this.user = user;
-    log.interno.magenta(`${this.httpMethod} :: ${this.pathParams ? this.pathParams.join('/') : '_'} :: ${!!this.authorization ? 'AUTH KEY' : 'NO AUTH KEY'}`);
-  }
-
-  parseQueryParams(multiValueQueryStringParameters) {
-    const queryParams = multiValueQueryStringParameters
-    for (const key in multiValueQueryStringParameters) {
-      if (multiValueQueryStringParameters[key].length <= 1) {
-        queryParams[key] = multiValueQueryStringParameters[key]?.[0]
-      }
-    }
-    return queryParams
-  }
-
-  parsePathParams(path) {
-    const pathParams = path.split("/");
-    for (let index = 0; index < 2; index++) {
-      pathParams.shift();
-    }
-    if (pathParams.length === 0) pathParams.push('');
-    return pathParams
-  }
-
-  async response() {
-    if (this.pathParams[0] === 'user' || this.pathParams[0] === 'public') {
-      return this.errorResponse(405, 'Rout Not Allowed. Miss /user o /public ');
-    }
-
-    try {
-      const response = await this.functionToResolve(this);
-      return this.setResponse(response);
-    } catch (error) {
-      return this.handlerError(error)
-    }
-
-  }
-
-  errorResponse(statusCode = 400, error = '400 Bad Request') {
-    if (typeof error === 'string') error = '|I|Error: ' + error
-    return this.setResponse({ error }, statusCode);
-  }
-
-  setResponse(body, statusCode = this.statusCode, headers = this.headersResponse) {
-    this.bodyResponse = body;
-    this.statusCode = statusCode;
-    this.headersResponse = headers;
-    return this.getResponse();
-  }
-  getResponse() {
-    return {
-      statusCode: this.statusCode,
-      headers: this.headersResponse,
-      body: JSON.stringify(this.bodyResponse),
-    }
-  }
-
-  handlerError(error) {
-    const key = (error.message || '').replace(/^Error:\s*/, '').trim();
-    const code = errorsList[key].code ?? errorsList.unknown.code;
-    const msg = errorsList[key].msg ?? errorsList.unknown.msg;
-    return this.errorResponse(code, msg);
-  }
-
-}
-
 exports.handler = async function (event, context) {
   const pathParams = event.path.split('/').slice(2);
   if (pathParams.length === 0) pathParams.push('');
@@ -290,7 +139,7 @@ exports.handler = async function (event, context) {
         body: JSON.stringify("Missing or invalid HTTP method"),
       }
     };
-    
+
     const functionToResolve = getRoutesFunction(routes[httpMethod], pathParams);
 
     if (typeof functionToResolve === 'string') {
