@@ -4,6 +4,7 @@
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 
 import { log } from './logger';
+import { allowedOrigins } from "./config";
 
 export class EventHandler {
   constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }, functionToResolve, user) {
@@ -11,6 +12,8 @@ export class EventHandler {
     this.httpMethod = httpMethod;
     this.pathParams = this.parsePathParams(path);
     this.queryParams = this.parseQueryParams(multiValueQueryStringParameters);
+
+
     try {
       this.bodyParams = body !== undefined ? JSON.parse(body) : undefined;
     } catch (error) {
@@ -20,7 +23,7 @@ export class EventHandler {
       }
     }
     this.authorization = headers?.authorization;
-    if (headers?.authorization) delete headers.authorization
+    if (headers?.authorization) delete headers.authorization;
     // this.headers = headers;
 
     try {
@@ -34,7 +37,7 @@ export class EventHandler {
       }
 
     } catch (error) {
-      log.error("Errore nel parsing dell'URL:", error);
+      log.error("Errore nel parsing allowed origin:", error);
       this.isOriginAllowed = false;
     }
 

@@ -6,7 +6,7 @@
 // ATTENZIONE Segui il tutorial nel README.md.
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
-import { APP_NAME, onDevMod, allowedOrigins } from "./config";
+import { APP_NAME, onDevMod, allowedOrigins, allowedUserEmail } from "./config";
 import { log, handlerSlackMsg } from './logger';
 import { errorsList } from './errorsList';
 import { FIREBASE } from './FIREBASE';
@@ -113,6 +113,15 @@ exports.handler = async function (event, context) {
         try {
           const decodedToken = await admin.auth().verifyIdToken(authorization);
           user = await admin.auth().getUser(decodedToken.uid);
+          
+          if (allowedUserEmail && !allowedUserEmail.includes(user?.email)) {
+            user = undefined
+            return {
+              statusCode: 401,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify('|I| Unauthorized: not allowed user'),
+            }
+          }
         } catch (error) {
           log.error("401, |I| Unauthorized: authorization not valid :" + authorization + '| error:' + JSON.stringify(error));
           this.user = undefined

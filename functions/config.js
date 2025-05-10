@@ -9,3 +9,4 @@ export const allowedOrigins = [
   'http://localhost',
   'https://tempbase2.netlify.app'
 ];
+export const allowedUserEmail = undefined; // 'email'[] or undefined
