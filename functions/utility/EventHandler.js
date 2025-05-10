@@ -4,7 +4,8 @@
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 
 import { log } from './logger';
-import { allowedOrigins } from "./config";
+import { allowedOrigins } from "../config";
+import { errorsList } from './errorsList';
 
 export class EventHandler {
   constructor({ rawUrl, path, httpMethod, body, headers, multiValueQueryStringParameters }, functionToResolve, user) {

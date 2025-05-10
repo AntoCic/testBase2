@@ -3,7 +3,7 @@
 // ||__|||__|||__|||__|||__|||__|||__||
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 
-import { APP_NAME, onDevMod } from "./config";
+import { APP_NAME, onDevMod } from "../config";
 
 function logColor(content, color = 'info') {
   const strColors = {

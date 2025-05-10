@@ -8,19 +8,6 @@ import { log } from './logger';
 
 export class FIREBASE {
   constructor() {
-    // Fai attenzione, alcune di queste sono obbligatorie.
-    // *  FIREBASE_TYPE,
-    // *  FIREBASE_PROJECT_ID,
-    // *  FIREBASE_PRIVATE_KEY_ID,
-    // *  FIREBASE_PRIVATE_KEY,
-    // *  FIREBASE_CLIENT_EMAIL,
-    // *  FIREBASE_CLIENT_ID,
-    // *  FIREBASE_AUTH_URI,
-    // *  FIREBASE_TOKEN_URI,
-    // *  FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-    // *  FIREBASE_CLIENT_X509_CERT_URL,
-    // *  FIREBASE_UNIVERSE_DOMAIN,
-    // *  FIREBASE_DATABASEURL
     const required = {
       type: process.env.FIREBASE_TYPE,
       project_id: process.env.FIREBASE_PROJECT_ID,
@@ -74,15 +61,6 @@ export class FIREBASE {
     this.database = admin.database();
     this.bucket = this.storageBucket ? admin.storage().bucket() : undefined;
   }
-
-  // Method che risponde con un nuovo unique id ogni volta che viene chiamata
-  // newId() {
-  //   let newId = this.idIndex.toString(36)
-  //   this.idIndex++;
-  //   newId += Math.random().toString(36).substring(2, 7) // stringa casuale
-  //   newId += "-" + Date.now().toString(36) // converte in base 36
-  //   return newId;
-  // }
 
   async get(event) {
     try {

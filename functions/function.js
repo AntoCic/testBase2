@@ -7,10 +7,10 @@
 // %-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%-%
 import admin from 'firebase-admin';
 import { APP_NAME, onDevMod, allowedOrigins, allowedUserEmail } from "./config";
-import { log, handlerSlackMsg } from './logger';
-import { errorsList } from './errorsList';
-import { FIREBASE } from './FIREBASE';
-import { EventHandler } from './EventHandler';
+import { log, handlerSlackMsg } from './utility/logger';
+import { errorsList } from './utility/errorsList';
+import { FIREBASE } from './utility/FIREBASE';
+import { EventHandler } from './utility/EventHandler';
 
 
 const routes = {
