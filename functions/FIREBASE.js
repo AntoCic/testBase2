@@ -6,7 +6,7 @@
 import admin from 'firebase-admin';
 import { log } from './logger';
 
-export default class FIREBASE {
+export class FIREBASE {
   constructor() {
     // Fai attenzione, alcune di queste sono obbligatorie.
     // *  FIREBASE_TYPE,
@@ -74,6 +74,15 @@ export default class FIREBASE {
     this.database = admin.database();
     this.bucket = this.storageBucket ? admin.storage().bucket() : undefined;
   }
+
+  // Method che risponde con un nuovo unique id ogni volta che viene chiamata
+  // newId() {
+  //   let newId = this.idIndex.toString(36)
+  //   this.idIndex++;
+  //   newId += Math.random().toString(36).substring(2, 7) // stringa casuale
+  //   newId += "-" + Date.now().toString(36) // converte in base 36
+  //   return newId;
+  // }
 
   async get(event) {
     try {
