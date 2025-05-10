@@ -70,6 +70,8 @@ export class EventHandler {
   }
 
   async response() {
+    log.info(`${this.pathParams[0]} -- ${this.pathParams.join('@')} `);
+    
     if (this.pathParams[0] === 'user' || this.pathParams[0] === 'public') {
       return this.errorResponse(405, 'Rout Not Allowed. Miss /user o /public ');
     }
