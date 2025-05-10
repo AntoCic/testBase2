@@ -9,8 +9,9 @@ import admin from 'firebase-admin';
 import { APP_NAME, onDevMod, allowedOrigins, allowedUserEmail } from "./config";
 import { log, handlerSlackMsg } from './utility/logger';
 import { errorsList } from './utility/errorsList';
-import { FIREBASE } from './utility/FIREBASE';
+import { firebase } from './utility/FIREBASE';
 import { EventHandler } from './utility/EventHandler';
+import { getRoutesFunction } from './utility/getRoutesFunction';
 
 
 const routes = {
@@ -89,18 +90,6 @@ const routes = {
 
 // ===============================
 
-// ATTENZIONE inizializzare FIREBASE esattamente cosi.
-let firebase = null
-try { firebase = new FIREBASE(); } catch (error) { log.error(String(error)); }
-
-// Controlla se ci sono chiavi dentro auth
-if (routes.auth || typeof routes.auth === 'object') {
-  const IsSetAnyAuthRoutes = !(Object.keys(routes.auth).length === 0 || Object.values(routes.auth).every(value => typeof value === 'object' && Object.keys(value).length === 0));
-  if (IsSetAnyAuthRoutes && !firebase) {
-    log.error('non hai settato tutte le chiavi in env');
-  }
-}
-
 exports.handler = async function (event, context) {
   const pathParams = event.path.split('/').slice(2);
   if (pathParams.length === 0) pathParams.push('');
@@ -172,48 +161,3 @@ exports.handler = async function (event, context) {
   }
 
 };
-
-function getRoutesFunction(_routes, pathParams, oldDefaultFunction = undefined, pathIndex = 0) {
-  if (_routes !== undefined) {
-    const routToCheck = _routes[pathParams?.[pathIndex]];
-
-    if (routToCheck) {
-      switch (typeof routToCheck) {
-        case 'function':
-          return routToCheck
-
-        case 'object':
-          const currentFunction = routToCheck?.['']
-          return getRoutesFunction(routToCheck, pathParams, currentFunction, pathIndex + 1);
-
-        case 'boolean':
-        case 'string':
-        case 'number':
-          return () => routToCheck;
-
-        default:
-          return 'Rout dichiarata male.';
-      }
-    } else {
-      if (pathIndex === 1) {
-        oldDefaultFunction = _routes?.['']
-      }
-      if (oldDefaultFunction !== undefined || _routes[pathParams?.[pathIndex - 1]]) {
-        switch (typeof oldDefaultFunction) {
-          case 'function':
-            return oldDefaultFunction;
-
-          case 'boolean':
-          case 'string':
-          case 'number':
-            return () => oldDefaultFunction;
-          default:
-            return 'Rout dichiarata male.';
-        }
-      }
-      return 'Route not found';
-    }
-  } else {
-    return 'Route not found';
-  }
-}

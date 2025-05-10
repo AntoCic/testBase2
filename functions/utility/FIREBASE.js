@@ -115,3 +115,19 @@ export class FIREBASE {
   getFullPath(event) { return '/' + event.pathParams.join('/'); }
 
 }
+
+
+// ATTENZIONE inizializzare FIREBASE esattamente cosi.
+let firebase = null
+try { firebase = new FIREBASE(); } catch (error) { log.error(String(error)); }
+
+
+// // Controlla se ci sono chiavi dentro auth
+// if (routes.auth || typeof routes.auth === 'object') {
+//   const IsSetAnyAuthRoutes = !(Object.keys(routes.auth).length === 0 || Object.values(routes.auth).every(value => typeof value === 'object' && Object.keys(value).length === 0));
+//   if (IsSetAnyAuthRoutes && !firebase) {
+//     log.error('non hai settato tutte le chiavi in env');
+//   }
+// }
+
+export { firebase }
