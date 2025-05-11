@@ -39,7 +39,7 @@ export default class DB {
     }
 
     fullPath() {
-        const apiPrefix = `${this.constructor.apiPrefix || '/api'}/${this.constructor.addUserId ? user.uid : ''}`;
+        const apiPrefix = `${this.constructor.apiPrefix || '/api'}${this.constructor.addUserId ? '/' + user.uid : ''}`;
         return `${apiPrefix}/${this.constructor.mainPath}`;
     }
     localPath() {
@@ -129,6 +129,8 @@ export default class DB {
     // DELETE
     async delete(key) {
         delete this[key];
+        console.log(this.fullPath());
+
         return axios.delete(this.fullPath(), { params: { key }, headers: this.headers() })
             .then(res => {
                 this.tabUpdated();

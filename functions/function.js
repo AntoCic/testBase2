@@ -11,8 +11,8 @@ import { log, handlerSlackMsg } from './utility/logger';
 import { errorsList } from './utility/errorsList';
 import { firebase } from './utility/FIREBASE';
 import { EventHandler } from './utility/EventHandler';
-import { getRoutesFunction } from './utility/getRoutesFunction';
-
+import { getFunctionToResolve } from './utility/getFunctionToResolve';
+import { TodoType } from './controller/TodoType';
 
 const routes = {
   GET: {
@@ -65,6 +65,7 @@ const routes = {
     },
     auth: {
       "": async (event) => await firebase.delete(event),
+      "todoType": TodoType.DELETE,
     },
   },
 };
@@ -102,7 +103,7 @@ exports.handler = async function (event, context) {
         try {
           const decodedToken = await admin.auth().verifyIdToken(authorization);
           user = await admin.auth().getUser(decodedToken.uid);
-          
+
           if (allowedUserEmail && !allowedUserEmail.includes(user?.email)) {
             user = undefined
             return {
@@ -138,7 +139,7 @@ exports.handler = async function (event, context) {
       }
     };
 
-    const functionToResolve = getRoutesFunction(routes[httpMethod], pathParams);
+    const functionToResolve = getFunctionToResolve(routes[httpMethod], pathParams);
 
     if (typeof functionToResolve === 'string') {
       return {

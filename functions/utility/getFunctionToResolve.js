@@ -1,12 +1,14 @@
 // ____ ____ ____ ____ ____ ____ ____ 
 // ||A |||n |||t |||o |||C |||i |||c ||
 // ||__|||__|||__|||__|||__|||__|||__||
+
+import { log } from "./logger";
+
 // |/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 
-export function getRoutesFunction(_routes, pathParams, oldDefaultFunction = undefined, pathIndex = 0) {
+export function getFunctionToResolve(_routes, pathParams, oldDefaultFunction = undefined, pathIndex = 0) {
     if (_routes !== undefined) {
         const routToCheck = _routes[pathParams?.[pathIndex]];
-
         if (routToCheck) {
             switch (typeof routToCheck) {
                 case 'function':
@@ -14,7 +16,7 @@ export function getRoutesFunction(_routes, pathParams, oldDefaultFunction = unde
 
                 case 'object':
                     const currentFunction = routToCheck?.['']
-                    return getRoutesFunction(routToCheck, pathParams, currentFunction, pathIndex + 1);
+                    return getFunctionToResolve(routToCheck, pathParams, currentFunction, pathIndex + 1);
 
                 case 'boolean':
                 case 'string':

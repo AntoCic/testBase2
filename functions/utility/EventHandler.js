@@ -48,7 +48,7 @@ export class EventHandler {
     this.bodyResponse = {};
 
     this.user = user;
-    log.interno.magenta(`${this.httpMethod} :: ${this.pathParams ? this.pathParams.join('/') : '_'} :: ${!!this.authorization ? 'AUTH KEY' : 'NO AUTH KEY'}`);
+    // log.interno.magenta(`${this.httpMethod} :: ${this.pathParams ? this.pathParams.join('/') : '_'} :: ${!!this.authorization ? 'AUTH KEY' : 'NO AUTH KEY'}`);
   }
 
   parseQueryParams(multiValueQueryStringParameters) {
